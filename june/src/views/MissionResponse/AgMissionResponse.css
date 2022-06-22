@@ -1,0 +1,145 @@
+/* Styles used in AgMissionResponse component. */
+.scroller {
+  margin: 0 auto;
+  height: 300px;
+  width: 300px;
+  overflow: auto;
+}
+#modal-title {
+  margin-bottom: 5px;
+}
+#simple-modal-description button {
+  color: #fff;
+  background-color: #074e9e;
+  margin-left: 10px;
+  margin-bottom: 10px;
+  padding: 5px 16px;
+}
+#simple-modal-description button:hover {
+  background-color: rgb(4, 54, 110);
+}
+
+.response-box {
+  width: 100%;
+  float: left;
+  flex-wrap: wrap;
+  justify-content: left;
+  padding: 0% 2%;
+  height: calc(100vh - 250px);
+}
+
+/*
+.ag-center-cols-container img {
+  margin: 0 5px;
+} */
+
+/*.MuiTypography-root-107 ul {
+  padding: 0;
+  position: relative;
+  align-content: space-between;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+.MuiTypography-root-107 ul li {
+  align-content: space-between;
+  display: inline-flex;
+}
+.MuiTypography-root-107 ul li img {
+  object-fit: contain;
+}*/
+#modal-title ul li img{
+  opacity: 1;
+}
+/*.MuiTypography-root-107 ul h6 {
+  font-size: 12px;
+  letter-spacing: 0px;
+  opacity: 0.3;
+  top: 100%;
+  position: absolute;
+  bottom: 0;
+  text-align: left;
+  width: 50px;
+}
+.MuiTypography-root-107 ul h6:last-of-type {
+  right: 0;
+  text-align: right;
+}*/
+
+/*
+.ag-react-container br {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.ag-react-container br {
+  display: none;
+}
+.ag-react-container > div {
+  padding: 5px 0 5px;
+  height: 35px !important;
+}
+*/
+.MuiGrid-container-172 form-label:first-child {
+  margin-left: 0;
+}
+
+.ag-theme-balham .status-New{
+  
+  background: #C0D4F0 !important
+}
+.ag-theme-balham .status-Hold{
+  background:  #F0E9FF !important
+}
+.ag-theme-balham .status-Inprogress{
+  background:#B4B4B4 !important
+}
+.ag-theme-balham .status-Accepted{
+  background: #FFFFFF !important
+}
+.ag-theme-balham .status-Invalid{
+  background: #F8DAC0 !important
+}
+.ag-theme-balham .status-Fraudulent{
+  background:#EDBCBC !important
+}
+.ag-theme-balham .capture-Text{
+  background: saddlebrown !important
+}
+.__react_modal_image__header{
+  background: transparent !important;
+}
+
+/*
+.ag-react-container{
+  white-space: normal;
+  width: 100%;
+}
+.ag-theme-balham .ag-ltr .ag-cell {
+  border-right: none;
+  display: flex;
+  align-items: center;
+} 
+.MuiCheckbox-colorSecondary-520.MuiCheckbox-checked-516, .MuiCheckbox-checked-303 {
+  color: #4f4f4f;
+}*/
+input[type="checkbox"]:checked {
+  color: #4f4f4f;
+}
+.css-1492t68, .css-15k3avv{
+  font-size:12px;
+}
+.css-15k3avv{
+  font-size:12px;
+  position: absolute;
+  /*z-index: 10000;*/
+  
+}
+
+.ag-header-cell .ag-react-container {
+	width: 100%
+}
+
+#textarea {
+  resize: none;
+}

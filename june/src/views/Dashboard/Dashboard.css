@@ -1,0 +1,149 @@
+/* Styles used in dashboard.jsx */
+
+hr {
+  margin-top: 0.35rem !important;
+  margin-bottom: 0.15rem !important;
+}
+
+@media only screen and (min-width: 768px) {
+  .body-full {
+    overflow: hidden;
+  }
+}
+
+.body-right-nav {
+  padding: 0 !important;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  margin-top: -2% !important;
+}
+
+.statusbox {
+  border-radius: 7px;
+  background: #fff;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, .16), 0 2px 10px 0 rgba(0, 0, 0, .12);
+  transition: all 0.5s;
+}
+
+.sq {
+  padding: 3%;
+  margin: 4%;
+
+}
+
+.rect {
+  padding: 3%;
+  margin: 1% 3%;
+}
+
+.statusbox:hover {
+  box-shadow: 0 0 12px 0 rgba(0, 0, 0, .6);
+  transform: scale(1.025, 1.025);
+  z-index: 1;
+  transition: all 0.5s;
+}
+
+.statusbox p {
+  margin: 0;
+}
+
+.statusbox:nth-child(3n),
+.statusbox:nth-child(5n) {
+  min-width: 50%;
+}
+
+.statusbox:nth-child(4n) p:nth-child(3n),
+.statusbox:nth-child(6n) p:nth-child(3n),
+.statusbox:nth-child(8n) p:nth-child(3n) {
+  margin-top: 30px;
+}
+
+.statusbox p:first-child {
+  font-size: 80%;
+  font-weight: 600;
+}
+
+.count {
+  font-size: 1.6rem !important;
+  font-weight: bold !important;
+  margin-left: 0% !important;
+  color: rgb(61, 60, 60) !important;
+  text-align: center;
+}
+
+.count-label {
+  font-size: 0.7rem !important;
+  font-weight: 600 !important;
+  color: #4c4a4a !important;
+  margin-left: 0% !important;
+  text-align: center;
+}
+
+.statusbox p:nth-child(2n) {
+  font-size: 57%;
+  color: #0D47A1;
+}
+
+.statusbox p:nth-child(3n),
+.statusbox p:nth-child(5n) {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.statusbox p:nth-child(4n),
+.statusbox p:nth-child(6n) {
+  font-size: 12px;
+  font-weight: 500;
+  color: #000;
+}
+
+.statusbox:nth-child(8n) p:nth-child(5n),
+.statusbox:nth-child(8n) p:nth-child(6n) {
+  margin-top: 0;
+}
+
+.fa-icon {
+  float: left !important;
+  font-size: 14pt !important;
+  padding-top: 3%;
+  padding-bottom: 2% !important;
+  padding-right: 4% !important;
+  padding-left: 1% !important;
+  color: #4c4a4a !important;
+}
+
+.fa-icon-top {
+  padding-top: 6% !important;
+}
+
+.fa-icon-top-client {
+  padding-top: 6% !important;
+  font-size: 23pt !important;
+
+}
+
+.link {
+  text-decoration: "none";
+  color: #0D47A1;
+}
+
+.head-adjust {
+  margin-bottom: 10px;
+  min-height: 7%;
+  width: 100%;
+}
+
+.head-icon {
+  color: #fff;
+  font-size: 1.5rem !important;
+  margin: 0px 6px;
+}
+
+/*
+* chart canvas padding
+*/
+.chartjs-render-monitor {
+  margin-bottom: 2%;
+}

@@ -1,0 +1,195 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans');
+@import url("https://use.fontawesome.com/releases/v5.3.1/css/all.css");
+*, *:active, *:hover, *:focus {
+  -webkit-touch-callout: none;
+  /* -webkit-user-select: none; */
+  /* -khtml-user-select: none; */
+  /* -moz-user-select: none; */
+  /* -ms-user-select: none; */
+  /* user-select: none; */
+  -webkit-tap-highlight-color: transparent;
+  outline: none !important;
+}
+
+body {
+  font-family: 'Open Sans', sans-serif !important;
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.App {
+  width: 100%;
+  height: 100%;
+}
+
+h1, h2, h3, h5 {
+  color: #666;
+  margin: 0 0 10px 0;
+}
+
+.App-body {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  background: #ececec;
+}
+
+.body-full {
+  height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 1% 0% 1% 1%;
+  justify-content: center;
+  background: #ececec;
+  /* overflow-y: hidden !important; */
+  overflow-y: auto;
+  transition: all 0.5s;
+}
+
+.body-full-expanded {
+  width: 85%;
+}
+
+.body-full-collapsed {
+  width: 96%;
+}
+
+.body-form {
+  height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 1%;
+  justify-content: center;
+  background: #ececec;
+  overflow-y: auto;
+  transition: all 0.5s;
+}
+
+.body-form-expanded {
+  width: 85%;
+}
+
+.body-form-collapsed {
+  width: 96%;
+}
+
+.body-center {
+  width: 57%;
+  height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 1%;
+  background: #ececec;
+  padding-right: 0% !important;
+}
+
+.body-right {
+  width: 23%;
+  height: 98%;
+  background: #ececec;
+  display: flex;
+  flex-wrap: wrap;
+  padding-top: 4%;
+  justify-content: center;
+  margin-right: 3%;
+}
+
+@media only screen and (max-width: 768px) {
+  .App-body {
+    display: block;
+  }
+  .body-left, .body-center, .body-right {
+    width: 100% !important;
+    height: fit-content !important;
+  }
+  .statusbox:first-child {
+    min-width: 50%;
+  }
+  .body-full {
+    width: 100%;
+  }
+  .body-form {
+    width: 100%;
+  }
+  .list-box>div {
+    flex-basis: 100%;
+  }
+  .list-box .MuiGrid-container-4 {
+    margin: 0 !important;
+  }
+  #filler {
+    display: none;
+  }
+  #gridHeader>div {
+    margin: 5px 0;
+  }
+}
+
+.list-box {
+  width: 100%;
+  float: left;
+  flex-wrap: wrap;
+  justify-content: left;
+  padding: 0% 3%;
+}
+
+.list-box>div:hover {
+  box-shadow: 0 0 12px 0 rgba(0, 0, 0, .6);
+  transform: scale(1.025, 1.025);
+  z-index: 1;
+  transition: all 0.5s;
+}
+
+.MuiGrid-item-5 {
+  align-self: center;
+}
+
+#gridHeader .MuiGrid-item-5 {
+  text-align: center;
+}
+
+.DropZone {
+  border: 2px dashed #888 !important;
+  font-size: 17px !important;
+  font-weight: 100 !important;
+}
+
+.form-control {
+  font-size: 0.8rem !important;
+}
+
+.grid-header {
+  width: 100%;
+  margin-left: 4%;
+}
+
+.rt-thead {
+  background: #074e9e !important;
+}
+
+.scrollbar-container {
+  height: 100% !important;
+  width: 100%;
+}
+
+.mission-select__control{
+  max-height: 150px;
+  overflow: auto;
+}
+
+.mission-select__menu{
+  max-height: 200px;
+  overflow: auto;
+}
+
+.mission-select__multi-value__label{
+  text-overflow: unset !important;
+  white-space: pre-wrap !important;
+}

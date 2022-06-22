@@ -1,0 +1,41 @@
+/* Styles used in Modalpopup.jsx */
+
+/* input[type="text"] {
+  border: 1px solid #000 !important;
+  padding: 6px 5px 7px !important;
+}
+input[type="text"]::before {
+  border: 0;
+} */
+
+.option-checkbox img {
+  width: 35px;
+  margin-left: 6px;
+  float: right;
+  height: 27px;
+  object-fit: cover;
+}
+.parent-of-child-class > div {
+  padding-right: 10px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  padding-left: 25px;
+}
+/* .MuiTypography-subtitle1-125 {
+  border: 1px solid rgba(0,0,0,0.05);
+}
+.MuiTypography-subtitle1-125 .field{
+  padding:0;
+} */
+/* .parent-of-child-title{
+  padding: 10px;
+}
+.parent-of-child-class{
+  width:100%;
+  margin:0;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+} */
+.AgMissionResponse-paper-8{
+  border-radius: 16px;
+}

@@ -1,0 +1,24 @@
+
+/* Styles used in ClientList.jsx */
+
+
+.list-box>div:hover {
+  box-shadow: none;
+  transform: scale(1, 1);
+  z-index: 1;
+  transition: all 0.5s;
+}
+
+.view-switch-button {
+  border-radius: 1rem !important;
+  font-size: 0.8rem !important;
+  margin: 0% 2%;
+}
+
+.cgrid {
+  padding: 0px !important;
+}
+
+h6 {
+  margin-left: 10px;
+}

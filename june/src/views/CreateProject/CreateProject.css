@@ -1,0 +1,22 @@
+
+/* Styles used in create project,projectpageone,projectpagetwo and projectpagethree component */
+
+.group-header {
+    background: #e9ecef;
+    padding: 10px 5px;
+    margin: -1px -15px 5px -15px !important
+}
+
+.group-container {
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ced4da;
+}
+
+.weblinktext {
+  -webkit-user-select: text; /* Chrome 49+ */
+  -moz-user-select: text; /* Firefox 43+ */
+  -ms-user-select: text; /* No support yet */
+  user-select: text;
+  word-wrap: break-word;
+}

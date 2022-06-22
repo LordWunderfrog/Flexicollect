@@ -1,0 +1,27 @@
+/* Styles used in SurveyInfo component */
+
+
+.show-grid {
+    text-align: center;
+}
+
+.survey-input {
+    margin-left: 25%;
+    margin-right: 25%;
+    background: "#ffffff";
+}
+.survey-input2 {
+    margin-left: 25%;
+}
+
+.selectinfo
+{
+    font-family: "Open Sans", sans-serif !important;
+    font-size: 0.8rem;
+    color: #000000 !important;
+}
+.padder
+{
+    padding-left: 15px;
+    padding-right: 15px;
+}

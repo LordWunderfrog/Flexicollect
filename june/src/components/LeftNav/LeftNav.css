@@ -1,0 +1,179 @@
+/* Styles used in leftNav component. */
+.body-left {
+    width: 15%;
+    height: 100%;
+    background: #074e9e;
+    transition: all 0.3s;
+}
+
+.sidebar-footer {
+    bottom: 0;
+    clear: both;
+    display: block;
+    position: fixed;
+    width: 15%;
+    background: #0d47a1;
+    color: #fff;
+    transition: all 0.3s;
+    cursor: pointer;
+
+}
+
+.sidebar-footer-shrink {
+    bottom: 0;
+    clear: both;
+    display: block;
+    position: fixed;
+    width: 4%;
+    background: #0d47a1;
+    color: #fff;
+    transition: all 0.3s;
+    cursor: pointer;
+
+}
+
+.fa-icon {
+    color: #fff !important;
+
+}
+
+.body-left-collapsed {
+    width: 4%;
+    height: 100%;
+    background: #074e9e;
+    transition: all 0.3s;
+}
+
+ul.left-nav {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    list-style: none;
+    height: 100%;
+}
+
+ul.left-nav li {
+    height: 40px;
+    line-height: 35px;
+    color: #c8c8c8;
+    padding: 2% 5%;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.nav-active {
+    background: #1976D2;
+    border-right: 5px solid #0d47a1;
+    color: #fff !important;
+}
+
+ul.left-nav li:hover,
+.nav-active:hover {
+    color: #1976D2 !important;
+    background: #0d47a1;
+}
+
+.nav-active:hover {
+    border-right: 5px solid #1976D2;
+}
+
+.nav-active:hover .nav-chevron {
+    color: #1976D2;
+}
+
+.nav-chevron {
+    float: right;
+    margin-top: 9px;
+    color: #0d47a1;
+}
+
+.floating-arrow {
+    position: absolute;
+    width: 15px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    background: #074e9e;
+    border-radius: 0 4px 4px 0;
+    transition: all 0.3s;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.floating-arrow-expanded {
+    left: 15%;
+}
+
+.floating-arrow-collapsed {
+    left: 4%;
+}
+
+@media only screen and (max-width: 768px) {
+    ul.left-nav li {
+        height: 100%;
+        display: none;
+    }
+
+    ul.left-nav li:first-child {
+        display: block;
+    }
+}
+
+
+.metismenu-link.has-active-child {
+    background: rgb(6, 84, 161) !important;
+    color: rgb(219, 217, 217) !important;
+}
+
+.metis-menu-parent {
+    background: #074e9e !important;
+}
+
+.metismenu-container {
+    background: #074e9e !important;
+}
+
+a:hover {
+    text-decoration: none !important;
+}
+
+.metismenu-link.active {
+    background: rgb(6, 52, 99) !important;
+}
+
+.metismenu {
+    font-size: 12pt !important;
+}
+
+.metismenu-item :hover {
+    transform: scale(1.025, 1.025);
+    z-index: 1;
+}
+
+.metismenu::after {
+    box-shadow: none !important;
+}
+
+.menu-logo {
+    width: 60%;
+    height: 20%;
+    cursor: pointer;
+    margin: 10% 20%;
+
+}
+
+.menu-logo-wrapper {
+    width: 100%;
+    height: 20%;
+    cursor: pointer;
+}
+
+.fa {
+    font-size: 1rem;
+}
+
+@media only screen and (min-width: 1277px) {
+  .body-left {
+    width: 18%;
+  }
+}
