@@ -15,8 +15,8 @@ export const CLEAR_LOOP_ANSWERS = "https://devapi.flexicollect.com/v2/clear_loop
 //export const google_translate_content_URI = "https://translation.googleapis.com/language/translate/v2/?key=AIzaSyDuUkopRJ8P-U1fehBehZIJ6cTDufpWy04"
 export const google_translate_content_URI = "https://translation.googleapis.com/language/translate/v2/?key=AIzaSyAa6kGNdh9lGH42_yiY-PasTkCWaWOY1Ro"
 export const GET_LISTOF_TRANSLATIONS_LANGUAGE = 'v1/crm_translation'
-export const COGNITO_LOGIN_URL = "https://eolasdevportal.auth.eu-west-1.amazoncognito.com/login?client_id=74gnkmlk9ec0j58injnlfj435p&response_type=token&redirect_uri=https://dev.flexicollect.com/"
-
+//export const COGNITO_LOGIN_URL = "https://eolasdevportal.auth.eu-west-1.amazoncognito.com/login?client_id=74gnkmlk9ec0j58injnlfj435p&response_type=token&redirect_uri=https://dev.flexicollect.com/"
+export const COGNITO_LOGIN_URL = "https://eolasdevportal.auth.eu-west-1.amazoncognito.com/login?client_id=74gnkmlk9ec0j58injnlfj435p&response_type=token&redirect_uri=http://localhost:3000/"
 export const COGNITO_LOGOUT_URL = "https://eolasdevportal.auth.eu-west-1.amazoncognito.com/logout?client_id=74gnkmlk9ec0j58injnlfj435p&logout_uri=https://dev.flexicollect.com/"
 export const COGNITO_USER_INFO_URL = "https://eolasdevportal.auth.eu-west-1.amazoncognito.com/oauth2/userInfo"
 export const REPORTING_APP_URL = "https://eolasdevportal.auth.eu-west-1.amazoncognito.com/login?client_id=74gnkmlk9ec0j58injnlfj435p&response_type=code&scope=aws.cognito.signin.user.admin+email+openid+phone+profile&redirect_uri=https://reporting.flexicollect.com/userportal.php&state=/userportal.php"

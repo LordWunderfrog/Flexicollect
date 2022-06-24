@@ -1094,7 +1094,8 @@ class CreateSurvey extends React.Component {
         }
 
         this.setState({
-            drops: i
+            drops: i,
+            defaultdrops: i
         }, this.autoSave);
     };
     setDropsLang = (languages_drop) => {
