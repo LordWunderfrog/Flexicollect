@@ -274,7 +274,7 @@ class Card extends React.Component {
             Mandatory_style = this.getMandatoryStyle(nextProps.labelprop)
         }
         let fieldprops = nextProps.labelprop;
-        otheroption = fieldprops.properties.other;
+        //otheroption = fieldprops.properties.other;
         if (!fieldprops.properties.question_text && fieldprops.type !== "dropdown") {
             fieldprops.properties.question_text = "<p>" + fieldprops.properties.question + "</p>";
         }
@@ -3508,7 +3508,15 @@ class Card extends React.Component {
             if (!fieldprops.properties[`${e}`]) {
                 fieldprops.properties[`${e}`] = [];
             }
-            fieldprops.properties[`${e}`].push({ id: manual, label: "", label_image: "" });
+
+            /** if other option available then push at second last position otherwise last */
+            if (fieldprops.properties[`${e}`].some(obj => obj.id === "other")) {
+                let indexToInsert = fieldprops.properties[`${e}`].length - 1
+                fieldprops.properties[`${e}`].splice(indexToInsert, 0, { id: manual, label: "", label_image: "" });
+            }
+            else {
+                fieldprops.properties[`${e}`].push({ id: manual, label: "", label_image: "" });
+            }
             let random = fieldprops.properties.random ? fieldprops.properties.random : 0;
             if (random === 1) {
                 let other_opt = {};
@@ -3541,7 +3549,14 @@ class Card extends React.Component {
                         languages_drop[a.label].content[this.props.index].properties[`${e}`] = [];
                     }
 
-                    languages_drop[a.label].content[this.props.index].properties[`${e}`].push({ id: manual1, label: "", label_image: "" });
+                    /** if other option available then push at second last position otherwise last */
+                    if (languages_drop[a.label].content[this.props.index].properties[`${e}`].some(obj => obj.id === "other")) {
+                        let indexToInsert1 = languages_drop[a.label].content[this.props.index].properties[`${e}`].length - 1
+                        languages_drop[a.label].content[this.props.index].properties[`${e}`].splice(indexToInsert1, 0, { id: manual1, label: "", label_image: "" });
+                    }
+                    else {
+                        languages_drop[a.label].content[this.props.index].properties[`${e}`].push({ id: manual1, label: "", label_image: "" });
+                    }
                     if (random === 1) {
                         let other_lan_opt = {};
                         for (let i = 0; i < languages_drop[a.label].content[this.props.index].properties[`${e}`].length; i++) {
@@ -5874,7 +5889,7 @@ class Card extends React.Component {
                                 </div>
                                         } */}
                                         <div className="switches-boxes" style={this.state.fieldprops.properties.display_type === "dropdown" ? disabledive : null}>
-                                            <Switch checked={otheroption ? otheroption : 0} onChange={this.other("other")} value="<p>other</p>" color="primary" />
+                                            <Switch checked={Boolean(this.state.fieldprops.properties.other)} onChange={this.other("other")} value="<p>other</p>" color="primary" />
                                         </div>
                                     </div>
                                 </div>

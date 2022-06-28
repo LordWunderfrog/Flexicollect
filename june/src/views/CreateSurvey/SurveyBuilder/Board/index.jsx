@@ -1344,6 +1344,44 @@ class Board extends Component {
       }, 3000);
     });
   }
+  /* Handles the validation of reference code for cloned question. */
+  addrefcodeForClonedQuestion(newDropArray) {
+    this.state.drops = newDropArray
+    newDropArray && newDropArray.map((p, i) => {
+      let fieldprops = p;
+      if (fieldprops.type !== "info" && fieldprops.type !== "gps") {
+        if (fieldprops.properties.refcode && fieldprops.properties.refcode === "" || !fieldprops.properties.refcode) {
+          let type = ""
+          if (fieldprops.type === "input") {
+            type = "TXT"
+          } else if (fieldprops.type === "upload") {
+            type = "UPL"
+          } else if (fieldprops.type === "choice") {
+            type = "CHO"
+          } else if (fieldprops.type === "scale") {
+            type = "SCA"
+          } else if (fieldprops.type === "capture") {
+            type = "CAP  "
+          } else if (fieldprops.type === "barcode") {
+            type = "BAR"
+          }
+          this.generaterefcode('generate', type, this.state.drops, i);
+        }
+      } else {
+        // drops.push(p)
+      }
+    })
+    let drops = this.state.drops
+    this.setState({
+      drops: drops,
+      elementsDefined: true
+    }, () => {
+      setTimeout(() => {
+        this.autoSave()
+      }, 3000);
+    });
+  }
+
   /* Handles the api to generate the reference code. */
   async generaterefcode(check, type, fieldprops, i) {
     let refcode = ""
@@ -1732,15 +1770,16 @@ class Board extends Component {
       refcode: "",
       question: "Copy of " + String(this.state.drops[index].properties.question).trim()
     }
+    newDrop['question'] = "Copy of " + String(this.state.drops[index].properties.question).trim()
     newDrop.question_id = Number([...this.state.drops].sort((a, b) => Number(b.question_id) - Number(a.question_id))[0].question_id) + 1
 
     let dropindex = newDropsArray.findIndex((element) => element.question_id === question_id);
-    newDropsArray.splice(dropindex + 1, 0, newDrop);
+    newDropsArray.splice(dropindex + 1, 0, cloneDeep(newDrop));
     this.setState({
       drops: [...newDropsArray]
 
     }, () => {
-      this.checkrefcode(newDropsArray);
+      this.addrefcodeForClonedQuestion(newDropsArray);
       this.props.ondraglick(newDropsArray, true);
     });
 
