@@ -1,11 +1,11 @@
 export const BANNER_URI = "https://devapi.flexicollect.com/images/video.mp4"
-export const WEBLINK_URI = "https://dev.flexicollect.com/websurvey/"
-//export const WEBLINK_URI = "http://localhost:3000/websurvey/";
+//export const WEBLINK_URI = "https://dev.flexicollect.com/websurvey/"
+export const WEBLINK_URI = "http://localhost:3000/websurvey/";
 export const GOOGLE_MAP = "AIzaSyAa6kGNdh9lGH42_yiY-PasTkCWaWOY1Ro"
 export const MAP_ADD_URI = "https://maps.googleapis.com/maps/api/geocode/json?address="
 export const MAP_GEO_URI = "https://www.googleapis.com/geolocation/v1/geolocate?key="
-export const SURVEYLINK_URI = "https://dev.flexicollect.com/survey/"
-//export const SURVEYLINK_URI = "http://localhost:3000/survey/"
+//export const SURVEYLINK_URI = "https://dev.flexicollect.com/survey/"
+export const SURVEYLINK_URI = "http://localhost:3000/survey/"
 export const APPLINK_URI_SUFFIX = "&apn=com.eolas&isi=1463959676&ibi=com.atom.EolasReact"
 export const MISSION_URI = "https://devapi.flexicollect.com/v2/mission_survey?cust_id="
 export const ANSWER_URI = "https://devapi.flexicollect.com/v2/survey_answers"

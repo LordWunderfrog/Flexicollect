@@ -5571,7 +5571,7 @@ class Card extends React.Component {
                                                                                     {this.state.scale_popup.table_gallery && this.state.scale_popup.table_gallery[index] && this.state.scale_popup.table_gallery[index][i] ? (
                                                                                         this.state.scale_popup.table_gallery[index][i] === "enabled" ? (
                                                                                             <div className="imgdpgall">
-                                                                                                {scaleicon.map((image, index) => (
+                                                                                                {scaleicon.map((image, objIndex) => (
                                                                                                     <img key={index} src={image.image} alt="scale" onClick={() => this.scaleIcon(image.image, index, i, "table_image")} />
                                                                                                 ))}
                                                                                                 <div className="scalgalclose" onClick={() => this.hideGallery(index, "table_gallery", i)}>

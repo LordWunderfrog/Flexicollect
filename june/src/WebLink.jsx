@@ -2602,7 +2602,6 @@ class WebLink extends React.Component {
         }
       }
     }
-
   }
 
   /**
@@ -3048,7 +3047,7 @@ class WebLink extends React.Component {
         case 'equal':
           if (target === "Value_Multiple_Any") {
             for (let mv = 0; mv < matchVal.length; mv++) {
-              if (matchVal[mv].value === value) {
+              if (matchVal[mv].value === val) {
                 isMatch = true;
               }
             }
@@ -3066,7 +3065,7 @@ class WebLink extends React.Component {
         case 'notequal':
           if (target === "Value_Multiple_Any") {
             for (let mv = 0; mv < matchVal.length; mv++) {
-              if (matchVal[mv].value === value) {
+              if (matchVal[mv].value === val) {
                 multiple_value = false;
               }
             }
