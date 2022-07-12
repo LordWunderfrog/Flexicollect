@@ -4905,7 +4905,7 @@ class Card extends React.Component {
                                 >
                                     <div className="switch-textboxes xtboxestext">Mandatory</div>
                                     <div className="switches-boxes">
-                                        <Switch checked={this.state.fieldprops.properties.mandatory} onChange={this.mandatory("mandatory")} value="mandatory" color="primary" />
+                                        <Switch checked={Boolean(this.state.fieldprops.properties.mandatory)} onChange={this.mandatory("mandatory")} value="mandatory" color="primary" />
                                     </div>
                                     {MandatoryStyle && <label className="mandatory-disable" >Disabled : Trigger Question</label>}
                                 </div>
@@ -5020,7 +5020,7 @@ class Card extends React.Component {
                                 >
                                     <div className="switch-textboxes xtboxestext">Scale</div>
                                     <div className="switches-boxes">
-                                        <Switch checked={this.state.fieldprops.properties.scale_enabled} onChange={this.scale_enabled("scale_enabled")} value="scale" color="primary" />
+                                        <Switch checked={Boolean(this.state.fieldprops.properties.scale_enabled)} onChange={this.scale_enabled("scale_enabled")} value="scale" color="primary" />
                                     </div>
                                 </div>
                                 {this.state.fieldprops.properties.scale_enabled ? (
@@ -5241,7 +5241,7 @@ class Card extends React.Component {
                                 >
                                     <div className="switch-textboxes xtboxestext">Mandatory</div>
                                     <div className="switches-boxes">
-                                        <Switch checked={this.state.fieldprops.properties.mandatory} onChange={this.mandatory("mandatory")} value="mandatory" color="primary" />
+                                        <Switch checked={Boolean(this.state.fieldprops.properties.mandatory)} onChange={this.mandatory("mandatory")} value="mandatory" color="primary" />
                                     </div>
                                     {MandatoryStyle && <label className="mandatory-disable" >Disabled : Trigger Question</label>}
                                 </div>
@@ -5435,7 +5435,8 @@ class Card extends React.Component {
                                                         <span>Values</span>
                                                         <input
                                                             type="number"
-                                                            value={this.state.fieldprops.properties.table_content.value_length}
+                                                            // value={this.state.fieldprops.properties.table_content.value_length}
+                                                            value={this.state.fieldprops.properties.table_content.value_length > 0 ? this.state.fieldprops.properties.table_content.value_length : ''}
                                                             name="table"
                                                             onChange={e => this.table_value(e, "table_value")}
                                                         />{" "}
@@ -5445,7 +5446,8 @@ class Card extends React.Component {
                                                         <input
                                                             disabled={this.state.fieldprops.properties.table_content.value_length ? "" : "disabled"}
                                                             type="number"
-                                                            value={this.state.fieldprops.properties.table_content.options_length}
+                                                            // value={this.state.fieldprops.properties.table_content.options_length}
+                                                            value={this.state.fieldprops.properties.table_content.options_length > 0 ? this.state.fieldprops.properties.table_content.options_length : ''}
                                                             name="tableop"
                                                             onChange={e => this.table_options(e, "table_options")}
                                                         />{" "}
@@ -6396,7 +6398,7 @@ class Card extends React.Component {
                                     <div className="switch-textboxes xtboxestext">List of Barcodes</div>
                                     <div className="switches-boxes">
                                         <Switch
-                                            checked={this.state.fieldprops.properties.barcode_enabled}
+                                            checked={Boolean(this.state.fieldprops.properties.barcode_enabled)}
                                             onChange={this.barcode_enabled("barcode_enabled")}
 
                                             value="barcode enabled"

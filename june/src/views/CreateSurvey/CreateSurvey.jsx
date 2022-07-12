@@ -1461,7 +1461,25 @@ class CreateSurvey extends React.Component {
                         }
                     }
                     else if (q.properties.scale_type === "table" && q.properties.table_content) {
+                        let optionObject = q.properties.table_content.table_options && q.properties.table_content.table_options.filter((obj) => {
+                            return !obj.value
+                        })
+                        let valueObject = q.properties.table_content.table_value && q.properties.table_content.table_value.filter((obj) => {
+                            return !obj.value
+                        })
                         if (!q.properties.table_content.options_length || !q.properties.table_content.value_length) {
+                            scalecheck = false;
+                            labelname = q.label;
+                            type = "Table";
+                            break;
+                        }
+                        else if (q.properties.table_content.options_length <= 0 || q.properties.table_content.value_length <= 0) {
+                            scalecheck = false;
+                            labelname = q.label;
+                            type = "Table";
+                            break;
+                        }
+                        else if ((optionObject && optionObject.length > 0) || valueObject && valueObject.length > 0) {
                             scalecheck = false;
                             labelname = q.label;
                             type = "Table";
