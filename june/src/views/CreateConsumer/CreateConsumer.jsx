@@ -455,7 +455,8 @@ class CreateConsumer extends Component {
       is_active: this.state.active,
       fraudulent: this.state.fraudulent,
 
-      image: values.image,
+      // image: values.image,
+      image: values.image ? values.image : "",
       imageType: values.imageType
     };
 
