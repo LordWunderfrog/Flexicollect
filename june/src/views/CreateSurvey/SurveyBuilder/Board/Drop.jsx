@@ -4001,7 +4001,7 @@ class Card extends React.Component {
                                             </div>
                                         ) : this.state.fieldprops.properties.info_type === "video" && !this.state.fieldprops.properties.info_video ? (
                                             <div>
-                                                <input className="inputfiletypech" type="file" name="" id="" onChange={this.handleselectedFile} />
+                                                <input className="inputfiletypech" type="file" accept="video/mp4,video/x-m4v,video/*" name="" id="" onChange={this.handleselectedFile} />
 
                                                 <div className="upload-process clearfix">
                                                     <button className="uploadbtncls" onClick={() => this.handleUpload("info_video")} disabled={this.state.selectedFile ? "" : "disabled"}>
@@ -4012,7 +4012,7 @@ class Card extends React.Component {
                                             </div>
                                         ) : this.state.fieldprops.properties.info_type === "audio" && !this.state.fieldprops.properties.info_audio ? (
                                             <div>
-                                                <input className="inputfiletypech" type="file" name="" id="" onChange={this.handleselectedFile} />
+                                                <input className="inputfiletypech" type="file" accept="audio/mpeg3,audio/mp3" name="" id="" onChange={this.handleselectedFile} />
                                                 <div className="upload-process clearfix">
                                                     <button className="uploadbtncls" onClick={() => this.handleUpload("info_audio")} disabled={this.state.selectedFile ? "" : "disabled"}>
                                                         Upload
