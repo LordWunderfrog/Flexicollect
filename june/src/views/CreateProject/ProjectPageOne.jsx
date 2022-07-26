@@ -526,7 +526,7 @@ class ProjectPageOne extends Component {
                       {values.projectImageName === "" ? null : (
                         <Form.Label>: {values.projectImageName}</Form.Label>
                       )}
-                      <StyledDropZone onDrop={this.onDrop.bind(this)} />
+                      <StyledDropZone accept={"image/png, image/gif, image/jpeg, image/*"} onDrop={this.onDrop.bind(this)} />
                     </div>
                   </Form.Group>
 

@@ -664,7 +664,7 @@ class CreateConsumer extends Component {
                                   : {values.consumerImageName}
                                 </Form.Label>
                               )}
-                              <StyledDropZone onDrop={this.onDrop.bind(this)} />
+                              <StyledDropZone accept={"image/png, image/gif, image/jpeg, image/*"} onDrop={this.onDrop.bind(this)} />
                             </Form.Group>
                             <Form.Group
                               as={Col}

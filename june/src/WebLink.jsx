@@ -273,7 +273,22 @@ class WebLink extends React.Component {
   }
 
   /* Handles the google api to fetch the latitude and longitude. */
-  fetchLatitudeLongitude() {
+  async fetchLatitudeLongitude() {
+    await navigator.geolocation.getCurrentPosition(position => {
+      if (position.coords) {
+        latitude = position.coords.latitude ? position.coords.latitude : ''
+        longitude = position.coords.longitude ? position.coords.longitude : '';
+      }
+      else {
+        this.fetchLatitudeLongitudeByAPI()
+      }
+    },
+      err => {
+        this.fetchLatitudeLongitudeByAPI()
+      }
+    )
+  }
+  fetchLatitudeLongitudeByAPI() {
     let myApiKey = Constants.GOOGLE_MAP;
 
     fetch(
@@ -285,8 +300,12 @@ class WebLink extends React.Component {
       .then(response => response.json())
       .then(responseJson => {
         let data = JSON.parse(JSON.stringify(responseJson));
-        latitude = data.location.lat;
-        longitude = data.location.lng;
+        if (data) {
+          latitude = data.location.lat ? data.location.lat : '';
+          longitude = data.location.lng ? data.location.lng : '';
+        }
+      }).catch(async (error) => {
+        console.log('Error', error)
       });
 
   }
@@ -1172,6 +1191,10 @@ class WebLink extends React.Component {
   */
   handleNext = () => {
     this.setState(() => ({ show: true }));
+    if (this.state.selectedQuestion.type == "input") {
+      document.getElementById("inputTypeQuestion").focus()
+    }
+
     if (this.state.selectedQuestion.type !== "info") {
 
       this.editSurveyAnswer()
@@ -1503,13 +1526,15 @@ class WebLink extends React.Component {
         }
       }
       else if (question.type === 'scale') {
-        console.dir("question " + JSON.stringify(question, null, 4))
-        console.log("question " + question.properties.table_content.value_length)
-        console.log("answer " + answer)
-        console.log("answer.selected_option " + JSON.stringify(answer.selected_option))
-        console.log("answer.selected_option.length " + answer.selected_option.length)
-        console.log("answer.label " + answer.label)
-        if (answer && ((answer.selected_option && answer.selected_option.length >= question.properties.table_content.value_length) || (answer.label && answer.label !== ""))) {
+        // console.dir("question " + JSON.stringify(question, null, 4))
+        // console.log("question " + question.properties.table_content.value_length)
+        // console.log("answer " + answer)
+        // console.log("answer.selected_option " + JSON.stringify(answer.selected_option))
+        // console.log("answer.selected_option.length " + answer.selected_option.length)
+        // console.log("answer.label " + answer.label)
+        // if (answer && ((answer.selected_option && answer.selected_option.length >= question.properties.table_content.value_length) || (answer.label && answer.label !== ""))) {
+        if (answer && ((answer.selected_option && answer.selected_option.length > 0)
+          || (answer.label && answer.label != ""))) {
           mandatoryError = false;
         }
         else {
@@ -3632,6 +3657,7 @@ class WebLink extends React.Component {
                     {selectedQuestion.type === "input" ? (
                       <div className="inputClass">
                         <TextField
+                          id={"inputTypeQuestion"}
                           style={{
                             width: 400,
                             margin: 0,
@@ -3641,6 +3667,7 @@ class WebLink extends React.Component {
                             //overflow: "auto",
                             fontStyle: "Roboto"
                           }}
+                          autoFocus={true}
                           className="scrollVisible"
                           //inputStyle={styles.resize}
                           multiline={true}
@@ -3650,6 +3677,19 @@ class WebLink extends React.Component {
                             this.setState({ updatedText: event.target.value });
                           }}
                         />
+                        <h6
+                          style={{
+                            marginTop: "5px",
+                            fontSize: "12px",
+                            textAlign: "center",
+                            opacity: "0.4",
+                            color: "#000000",
+                            fontWeight: "600",
+                            fontStyle: "Roboto"
+                          }}
+                        >
+                          {selectedQuestion.properties.sublabel ? selectedQuestion.properties.sublabel : ""}
+                        </h6>
                       </div>
                     ) : (
                       ""
@@ -3842,8 +3882,12 @@ class WebLink extends React.Component {
                     {selectedQuestion.type === "upload" ? (
                       <div className="uploadClass" style={{ marginLeft: "auto", marginRight: "auto" }}>
                         <div className="new-img-prev-up">
-                          <StyledDropZone onDrop={this.onDrop.bind(this)} label="upload" />
-
+                          <StyledDropZone
+                            accept={selectedQuestion.properties.media_type === "image" ? "image/png, image/gif, image/jpeg, image/*" :
+                              selectedQuestion.properties.media_type === "video" ? "video/mp4,video/x-m4v,video/*" :
+                                selectedQuestion.properties.media_type === "audio" ? "audio/mpeg3,audio/mp3,audio/*" : ""}
+                            onDrop={this.onDrop.bind(this)}
+                            children="upload" />
                         </div>
                         <div className="new-div-parts" >
                           {selectedQuestion.properties.media_type === "image" && this.state.Upload.media ? (

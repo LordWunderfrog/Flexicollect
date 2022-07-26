@@ -3997,7 +3997,7 @@ class Card extends React.Component {
                                         {this.state.fieldprops.properties.info_type === "image" && !this.state.fieldprops.properties.info_image ? (
                                             <div className="uploadimage-alter">
                                                 {" "}
-                                                <StyledDropZone label="Scale upload image" minSize={0} maxSize={2097152} onDrop={this.onDrop.bind(this, "info_image", "", "")} />
+                                                <StyledDropZone children="Scale upload image" accept="image/png, image/gif, image/jpeg, image/*" minSize={0} maxSize={2097152} onDrop={this.onDrop.bind(this, "info_image", "", "")} />
                                             </div>
                                         ) : this.state.fieldprops.properties.info_type === "video" && !this.state.fieldprops.properties.info_video ? (
                                             <div>
@@ -5050,7 +5050,7 @@ class Card extends React.Component {
                                                                 <label>
                                                                     Scale {index + 1} of {scale_len}
                                                                 </label>
-                                                                <StyledDropZone label="Scale upload image" onDrop={this.onDrop.bind(this, "scale_images", key, "")} />
+                                                                <StyledDropZone accept={"image/png, image/gif, image/jpeg, image/*"} children="Scale upload image" onDrop={this.onDrop.bind(this, "scale_images", key, "")} />
                                                             </div>
                                                             {scale_images[`${key}`].image ? (
                                                                 <div className="dropperprev dropperprevnicons relative">
@@ -5666,7 +5666,7 @@ class Card extends React.Component {
                                                                 <label>
                                                                     Scale {index + 1} of {scale_len}
                                                                 </label>
-                                                                <StyledDropZone label="Scale upload image" onDrop={this.onDrop.bind(this, "scale_images", key, "")} />
+                                                                <StyledDropZone accept={"image/png, image/gif, image/jpeg, image/*"} children="Scale upload image" onDrop={this.onDrop.bind(this, "scale_images", key, "")} />
                                                             </div>
                                                             {scale_images[`${key}`].image ? (
                                                                 <div className="dropperprev">
@@ -6068,7 +6068,7 @@ class Card extends React.Component {
                                                                         style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                                                                     >
                                                                         <div style={this.state.fieldprops.properties.display_type === "dropdown" ? disabledive : null}>
-                                                                            <StyledDropZone label="upload" onDrop={this.onDrop.bind(this, "parenlabel_image", index, "")} />
+                                                                            <StyledDropZone accept={"image/png, image/gif, image/jpeg, image/*"} children="upload" onDrop={this.onDrop.bind(this, "parenlabel_image", index, "")} />
                                                                         </div>
                                                                         <div className="addimgs"
                                                                             style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
@@ -6118,7 +6118,7 @@ class Card extends React.Component {
                                                                                                 style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                                                                                             >
                                                                                                 <div style={this.state.fieldprops.properties.display_type === "dropdown" ? disabledive : null}>
-                                                                                                    <StyledDropZone label="upload" onDrop={this.onDrop.bind(this, "sublabel_image", index, key)} />
+                                                                                                    <StyledDropZone accept={"image/png, image/gif, image/jpeg, image/*"} children="upload" onDrop={this.onDrop.bind(this, "sublabel_image", index, key)} />
                                                                                                 </div>
                                                                                                 <div className="addimgs"
                                                                                                     style={this.state.currentlanguage.value !== "English" ? disabledive : {}}

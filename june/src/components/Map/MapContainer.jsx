@@ -24,7 +24,24 @@ export class MapContainer extends Component {
   }
 
   /* Used to fetch the latitude and longitude of current location. */
-  fetchLatitudeLongitude() {
+  async fetchLatitudeLongitude() {
+    await navigator.geolocation.getCurrentPosition(position => {
+      if (position.coords) {
+        this.setState({
+          latitude: position.coords.latitude ? position.coords.latitude : '',
+          longitude: position.coords.longitude ? position.coords.longitude : ''
+        });
+      }
+      else {
+        this.fetchLatitudeLongitudeMarkerByAPI()
+      }
+    },
+      err => {
+        this.fetchLatitudeLongitudeMarkerByAPI()
+      }
+    )
+  }
+  fetchLatitudeLongitudeMarkerByAPI() {
     let myApiKey = Constants.GOOGLE_MAP;
     let lat = "";
     let lng = "";
@@ -38,13 +55,17 @@ export class MapContainer extends Component {
       .then(response => response.json())
       .then(responseJson => {
         let data = JSON.parse(JSON.stringify(responseJson));
-        lat = data.location.lat;
-        lng = data.location.lng;
+        if (data) {
+          lat = data.location.lat;
+          lng = data.location.lng;
 
-        this.setState({
-          latitude: lat,
-          longitude: lng
-        });
+          this.setState({
+            latitude: lat,
+            longitude: lng
+          });
+        }
+      }).catch(error => {
+        console.log('Error', error)
       });
   }
 
@@ -67,13 +88,18 @@ export class MapContainer extends Component {
       .then(response => response.json())
       .then(responseJson => {
         let data = JSON.parse(JSON.stringify(responseJson));
-        Address = data.results[0].formatted_address;
+        if (data) {
+          Address = data.results[0].formatted_address;
 
-        this.setState({
-          selectedPlace: Address,
-          activeMarker: marker,
-          showingInfoWindow: true
-        });
+          this.setState({
+            selectedPlace: Address,
+            activeMarker: marker,
+            showingInfoWindow: true
+          });
+        }
+
+      }).catch(error => {
+        console.log('Error', error)
       });
 
   };

@@ -1050,9 +1050,10 @@ class CreateSurvey extends React.Component {
                     newarray[position + 1] = newarray[position];
                     newarray[position] = temp;
                 }
-                let languages_drop_tmp = this.state.languages_drop
-                languages_drop_tmp[a.label].content = newarray;
-                this.setState({ languages_drop: languages_drop_tmp })
+                this.state.languages_drop[a.label].content = newarray;
+                // let languages_drop_tmp = this.state.languages_drop
+                // languages_drop_tmp[a.label].content = newarray;
+                // this.setState({ languages_drop: languages_drop_tmp })
             }
         })
     };
@@ -1078,9 +1079,10 @@ class CreateSurvey extends React.Component {
                     newarray[position - 1] = newarray[position];
                     newarray[position] = temp;
                 }
-                let languages_drop_tmp = this.state.languages_drop
-                languages_drop_tmp[a.label].content = newarray;
-                this.setState({ languages_drop: languages_drop_tmp })
+                this.state.languages_drop[a.label].content = newarray;
+                //let languages_drop_tmp = this.state.languages_drop
+                // languages_drop_tmp[a.label].content = newarray;
+                // this.setState({ languages_drop: languages_drop_tmp })
             }
         })
     };

@@ -765,7 +765,7 @@ class ProjectPageTwo extends Component {
                         {/* {values.missionImageName === "" ? null : (
                           <Form.Label>: {values.missionImageName}</Form.Label>
                         )} */}
-                        <StyledDropZone onDrop={this.onDrop.bind(this)} />
+                        <StyledDropZone accept={"image/png, image/gif, image/jpeg, image/*"} onDrop={this.onDrop.bind(this)} />
                       </div>
                     </Form.Group>
                   </Form.Group>
