@@ -25,6 +25,7 @@ import * as Constants from "./helpers/constants";
 import logo from "assets/img/white-logo.png";
 import background from 'assets/img/survey.jpg';
 import surveyWeb from 'assets/img/surveyWeb.png';
+import defaultImage from 'assets/img/defaultImage.png';
 
 import Snackbar from "components/Snackbar/Snackbar.jsx";
 import MapContainer from "components/Map/MapContainer.jsx";
@@ -3572,7 +3573,22 @@ class WebLink extends React.Component {
                                               }
                                             />
                                           ) : (
-                                            ""
+                                            <Image
+                                              style={{
+                                                width: 25,
+                                                height: 25,
+                                                resizeMode: "contain",
+                                                opacity: cellData.opacity
+                                              }}
+                                              src={defaultImage}
+                                              onClick={e =>
+                                                this.onScaleTableClickImage(
+                                                  index,
+                                                  cellIndex,
+                                                  cellData
+                                                )
+                                              }
+                                            />
                                           )
                                         ) : (
                                           cellData
