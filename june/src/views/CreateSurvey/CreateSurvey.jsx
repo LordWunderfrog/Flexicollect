@@ -1050,9 +1050,10 @@ class CreateSurvey extends React.Component {
                     newarray[position + 1] = newarray[position];
                     newarray[position] = temp;
                 }
-                let languages_drop_tmp = this.state.languages_drop
-                languages_drop_tmp[a.label].content = newarray;
-                this.setState({ languages_drop: languages_drop_tmp })
+                this.state.languages_drop[a.label].content = newarray;
+                // let languages_drop_tmp = this.state.languages_drop
+                // languages_drop_tmp[a.label].content = newarray;
+                // this.setState({ languages_drop: languages_drop_tmp })
             }
         })
     };
@@ -1078,9 +1079,10 @@ class CreateSurvey extends React.Component {
                     newarray[position - 1] = newarray[position];
                     newarray[position] = temp;
                 }
-                let languages_drop_tmp = this.state.languages_drop
-                languages_drop_tmp[a.label].content = newarray;
-                this.setState({ languages_drop: languages_drop_tmp })
+                this.state.languages_drop[a.label].content = newarray;
+                //let languages_drop_tmp = this.state.languages_drop
+                // languages_drop_tmp[a.label].content = newarray;
+                // this.setState({ languages_drop: languages_drop_tmp })
             }
         })
     };
@@ -1094,7 +1096,8 @@ class CreateSurvey extends React.Component {
         }
 
         this.setState({
-            drops: i
+            drops: i,
+            defaultdrops: i
         }, this.autoSave);
     };
     setDropsLang = (languages_drop) => {
@@ -1460,7 +1463,25 @@ class CreateSurvey extends React.Component {
                         }
                     }
                     else if (q.properties.scale_type === "table" && q.properties.table_content) {
+                        let optionObject = q.properties.table_content.table_options && q.properties.table_content.table_options.filter((obj) => {
+                            return !obj.value
+                        })
+                        let valueObject = q.properties.table_content.table_value && q.properties.table_content.table_value.filter((obj) => {
+                            return !obj.value
+                        })
                         if (!q.properties.table_content.options_length || !q.properties.table_content.value_length) {
+                            scalecheck = false;
+                            labelname = q.label;
+                            type = "Table";
+                            break;
+                        }
+                        else if (q.properties.table_content.options_length <= 0 || q.properties.table_content.value_length <= 0) {
+                            scalecheck = false;
+                            labelname = q.label;
+                            type = "Table";
+                            break;
+                        }
+                        else if ((optionObject && optionObject.length > 0) || valueObject && valueObject.length > 0) {
                             scalecheck = false;
                             labelname = q.label;
                             type = "Table";

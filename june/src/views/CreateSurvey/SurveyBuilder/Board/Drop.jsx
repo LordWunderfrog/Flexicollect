@@ -274,7 +274,7 @@ class Card extends React.Component {
             Mandatory_style = this.getMandatoryStyle(nextProps.labelprop)
         }
         let fieldprops = nextProps.labelprop;
-        otheroption = fieldprops.properties.other;
+        //otheroption = fieldprops.properties.other;
         if (!fieldprops.properties.question_text && fieldprops.type !== "dropdown") {
             fieldprops.properties.question_text = "<p>" + fieldprops.properties.question + "</p>";
         }
@@ -3508,7 +3508,15 @@ class Card extends React.Component {
             if (!fieldprops.properties[`${e}`]) {
                 fieldprops.properties[`${e}`] = [];
             }
-            fieldprops.properties[`${e}`].push({ id: manual, label: "", label_image: "" });
+
+            /** if other option available then push at second last position otherwise last */
+            if (fieldprops.properties[`${e}`].some(obj => obj.id === "other")) {
+                let indexToInsert = fieldprops.properties[`${e}`].length - 1
+                fieldprops.properties[`${e}`].splice(indexToInsert, 0, { id: manual, label: "", label_image: "" });
+            }
+            else {
+                fieldprops.properties[`${e}`].push({ id: manual, label: "", label_image: "" });
+            }
             let random = fieldprops.properties.random ? fieldprops.properties.random : 0;
             if (random === 1) {
                 let other_opt = {};
@@ -3541,7 +3549,14 @@ class Card extends React.Component {
                         languages_drop[a.label].content[this.props.index].properties[`${e}`] = [];
                     }
 
-                    languages_drop[a.label].content[this.props.index].properties[`${e}`].push({ id: manual1, label: "", label_image: "" });
+                    /** if other option available then push at second last position otherwise last */
+                    if (languages_drop[a.label].content[this.props.index].properties[`${e}`].some(obj => obj.id === "other")) {
+                        let indexToInsert1 = languages_drop[a.label].content[this.props.index].properties[`${e}`].length - 1
+                        languages_drop[a.label].content[this.props.index].properties[`${e}`].splice(indexToInsert1, 0, { id: manual1, label: "", label_image: "" });
+                    }
+                    else {
+                        languages_drop[a.label].content[this.props.index].properties[`${e}`].push({ id: manual1, label: "", label_image: "" });
+                    }
                     if (random === 1) {
                         let other_lan_opt = {};
                         for (let i = 0; i < languages_drop[a.label].content[this.props.index].properties[`${e}`].length; i++) {
@@ -3982,11 +3997,11 @@ class Card extends React.Component {
                                         {this.state.fieldprops.properties.info_type === "image" && !this.state.fieldprops.properties.info_image ? (
                                             <div className="uploadimage-alter">
                                                 {" "}
-                                                <StyledDropZone label="Scale upload image" minSize={0} maxSize={2097152} onDrop={this.onDrop.bind(this, "info_image", "", "")} />
+                                                <StyledDropZone children="Scale upload image" accept="image/png, image/gif, image/jpeg, image/*" minSize={0} maxSize={2097152} onDrop={this.onDrop.bind(this, "info_image", "", "")} />
                                             </div>
                                         ) : this.state.fieldprops.properties.info_type === "video" && !this.state.fieldprops.properties.info_video ? (
                                             <div>
-                                                <input className="inputfiletypech" type="file" name="" id="" onChange={this.handleselectedFile} />
+                                                <input className="inputfiletypech" type="file" accept="video/mp4,video/x-m4v,video/*" name="" id="" onChange={this.handleselectedFile} />
 
                                                 <div className="upload-process clearfix">
                                                     <button className="uploadbtncls" onClick={() => this.handleUpload("info_video")} disabled={this.state.selectedFile ? "" : "disabled"}>
@@ -3997,7 +4012,7 @@ class Card extends React.Component {
                                             </div>
                                         ) : this.state.fieldprops.properties.info_type === "audio" && !this.state.fieldprops.properties.info_audio ? (
                                             <div>
-                                                <input className="inputfiletypech" type="file" name="" id="" onChange={this.handleselectedFile} />
+                                                <input className="inputfiletypech" type="file" accept="audio/mpeg3,audio/mp3" name="" id="" onChange={this.handleselectedFile} />
                                                 <div className="upload-process clearfix">
                                                     <button className="uploadbtncls" onClick={() => this.handleUpload("info_audio")} disabled={this.state.selectedFile ? "" : "disabled"}>
                                                         Upload
@@ -4890,7 +4905,7 @@ class Card extends React.Component {
                                 >
                                     <div className="switch-textboxes xtboxestext">Mandatory</div>
                                     <div className="switches-boxes">
-                                        <Switch checked={this.state.fieldprops.properties.mandatory} onChange={this.mandatory("mandatory")} value="mandatory" color="primary" />
+                                        <Switch checked={Boolean(this.state.fieldprops.properties.mandatory)} onChange={this.mandatory("mandatory")} value="mandatory" color="primary" />
                                     </div>
                                     {MandatoryStyle && <label className="mandatory-disable" >Disabled : Trigger Question</label>}
                                 </div>
@@ -5005,7 +5020,7 @@ class Card extends React.Component {
                                 >
                                     <div className="switch-textboxes xtboxestext">Scale</div>
                                     <div className="switches-boxes">
-                                        <Switch checked={this.state.fieldprops.properties.scale_enabled} onChange={this.scale_enabled("scale_enabled")} value="scale" color="primary" />
+                                        <Switch checked={Boolean(this.state.fieldprops.properties.scale_enabled)} onChange={this.scale_enabled("scale_enabled")} value="scale" color="primary" />
                                     </div>
                                 </div>
                                 {this.state.fieldprops.properties.scale_enabled ? (
@@ -5035,7 +5050,7 @@ class Card extends React.Component {
                                                                 <label>
                                                                     Scale {index + 1} of {scale_len}
                                                                 </label>
-                                                                <StyledDropZone label="Scale upload image" onDrop={this.onDrop.bind(this, "scale_images", key, "")} />
+                                                                <StyledDropZone accept={"image/png, image/gif, image/jpeg, image/*"} children="Scale upload image" onDrop={this.onDrop.bind(this, "scale_images", key, "")} />
                                                             </div>
                                                             {scale_images[`${key}`].image ? (
                                                                 <div className="dropperprev dropperprevnicons relative">
@@ -5226,7 +5241,7 @@ class Card extends React.Component {
                                 >
                                     <div className="switch-textboxes xtboxestext">Mandatory</div>
                                     <div className="switches-boxes">
-                                        <Switch checked={this.state.fieldprops.properties.mandatory} onChange={this.mandatory("mandatory")} value="mandatory" color="primary" />
+                                        <Switch checked={Boolean(this.state.fieldprops.properties.mandatory)} onChange={this.mandatory("mandatory")} value="mandatory" color="primary" />
                                     </div>
                                     {MandatoryStyle && <label className="mandatory-disable" >Disabled : Trigger Question</label>}
                                 </div>
@@ -5420,7 +5435,8 @@ class Card extends React.Component {
                                                         <span>Values</span>
                                                         <input
                                                             type="number"
-                                                            value={this.state.fieldprops.properties.table_content.value_length}
+                                                            // value={this.state.fieldprops.properties.table_content.value_length}
+                                                            value={this.state.fieldprops.properties.table_content.value_length > 0 ? this.state.fieldprops.properties.table_content.value_length : ''}
                                                             name="table"
                                                             onChange={e => this.table_value(e, "table_value")}
                                                         />{" "}
@@ -5430,7 +5446,8 @@ class Card extends React.Component {
                                                         <input
                                                             disabled={this.state.fieldprops.properties.table_content.value_length ? "" : "disabled"}
                                                             type="number"
-                                                            value={this.state.fieldprops.properties.table_content.options_length}
+                                                            // value={this.state.fieldprops.properties.table_content.options_length}
+                                                            value={this.state.fieldprops.properties.table_content.options_length > 0 ? this.state.fieldprops.properties.table_content.options_length : ''}
                                                             name="tableop"
                                                             onChange={e => this.table_options(e, "table_options")}
                                                         />{" "}
@@ -5556,7 +5573,7 @@ class Card extends React.Component {
                                                                                     {this.state.scale_popup.table_gallery && this.state.scale_popup.table_gallery[index] && this.state.scale_popup.table_gallery[index][i] ? (
                                                                                         this.state.scale_popup.table_gallery[index][i] === "enabled" ? (
                                                                                             <div className="imgdpgall">
-                                                                                                {scaleicon.map((image, index) => (
+                                                                                                {scaleicon.map((image, objIndex) => (
                                                                                                     <img key={index} src={image.image} alt="scale" onClick={() => this.scaleIcon(image.image, index, i, "table_image")} />
                                                                                                 ))}
                                                                                                 <div className="scalgalclose" onClick={() => this.hideGallery(index, "table_gallery", i)}>
@@ -5649,7 +5666,7 @@ class Card extends React.Component {
                                                                 <label>
                                                                     Scale {index + 1} of {scale_len}
                                                                 </label>
-                                                                <StyledDropZone label="Scale upload image" onDrop={this.onDrop.bind(this, "scale_images", key, "")} />
+                                                                <StyledDropZone accept={"image/png, image/gif, image/jpeg, image/*"} children="Scale upload image" onDrop={this.onDrop.bind(this, "scale_images", key, "")} />
                                                             </div>
                                                             {scale_images[`${key}`].image ? (
                                                                 <div className="dropperprev">
@@ -5874,7 +5891,7 @@ class Card extends React.Component {
                                 </div>
                                         } */}
                                         <div className="switches-boxes" style={this.state.fieldprops.properties.display_type === "dropdown" ? disabledive : null}>
-                                            <Switch checked={otheroption ? otheroption : 0} onChange={this.other("other")} value="<p>other</p>" color="primary" />
+                                            <Switch checked={Boolean(this.state.fieldprops.properties.other)} onChange={this.other("other")} value="<p>other</p>" color="primary" />
                                         </div>
                                     </div>
                                 </div>
@@ -6051,7 +6068,7 @@ class Card extends React.Component {
                                                                         style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                                                                     >
                                                                         <div style={this.state.fieldprops.properties.display_type === "dropdown" ? disabledive : null}>
-                                                                            <StyledDropZone label="upload" onDrop={this.onDrop.bind(this, "parenlabel_image", index, "")} />
+                                                                            <StyledDropZone accept={"image/png, image/gif, image/jpeg, image/*"} children="upload" onDrop={this.onDrop.bind(this, "parenlabel_image", index, "")} />
                                                                         </div>
                                                                         <div className="addimgs"
                                                                             style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
@@ -6101,7 +6118,7 @@ class Card extends React.Component {
                                                                                                 style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                                                                                             >
                                                                                                 <div style={this.state.fieldprops.properties.display_type === "dropdown" ? disabledive : null}>
-                                                                                                    <StyledDropZone label="upload" onDrop={this.onDrop.bind(this, "sublabel_image", index, key)} />
+                                                                                                    <StyledDropZone accept={"image/png, image/gif, image/jpeg, image/*"} children="upload" onDrop={this.onDrop.bind(this, "sublabel_image", index, key)} />
                                                                                                 </div>
                                                                                                 <div className="addimgs"
                                                                                                     style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
@@ -6381,7 +6398,7 @@ class Card extends React.Component {
                                     <div className="switch-textboxes xtboxestext">List of Barcodes</div>
                                     <div className="switches-boxes">
                                         <Switch
-                                            checked={this.state.fieldprops.properties.barcode_enabled}
+                                            checked={Boolean(this.state.fieldprops.properties.barcode_enabled)}
                                             onChange={this.barcode_enabled("barcode_enabled")}
 
                                             value="barcode enabled"

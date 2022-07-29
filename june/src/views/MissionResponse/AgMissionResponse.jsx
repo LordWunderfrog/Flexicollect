@@ -684,7 +684,6 @@ class AgMissionResponse extends React.Component {
 
     api2.get("v1/survey_report/metric_filter?mission_id=" + missionId)
       .then(resp => {
-
         this.setState({
           filteredMetricList: resp.data.result
         }, () => {
@@ -3469,8 +3468,8 @@ class AgMissionResponse extends React.Component {
     const { classes } = this.props;
     const { msgColor, br, message, page, pagecount, rowsPerPage } = this.state;
     this.apikey = localStorage.getItem("api_key")
-    console.log("agmissionResponse 3472 this.apikey")
-    console.log(this.apikey)
+    // console.log("agmissionResponse 3472 this.apikey")
+    // console.log(this.apikey)
     var hideButton = true
     if (localStorage.getItem('role') !== null && localStorage.getItem('role') !== "CLIENT") {
       hideButton = false
@@ -4227,8 +4226,10 @@ export class CreateImageSpan extends React.Component {
           images.map((image, index) => (
             <img
               key={index}
-              src={image + '&apikey' + this.state.apiKey}
-              alt={image + '&apikey' + this.state.apiKey}
+              src={image}
+              alt={image}
+              // src={image + '&apikey' + this.state.apiKey}
+              // alt={image + '&apikey' + this.state.apiKey}
               height="25"
               style={{
                 objectFit: "contain",
@@ -4259,7 +4260,7 @@ export class CreateVideoSpan extends React.Component {
     return (
       <div>
         {
-          this.state.value = this.state.value + '?token=' + this.state.apiKey,
+          // this.state.value = this.state.value + '?token=' + this.state.apiKey,
           this.state.value !== "" && (this.state.type === 'video' || this.state.type === 'audio')
             ?
 

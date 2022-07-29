@@ -264,7 +264,7 @@ class Gallerylist extends React.Component {
                         </div>
 
                     ))}
-                    <StyledDropZone onDrop={this.onDrop.bind(this)} />
+                    <StyledDropZone accept={"image/png, image/gif, image/jpeg, image/*"} onDrop={this.onDrop.bind(this)} />
                     <div className="dropsaveimage" style={{ textAlign: "center" }}>
                         {this.state.newimage ? <div className="dropimage"><img src={this.state.newimage} alt="gallery new" style={{ height: "100px", width: "18%" }} /></div> : ""}
                         <div className="gallerysave" onClick={this.addImage}>Save</div>

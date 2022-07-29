@@ -379,7 +379,13 @@ class DropList extends React.Component {
     handleDelete(e) {
         this.props.deleteddrops(this.props.question_id);
     }
-
+    /** Handle the event to clone button */
+    cloneAction = (questionID, type) => {
+        return this.state.currentlanguage.value === "English" &&
+            <span onClick={() => this.handleCloneClick(questionID, type)}>
+                <i className="far fa-clone" color="action" />
+            </span>
+    }
     handleCloneClick = (question_id, type) => {
         this.props.cloneDrop(question_id, type)
     }
@@ -413,15 +419,7 @@ class DropList extends React.Component {
                             <span onClick={() => this.handleClickOpen("open2")}>
                                 <i className="fa fa-cog" />
                             </span>
-                            {
-                                this.state.currentlanguage.value === "English"
-                                    ?
-                                    <span onClick={() => this.handleCloneClick(this.state.fieldprops.question_id, 0)}>
-                                        <i className="far fa-clone" color="action" />
-                                    </span>
-                                    :
-                                    null
-                            }
+                            {this.cloneAction(this.state.fieldprops.question_id, 0)}
                             {this.deleteAlert()}
                         </div>
                     </div>
@@ -468,9 +466,7 @@ class DropList extends React.Component {
                             <span onClick={() => this.handleClickOpen("open2")}>
                                 <i className="fa fa-cog" />
                             </span>
-                            <span onClick={() => this.handleCloneClick(this.state.fieldprops.question_id, 1)}>
-                                <i className="far fa-clone" color="action" />
-                            </span>
+                            {this.cloneAction(this.state.fieldprops.question_id, 1)}
                             {this.deleteAlert()}
                         </div>
                     </div>
@@ -511,9 +507,7 @@ class DropList extends React.Component {
                             <span onClick={() => this.handleClickOpen("open2")}>
                                 <i className="fa fa-cog" />
                             </span>
-                            <span onClick={() => this.handleCloneClick(this.state.fieldprops.question_id, 6)}>
-                                <i className="far fa-clone" color="action" />
-                            </span>
+                            {this.cloneAction(this.state.fieldprops.question_id, 6)}
                             {this.deleteAlert()}
                         </div>
 
@@ -550,9 +544,7 @@ class DropList extends React.Component {
                             <span onClick={() => this.handleClickOpen("open2")}>
                                 <i className="fa fa-cog" />
                             </span>
-                            <span onClick={() => this.handleCloneClick(this.state.fieldprops.question_id, 4)}>
-                                <i className="far fa-clone" color="action" />
-                            </span>
+                            {this.cloneAction(this.state.fieldprops.question_id, 4)}
                             {this.deleteAlert()}
                         </div>
                     </div>
@@ -588,9 +580,7 @@ class DropList extends React.Component {
                             <span onClick={() => this.handleClickOpen("open2")}>
                                 <i className="fa fa-cog" />
                             </span>
-                            <span onClick={() => this.handleCloneClick(this.state.fieldprops.question_id, 5)}>
-                                <i className="far fa-clone" color="action" />
-                            </span>
+                            {this.cloneAction(this.state.fieldprops.question_id, 5)}
                             {this.deleteAlert()}
                         </div>
                     </div>
@@ -626,9 +616,7 @@ class DropList extends React.Component {
                             <span onClick={() => this.handleClickOpen("open2")}>
                                 <i className="fa fa-cog" />
                             </span>
-                            <span onClick={() => this.handleCloneClick(this.state.fieldprops.question_id, 8)}>
-                                <i className="far fa-clone" color="action" />
-                            </span>
+                            {this.cloneAction(this.state.fieldprops.question_id, 8)}
                             {this.deleteAlert()}
                         </div>
 
@@ -729,9 +717,7 @@ class DropList extends React.Component {
                             <span onClick={() => this.handleClickOpen("open2")}>
                                 <i className="fa fa-cog" />
                             </span>
-                            <span onClick={() => this.handleCloneClick(this.state.fieldprops.question_id, 7)}>
-                                <i className="far fa-clone" color="action" />
-                            </span>
+                            {this.cloneAction(this.state.fieldprops.question_id, 7)}
                             {this.deleteAlert()}
                         </div>
 
@@ -769,9 +755,7 @@ class DropList extends React.Component {
                             <span onClick={() => this.handleClickOpen("open2")}>
                                 <i className="fa fa-cog" />
                             </span>
-                            <span onClick={() => this.handleCloneClick(this.state.fieldprops.question_id, 3)}>
-                                <i className="far fa-clone" color="action" />
-                            </span>
+                            {this.cloneAction(this.state.fieldprops.question_id, 3)}
                             {this.deleteAlert()}
                         </div>
 

@@ -545,7 +545,7 @@ class CreateClient extends Component {
                                 : {values.clientImageName}
                               </Form.Label>
                             )}
-                            <StyledDropZone onDrop={this.onDrop.bind(this)} />
+                            <StyledDropZone accept={"image/png, image/gif, image/jpeg, image/*"} onDrop={this.onDrop.bind(this)} />
                           </div>
                         </Form.Group>
 

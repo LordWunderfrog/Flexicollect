@@ -1344,6 +1344,44 @@ class Board extends Component {
       }, 3000);
     });
   }
+  /* Handles the validation of reference code for cloned question. */
+  addrefcodeForClonedQuestion(newDropArray) {
+    this.state.drops = newDropArray
+    newDropArray && newDropArray.map((p, i) => {
+      let fieldprops = p;
+      if (fieldprops.type !== "info" && fieldprops.type !== "gps") {
+        if (fieldprops.properties.refcode && fieldprops.properties.refcode === "" || !fieldprops.properties.refcode) {
+          let type = ""
+          if (fieldprops.type === "input") {
+            type = "TXT"
+          } else if (fieldprops.type === "upload") {
+            type = "UPL"
+          } else if (fieldprops.type === "choice") {
+            type = "CHO"
+          } else if (fieldprops.type === "scale") {
+            type = "SCA"
+          } else if (fieldprops.type === "capture") {
+            type = "CAP  "
+          } else if (fieldprops.type === "barcode") {
+            type = "BAR"
+          }
+          this.generaterefcode('generate', type, this.state.drops, i);
+        }
+      } else {
+        // drops.push(p)
+      }
+    })
+    let drops = this.state.drops
+    this.setState({
+      drops: drops,
+      elementsDefined: true
+    }, () => {
+      setTimeout(() => {
+        this.autoSave()
+      }, 3000);
+    });
+  }
+
   /* Handles the api to generate the reference code. */
   async generaterefcode(check, type, fieldprops, i) {
     let refcode = ""
@@ -1489,7 +1527,7 @@ class Board extends Component {
 
               defaultdrops.completed = 0;
             }
-            else if ((defaultdrops.properties.info_text.trim() === "" && fieldprops.properties.info_text.trim() !== "") ||
+            else if (((defaultdrops.properties.info_text || '').trim() === "" && (fieldprops.properties.info_text || '').trim() !== "") ||
               (defaultdrops.properties.question.trim() === "" && fieldprops.properties.question.trim() !== "")) {
 
               defaultdrops.completed = 0;
@@ -1725,22 +1763,23 @@ class Board extends Component {
     const index = this.state.drops.findIndex(drop => Number(drop.question_id) === Number(question_id)),
       newDrop = this.endDrag(type),
       newDropsArray = [...this.state.drops]
+    newDrop['rightStatus'] = false
     newDrop.properties = {
       ...newDrop.properties,
       ...this.state.drops[index].properties,
       refcode: "",
       question: "Copy of " + String(this.state.drops[index].properties.question).trim()
     }
+    newDrop['question'] = "Copy of " + String(this.state.drops[index].properties.question).trim()
     newDrop.question_id = Number([...this.state.drops].sort((a, b) => Number(b.question_id) - Number(a.question_id))[0].question_id) + 1
 
     let dropindex = newDropsArray.findIndex((element) => element.question_id === question_id);
-    newDropsArray.splice(dropindex + 1, 0, newDrop);
-    // newDropsArray.push(newDrop)
+    newDropsArray.splice(dropindex + 1, 0, cloneDeep(newDrop));
     this.setState({
       drops: [...newDropsArray]
 
     }, () => {
-      this.checkrefcode(newDropsArray);
+      this.addrefcodeForClonedQuestion(newDropsArray);
       this.props.ondraglick(newDropsArray, true);
     });
 
@@ -1756,14 +1795,60 @@ class Board extends Component {
         })
         const newDropLang = {
           ...languages_drop[a.label].content[index],
+          label: newDrop.label,
           handler: newDrop.handler,
           question_id: newDrop.question_id
         }
-        languages_drop[a.label].content.push(newDropLang)
+        languages_drop[a.label].content.splice(index + 1, 0, newDropLang);
       }
     })
     this.props.setDropsLang(languages_drop)
   }
+
+
+  // cloneDrop = (question_id, type) => {
+  //   const index = this.state.drops.findIndex(drop => Number(drop.question_id) === Number(question_id)),
+  //     newDrop = this.endDrag(type),
+  //     newDropsArray = [...this.state.drops]
+  //   newDrop.properties = {
+  //     ...newDrop.properties,
+  //     ...this.state.drops[index].properties,
+  //     refcode: "",
+  //     question: "Copy of " + String(this.state.drops[index].properties.question).trim()
+  //   }
+  //   newDrop.question_id = Number([...this.state.drops].sort((a, b) => Number(b.question_id) - Number(a.question_id))[0].question_id) + 1
+
+  //   let dropindex = newDropsArray.findIndex((element) => element.question_id === question_id);
+  //   newDropsArray.splice(dropindex + 1, 0, newDrop);
+  //   // newDropsArray.push(newDrop)
+  //   this.setState({
+  //     drops: [...newDropsArray]
+
+  //   }, () => {
+  //     this.checkrefcode(newDropsArray);
+  //     this.props.ondraglick(newDropsArray, true);
+  //   });
+
+
+  //   const selectedlanguage = this.props.selectedlanguage,
+  //     languages_drop = {
+  //       ...this.props.languages_drop
+  //     }
+  //   selectedlanguage.forEach((a, b) => {
+  //     if (a.label !== 'English') {
+  //       const index = languages_drop[a.label].content.findIndex(content => {
+  //         return Number(content.question_id) === Number(question_id)
+  //       })
+  //       const newDropLang = {
+  //         ...languages_drop[a.label].content[index],
+  //         handler: newDrop.handler,
+  //         question_id: newDrop.question_id
+  //       }
+  //       languages_drop[a.label].content.push(newDropLang)
+  //     }
+  //   })
+  //   this.props.setDropsLang(languages_drop)
+  // }
 
 
   /**
