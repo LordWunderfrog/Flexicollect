@@ -1952,11 +1952,13 @@ class AgMissionResponse extends React.Component {
         if (changerow !== undefined && changerow !== null && changerow === 'changerow') {
           this.setState({ filteredMissions: [], missionResponses: [], listItems: [] })
         }
-        let filteredMissions = this.state.filteredMissions.concat(resp.data.list);
+        // let filteredMissions = this.state.filteredMissions.concat(resp.data.list);
+        let filteredMissions = resp.data.list.concat(this.state.filteredMissions);
         let temp_missionResponses = resp.data.list.filter(x => {
           return x.responses.length >= 0;
         })
-        let missionResponses = this.state.missionResponses.concat(temp_missionResponses)
+        // let missionResponses = this.state.missionResponses.concat(temp_missionResponses)
+        let missionResponses = temp_missionResponses.concat(this.state.missionResponses)
         self.setState({
           filteredMissions: filteredMissions,
           missionResponses: missionResponses,
@@ -2631,7 +2633,8 @@ class AgMissionResponse extends React.Component {
       temp.column_index = index;
       listItems.push(temp);
     });
-    let loadlistItems = loadedlistItems.concat(listItems);
+    // let loadlistItems = loadedlistItems.concat(listItems);
+    let loadlistItems = listItems.concat(loadedlistItems);
     loadedlistItems = loadlistItems;
     if (this.state.datapagecount > loadedlistItems.length && sepMission.length > 0) {
       let id = sepMission[0].survey_tag_id
