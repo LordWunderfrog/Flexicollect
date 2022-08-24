@@ -6,6 +6,7 @@
  *
  */
 import React from "react";
+import Textarea from "react-textarea-autosize";
 import placeholder from "assets/img/placeholder.png";
 import barimg from "assets/img/barimg.jpg";
 import "react-drop-zone/dist/styles.css";
@@ -400,15 +401,15 @@ class DropList extends React.Component {
                     <div className="topbar">
                         <div className="label customlbl">
                             {this.state.fieldprops.properties.question_text ?
-                                <>  {React.createElement("div", { className: 'questionText', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.question_text } })}</>
-
-                                : ""}
+                                <>  {React.createElement("div", { className: 'questionText', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : "" } })}</>
+                                : <Textarea minRows={1} maxRows={10} value={this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth"
+                                    style={{ resize: "none" }} onFocus={this.handleFocus} readonly />}
                             {/* <Textarea minRows={1} maxRows={10} value={this.state.fieldprops.properties.question} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth"
                                 style={{ resize: "none" }} onFocus={this.handleFocus} /> */}
 
                             {this.state.fieldprops.properties.subheading_text ?
                                 <>  {React.createElement("h6", { className: 'subheading', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.subheading_text } })}</>
-                                : ""}
+                                : this.state.fieldprops.properties.subheading ? <h6 className="subheading">{this.state.fieldprops.properties.subheading}</h6> : ""}
                             {/* {this.state.fieldprops.properties.subheading ? <h6 className="subheading">{this.state.fieldprops.properties.subheading}</h6> : ""} */}
                             <div className="arrowstyl">
                                 {this.upArrow()}
@@ -444,19 +445,18 @@ class DropList extends React.Component {
                     <div className="topbar">
                         <div className="label customlbl">
                             {this.state.fieldprops.properties.question_text ?
-                                <>  {React.createElement("div", { className: 'questionText', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.question_text } })}</>
-
-                                : ""}
+                                <>{React.createElement("div", { className: 'questionText', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : "" } })}</>
+                                : <Textarea minRows={1} maxRows={10} value={this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth"
+                                    style={{ resize: "none" }} onFocus={this.handleFocus} onBlur={this.handleBlur} readonly />}
                             {/* <Textarea minRows={1} maxRows={10} value={this.state.fieldprops.properties.question} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth"
                                 style={{ resize: "none" }} onFocus={this.handleFocus} onBlur={this.handleBlur} /> */}
                             {this.state.fieldprops.properties.subheading_text ?
-
                                 <>  {React.createElement("h6", { className: 'subheading', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.subheading_text } })}</>
+                                : this.state.fieldprops.properties.subheading ? <h6 className="subheading">{this.state.fieldprops.properties.subheading}</h6> : ""}
+                            {/* <h6 className="subheading">
+                                 {this.state.fieldprops.properties.subheading}
+                                 </h6> */}
 
-                                // <h6 className="subheading">
-                                // {/* {this.state.fieldprops.properties.subheading} */}
-                                // {/* </h6>  */}
-                                : ""}
                             <div className="arrowstyl">
                                 {this.upArrow()}
                                 {this.downArrow()}
@@ -472,10 +472,10 @@ class DropList extends React.Component {
                     </div>
                     <div className="field">
                         <input type="text" name="name" style={{ 'width': '100%' }} disabled size={this.state.fieldprops.properties.length} />
-                        {/* <p className="flabel"> */}
                         {this.state.fieldprops.properties.sublabel_text ?
                             <> {React.createElement("p", { className: 'flabel', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.sublabel_text } })}</>
-                            : ""}
+                            : this.state.fieldprops.properties.sublabel ? <p className="flabel">{this.state.fieldprops.properties.sublabel}</p> : ""}
+                        {/* <p className="flabel"> */}
                         {/* {this.state.fieldprops.properties.sublabel} */}
                         {/* </p> */}
                     </div>
@@ -484,19 +484,21 @@ class DropList extends React.Component {
 
             </div>
         )
+
         const upload = (
             <div>
                 <h4 className="labelheading">{this.state.fieldprops.label}</h4>
                 <div className="bdrop" onDoubleClick={() => this.handleClickOpen("open2")}>
                     <div className="topbar">
                         <div className="label customlbl">
-                            {React.createElement("div", { className: 'questionText', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : "" } })}
+                            {this.state.fieldprops.properties.question_text ?
+                                <>{React.createElement("div", { className: 'questionText', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : "" } })}</>
+                                : <Textarea minRows={1} maxRows={10} onFocus={this.handleFocus} onBlur={this.handleBlur} value={this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} readonly />}
 
                             {/* <Textarea minRows={1} maxRows={10} onFocus={this.handleFocus} onBlur={this.handleBlur} value={this.state.fieldprops.properties.question} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} /> */}
                             {this.state.fieldprops.properties.subheading_text ?
-
                                 <>  {React.createElement("h6", { className: 'subheading', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.subheading_text } })}</>
-                                : ""}
+                                : this.state.fieldprops.properties.subheading ? <h6 className="subheading">{this.state.fieldprops.properties.subheading}</h6> : ""}
                             {/* {this.state.fieldprops.properties.subheading ? <h6 className="subheading">{this.state.fieldprops.properties.subheading}</h6> : ""} */}
                             <div className="arrowstyl">
                                 {this.upArrow()}
@@ -527,13 +529,13 @@ class DropList extends React.Component {
                 <div className="bdrop" onDoubleClick={() => this.handleClickOpen("open2")}>
                     <div className="topbar">
                         <div className="label customlbl">
-                            {React.createElement("div", { className: 'questionText', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : "" } })}
+                            {this.state.fieldprops.properties.question_text ?
+                                <>{React.createElement("div", { className: 'questionText', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : "" } })}</>
+                                : <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} readonly />}
                             {/* <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} /> */}
                             {this.state.fieldprops.properties.subheading_text ?
-
                                 <>  {React.createElement("h6", { className: 'subheading', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.subheading_text } })}</>
-
-                                : ""}
+                                : this.state.fieldprops.properties.subheading ? <h6 className="subheading">{this.state.fieldprops.properties.subheading}</h6> : ""}
                             {/* {this.state.fieldprops.properties.subheading ? <h6 className="subheading">{this.state.fieldprops.properties.subheading}</h6> : ""} */}
                             <div className="arrowstyl">
                                 {this.upArrow()}
@@ -563,13 +565,13 @@ class DropList extends React.Component {
                 <div className="bdrop" onDoubleClick={() => this.handleClickOpen("open2")}>
                     <div className="topbar">
                         <div className="label customlbl">
-                            {React.createElement("div", { className: 'questionText', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : "" } })}
+                            {this.state.fieldprops.properties.question_text ?
+                                <>{React.createElement("div", { className: 'questionText', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : "" } })}</>
+                                : <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} readonly />}
                             {/* <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} /> */}
                             {this.state.fieldprops.properties.subheading_text ?
-
                                 <>  {React.createElement("h6", { className: 'subheading', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.subheading_text } })}</>
-
-                                : ""}
+                                : this.state.fieldprops.properties.subheading ? <h6 className="subheading">{this.state.fieldprops.properties.subheading}</h6> : ""}
                             {/* {this.state.fieldprops.properties.subheading ? <h6 className="subheading">{this.state.fieldprops.properties.subheading}</h6> : ""} */}
                             <div className="arrowstyl">
                                 {this.upArrow()}
@@ -599,13 +601,13 @@ class DropList extends React.Component {
                 <div className="bdrop" onDoubleClick={() => this.handleClickOpen("open2")}>
                     <div className="topbar">
                         <div className="label customlbl">
-                            {React.createElement("div", { className: 'questionText', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : "" } })}
-
+                            {this.state.fieldprops.properties.question_text ?
+                                <>{React.createElement("div", { className: 'questionText', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : "" } })}</>
+                                : <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} readonly />}
                             {/* <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} /> */}
                             {this.state.fieldprops.properties.subheading_text ?
-
                                 <>  {React.createElement("h6", { className: 'subheading', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.subheading_text } })}</>
-                                : ""}
+                                : this.state.fieldprops.properties.subheading ? <h6 className="subheading">{this.state.fieldprops.properties.subheading}</h6> : ""}
                             {/* {this.state.fieldprops.properties.subheading ? <h6 className="subheading">{this.state.fieldprops.properties.subheading}</h6> : ""} */}
                             <div className="arrowstyl">
                                 {this.upArrow()}
@@ -700,13 +702,14 @@ class DropList extends React.Component {
                 <div className="bdrop" onDoubleClick={() => this.handleClickOpen("open2")}>
                     <div className="topbar">
                         <div className="label customlbl">
-                            {React.createElement("div", { className: 'questionText', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : "" } })}
+                            {this.state.fieldprops.properties.question_text ?
+                                <>{React.createElement("div", { className: 'questionText', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : "" } })}</>
+                                : <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} readonly />}
 
                             {/* <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} /> */}
                             {this.state.fieldprops.properties.subheading_text ?
-
-                                <>  {React.createElement("h6", { className: 'subheading', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.subheading_text } })}</>
-                                : ""}
+                                <>{React.createElement("h6", { className: 'subheading', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.subheading_text } })}</>
+                                : this.state.fieldprops.properties.subheading ? <h6 className="subheading">{this.state.fieldprops.properties.subheading}</h6> : ""}
                             {/* {this.state.fieldprops.properties.subheading ? <h6 className="subheading">{this.state.fieldprops.properties.subheading}</h6> : ""} */}
                             <div className="arrowstyl">
                                 {this.upArrow()}
@@ -737,13 +740,13 @@ class DropList extends React.Component {
                 <div className="bdrop" onDoubleClick={() => this.handleClickOpen("open2")}>
                     <div className="topbar">
                         <div className="label customlbl">
-                            {React.createElement("div", { className: 'questionText', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : "" } })}
+                            {this.state.fieldprops.properties.question_text ?
+                                <>{React.createElement("div", { className: 'questionText', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : "" } })}</>
+                                : <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} readonly />}
                             {/* <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} /> */}
                             {this.state.fieldprops.properties.subheading_text ?
-
-                                <>  {React.createElement("h6", { className: 'subheading', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.subheading_text } })}</>
-
-                                : ""}
+                                <>{React.createElement("h6", { className: 'subheading', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.subheading_text } })}</>
+                                : this.state.fieldprops.properties.subheading ? <h6 className="subheading">{this.state.fieldprops.properties.subheading}</h6> : ""}
                             {/* {this.state.fieldprops.properties.subheading ? 
                             <h6 className="subheading">{this.state.fieldprops.properties.subheading}</h6> : ""} */}
                             <div className="arrowstyl">
