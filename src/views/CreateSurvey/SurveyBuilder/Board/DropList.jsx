@@ -652,7 +652,7 @@ class DropList extends React.Component {
                                                         {this.state.fieldprops.properties.choice_type === "multiple" ? <input type="checkbox" /> : <input name="choice" type="radio" />}{" "}
                                                         <img src={value.label_image} alt="label" />
                                                         {/* {value.label} */}
-                                                        {React.createElement("div", { className: 'choicelabel', dangerouslySetInnerHTML: { __html: value.label_text ? value.label_text : "" } })}
+                                                        {React.createElement("div", { className: 'choicelabel', dangerouslySetInnerHTML: { __html: value.label_text ? value.label_text : value.label } })}
 
                                                         <div className="parent-of-child-class clear">
                                                             {value.sublabel && value.sublabel instanceof Array
@@ -662,7 +662,7 @@ class DropList extends React.Component {
                                                                             <div key={key}>
                                                                                 {this.state.fieldprops.properties.choice_type === "multiple" ? <input type="checkbox" /> : <input name="choice" type="radio" />}{" "}
                                                                                 <img src={subval.label_image} alt="label" />
-                                                                                {React.createElement("div", { className: 'choicelabel', dangerouslySetInnerHTML: { __html: subval.sublabel_text ? subval.sublabel_text : "" } })}
+                                                                                {React.createElement("div", { className: 'choicelabel', dangerouslySetInnerHTML: { __html: subval.sublabel_text ? subval.sublabel_text : subval.sublabel } })}
                                                                                 {/* {subval.sublabel} */}
                                                                             </div>
                                                                         );

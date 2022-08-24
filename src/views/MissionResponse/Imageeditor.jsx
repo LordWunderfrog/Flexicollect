@@ -687,8 +687,10 @@ class PhotoEditor extends React.Component {
                     <div style={{ float: 'right', marginTop: '5px' }} className="tui-image-editor__apply-btn">
                       <label style={{ color: "white", fontSize: '18px' }}>Hide</label>
                       <MuiThemeProvider theme={theme}>
-                        <Switchlimit color='primary' value="hide" checked={this.state.imageData.answers.hide ?
-                          this.state.imageData.answers.hide === 1 ? true : false : false} onChange={this.handleChange()} />
+                        <Switchlimit color='primary' value="hide"
+                          checked={(this.state.imageData.length > 0 && this.state.imageData.answers.hide) ?
+                            this.state.imageData.answers.hide === 1 ? true : false : false}
+                          onChange={this.handleChange()} />
                       </MuiThemeProvider>
                     </div>
 
