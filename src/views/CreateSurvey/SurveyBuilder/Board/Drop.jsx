@@ -3804,7 +3804,7 @@ class Card extends React.Component {
                                 <ReactQuill
                                     className="quillEditor"
                                     name="inputquestion"
-                                    value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : ""}
+                                    value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""}
                                     inlineStyles="true"
                                     modules={this.modules_minimal}
                                     formats={this.formats}
@@ -3839,7 +3839,7 @@ class Card extends React.Component {
                             >
                                 <ReactQuill
                                     className="quillEditor"
-                                    value={this.state.fieldprops.properties.subheading_text ? this.state.fieldprops.properties.subheading_text : ""}
+                                    value={this.state.fieldprops.properties.subheading_text ? this.state.fieldprops.properties.subheading_text : this.state.fieldprops.properties.subheading ? this.state.fieldprops.properties.subheading : ""}
                                     inlineStyles="true"
                                     modules={this.modules_minimal}
                                     formats={this.formats}
@@ -4146,7 +4146,7 @@ class Card extends React.Component {
                             >
                                 <ReactQuill
                                     className="quillEditor"
-                                    value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : ""}
+                                    value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""}
                                     inlineStyles="true"
                                     modules={this.modules_minimal}
                                     formats={this.formats}
@@ -4204,7 +4204,7 @@ class Card extends React.Component {
                             >
                                 <ReactQuill
                                     className="quillEditor"
-                                    value={this.state.fieldprops.properties.subheading_text ? this.state.fieldprops.properties.subheading_text : ""}
+                                    value={this.state.fieldprops.properties.subheading_text ? this.state.fieldprops.properties.subheading_text : this.state.fieldprops.properties.subheading ? this.state.fieldprops.properties.subheading : ""}
                                     inlineStyles="true"
                                     modules={this.modules_minimal}
                                     formats={this.formats}
@@ -4354,7 +4354,7 @@ class Card extends React.Component {
                             <div className="below-lanbel-body">
                                 <ReactQuill
                                     className="quillEditor"
-                                    value={this.state.fieldprops.properties.sublabel_text ? this.state.fieldprops.properties.sublabel_text : ""}
+                                    value={this.state.fieldprops.properties.sublabel_text ? this.state.fieldprops.properties.sublabel_text : this.state.fieldprops.properties.sublabel ? this.state.fieldprops.properties.sublabel : ""}
                                     inlineStyles="true"
                                     modules={this.modules_minimal}
                                     formats={this.formats}
@@ -4438,7 +4438,7 @@ class Card extends React.Component {
                             >
                                 <ReactQuill
                                     className="quillEditor"
-                                    value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : ""}
+                                    value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""}
                                     inlineStyles="true"
                                     modules={this.modules_minimal}
                                     formats={this.formats}
@@ -4474,7 +4474,7 @@ class Card extends React.Component {
                             <div className="below-lanbel-body">
                                 <ReactQuill
                                     className="quillEditor"
-                                    value={this.state.fieldprops.properties.subheading_text ? this.state.fieldprops.properties.subheading_text : ""}
+                                    value={this.state.fieldprops.properties.subheading_text ? this.state.fieldprops.properties.subheading_text : this.state.fieldprops.properties.subheading ? this.state.fieldprops.properties.subheading : ""}
                                     inlineStyles="true"
                                     modules={this.modules_minimal}
                                     formats={this.formats}
@@ -4794,7 +4794,7 @@ class Card extends React.Component {
                             >
                                 <ReactQuill
                                     className="quillEditor"
-                                    value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : ""}
+                                    value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""}
                                     inlineStyles="true"
                                     modules={this.modules_minimal}
                                     formats={this.formats}
@@ -4828,7 +4828,7 @@ class Card extends React.Component {
                             >
                                 <ReactQuill
                                     className="quillEditor"
-                                    value={this.state.fieldprops.properties.subheading_text ? this.state.fieldprops.properties.subheading_text : ""}
+                                    value={this.state.fieldprops.properties.subheading_text ? this.state.fieldprops.properties.subheading_text : this.state.fieldprops.properties.subheading ? this.state.fieldprops.properties.subheading : ""}
                                     inlineStyles="true"
                                     modules={this.modules_minimal}
                                     formats={this.formats}
@@ -5131,7 +5131,7 @@ class Card extends React.Component {
                             >
                                 <ReactQuill
                                     className="quillEditor"
-                                    value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : ""}
+                                    value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""}
                                     inlineStyles="true"
                                     modules={this.modules_minimal}
                                     formats={this.formats}
@@ -5165,7 +5165,7 @@ class Card extends React.Component {
                             <div className="below-lanbel-body">
                                 <ReactQuill
                                     className="quillEditor"
-                                    value={this.state.fieldprops.properties.subheading_text ? this.state.fieldprops.properties.subheading_text : ""}
+                                    value={this.state.fieldprops.properties.subheading_text ? this.state.fieldprops.properties.subheading_text : this.state.fieldprops.properties.subheading ? this.state.fieldprops.properties.subheading : ""}
                                     inlineStyles="true"
                                     modules={this.modules_minimal}
                                     formats={this.formats}
@@ -5745,7 +5745,7 @@ class Card extends React.Component {
                                 >
                                     <ReactQuill
                                         className="quillEditor"
-                                        value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : ""}
+                                        value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""}
                                         inlineStyles="true"
                                         modules={this.modules_minimal}
                                         formats={this.formats}
@@ -5779,7 +5779,7 @@ class Card extends React.Component {
                                 >
                                     <ReactQuill
                                         className="quillEditor"
-                                        value={this.state.fieldprops.properties.subheading_text ? this.state.fieldprops.properties.subheading_text : ""}
+                                        value={this.state.fieldprops.properties.subheading_text ? this.state.fieldprops.properties.subheading_text : this.state.fieldprops.properties.subheading ? this.state.fieldprops.properties.subheading : ""}
                                         inlineStyles="true"
                                         modules={this.modules_minimal}
                                         formats={this.formats}
@@ -6041,7 +6041,7 @@ class Card extends React.Component {
                                                                     <span>{alphabet[index]}</span>
                                                                     <ReactQuill
                                                                         className={`${this.state.fieldprops.properties.multilevel ? 'multichoicequill' : 'choicequill'} ${'quillEditor'}`}
-                                                                        value={this.state.fieldprops.properties.options[index].label_text ? this.state.fieldprops.properties.options[index].label_text : ""}
+                                                                        value={this.state.fieldprops.properties.options[index].label_text ? this.state.fieldprops.properties.options[index].label_text : this.state.fieldprops.properties.options[index].label ? this.state.fieldprops.properties.options[index].label : ""}
                                                                         inlineStyles="true"
                                                                         modules={this.modules_minimal}
                                                                         formats={this.formats}
@@ -6094,7 +6094,7 @@ class Card extends React.Component {
                                                                                         >
                                                                                             <ReactQuill
                                                                                                 className="quillEditor"
-                                                                                                value={this.state.fieldprops.properties.options[index].sublabel[key].sublabel_text ? this.state.fieldprops.properties.options[index].sublabel[key].sublabel_text : ""}
+                                                                                                value={this.state.fieldprops.properties.options[index].sublabel[key].sublabel_text ? this.state.fieldprops.properties.options[index].sublabel[key].sublabel_text : this.state.fieldprops.properties.options[index].sublabel[key].sublabel ? this.state.fieldprops.properties.options[index].sublabel[key].sublabel : ""}
                                                                                                 inlineStyles="true"
                                                                                                 modules={this.modules_minimal}
                                                                                                 formats={this.formats}
@@ -6223,7 +6223,7 @@ class Card extends React.Component {
                             >
                                 <ReactQuill
                                     className="quillEditor"
-                                    value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : ""}
+                                    value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""}
                                     inlineStyles="true"
                                     modules={this.modules_minimal}
                                     formats={this.formats}
@@ -6257,7 +6257,7 @@ class Card extends React.Component {
                             >
                                 <ReactQuill
                                     className="quillEditor"
-                                    value={this.state.fieldprops.properties.subheading_text ? this.state.fieldprops.properties.subheading_text : ""}
+                                    value={this.state.fieldprops.properties.subheading_text ? this.state.fieldprops.properties.subheading_text : this.state.fieldprops.properties.subheading ? this.state.fieldprops.properties.subheading : ""}
                                     inlineStyles="true"
                                     modules={this.modules_minimal}
                                     formats={this.formats}
@@ -6482,7 +6482,7 @@ class Card extends React.Component {
                             >
                                 <ReactQuill
                                     className="quillEditor"
-                                    value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : ""}
+                                    value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""}
                                     inlineStyles="true"
                                     modules={this.modules_minimal}
                                     formats={this.formats}
@@ -6610,7 +6610,7 @@ class Card extends React.Component {
                                 <div className="below-lanbel-body">
                                     <ReactQuill
                                         className="quillEditor"
-                                        value={this.state.fieldprops.properties.subheading_text ? this.state.fieldprops.properties.subheading_text : ""}
+                                        value={this.state.fieldprops.properties.subheading_text ? this.state.fieldprops.properties.subheading_text : this.state.fieldprops.properties.subheading ? this.state.fieldprops.properties.subheading : ""}
                                         inlineStyles="true"
                                         modules={this.modules_minimal}
                                         formats={this.formats}
