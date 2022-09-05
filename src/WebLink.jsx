@@ -3191,6 +3191,7 @@ class WebLink extends React.Component {
 
     let questions = this.state.questions;
     let index = this.state.index;
+    let increasingIndex = 0
     let selectedQuestion =
       questions.length > 0
         ? questions[index].question
@@ -3364,7 +3365,7 @@ class WebLink extends React.Component {
                       style={{
                         fontSize: "20px",
                         fontWeight: 600,
-                        textTransform: "capitalize",
+                        // textTransform: "capitalize",
                         marginBottom: "10px",
                         color: "#1A385B",
                         fontStyle: "Roboto"
@@ -3376,7 +3377,7 @@ class WebLink extends React.Component {
                         style={{
                           fontSize: "18px",
                           fontWeight: 600,
-                          textTransform: "capitalize",
+                          // textTransform: "capitalize",
                           marginBottom: "10px",
                           color: "red"
                         }}
@@ -3751,6 +3752,7 @@ class WebLink extends React.Component {
                                         <input
                                           name="choice"
                                           type="radio"
+                                          id={index}
                                           defaultChecked={value.defaultValue}
                                           onChange={(e) => this.onChoiceClick(value, e)}
                                           style={{
@@ -3764,6 +3766,7 @@ class WebLink extends React.Component {
                                         "multiple" ? (
                                         <input
                                           type="checkbox"
+                                          id={index}
                                           defaultChecked={value.defaultValue}
                                           onChange={(e) => this.onChoiceClick(value, e)}
                                           style={{
@@ -3776,7 +3779,7 @@ class WebLink extends React.Component {
                                         ""
                                       )}
 
-                                      {value.label}{" "}
+                                      <label for={index}>{value.label}</label>{" "}
                                       {value.label_image &&
                                         value.label_image.length > 0 && (
                                           <img
@@ -3784,7 +3787,7 @@ class WebLink extends React.Component {
                                             src={value.label_image}
                                             style={{
                                               position: "absolute",
-                                              right: 5
+                                              right: 10,
                                             }}
                                           />
                                         )}
@@ -3811,6 +3814,7 @@ class WebLink extends React.Component {
                                       {value.sublabel
                                         ? value.sublabel.map(
                                           function (subval, key) {
+                                            increasingIndex = increasingIndex + 1
                                             return (
                                               <div
                                                 style={{
@@ -3826,6 +3830,7 @@ class WebLink extends React.Component {
                                                   .choice_type === "single" ? (
                                                   <input
                                                     name="choice"
+                                                    id={increasingIndex}
                                                     type="radio"
                                                     defaultChecked={
                                                       subval.defaultValue
@@ -3841,6 +3846,7 @@ class WebLink extends React.Component {
                                                 ) : (
                                                   <input
                                                     type="checkbox"
+                                                    id={increasingIndex}
                                                     defaultChecked={
                                                       subval.defaultValue
                                                     }
@@ -3864,7 +3870,7 @@ class WebLink extends React.Component {
                                                       }}
                                                     />
                                                   )}{" "}
-                                                {subval.sublabel}
+                                                <label for={increasingIndex}>{subval.sublabel}</label>
                                                 {selectedQuestion.properties.multilevel === 1 && subval.id === "other" &&
                                                   <TextField style={{
                                                     display: "flex"
