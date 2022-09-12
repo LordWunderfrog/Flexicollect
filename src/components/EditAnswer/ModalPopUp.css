@@ -15,11 +15,13 @@ input[type="text"]::before {
   height: 27px;
   object-fit: cover;
 }
-.parent-of-child-class > div {
+
+.parent-of-child-class>div {
   padding-right: 10px;
-  border-bottom: 1px solid rgba(0,0,0,0.05);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   padding-left: 25px;
 }
+
 /* .MuiTypography-subtitle1-125 {
   border: 1px solid rgba(0,0,0,0.05);
 }
@@ -36,6 +38,31 @@ input[type="text"]::before {
   border-right: 0;
   border-bottom: 0;
 } */
-.AgMissionResponse-paper-8{
+.AgMissionResponse-paper-8 {
   border-radius: 16px;
+}
+
+/* 05/09/2022 */
+.choiceClass .mainList input,
+.option-checkbox input {
+  margin-right: 10px;
+  margin-top: 2px;
+}
+
+.option-checkbox input[type="checkbox"] {
+  margin-top: 0px;
+}
+
+.choiceClass .mainList label {
+  margin-bottom: 0px;
+}
+
+.choiceClass .option-checkbox img {
+  width: 32px;
+  height: 31px;
+  top: 10px;
+}
+
+.coloredInput .choiceClass input[type="checkbox"]:after {
+  top: 1px;
 }

@@ -674,6 +674,7 @@ class ModalPopUp extends Component {
   render() {
 
     const { selectedQuestion } = this.state;
+    let increasingIndex = 0;
     const { updatedScaleOptions, updatedChoiceOptions, otheroptiontextbox } = this.state;
     const {
       tableContainer,
@@ -690,7 +691,7 @@ class ModalPopUp extends Component {
             style={{
               fontSize: "12px",
               fontWeight: 600,
-              textTransform: "capitalize"
+              // textTransform: "capitalize"
             }}
           >{selectedQuestion.type === "m" ? selectedQuestion.headerName : selectedQuestion.question}</h4>
           {this.state.selectedQuestion.type === "scale" &&
@@ -977,14 +978,14 @@ class ModalPopUp extends Component {
                         >
 
                           {selectedQuestion.properties.multilevel === 0 && selectedQuestion.properties.choice_type === "single" ?
-                            <input name="choice" type="radio" defaultChecked={value.defaultValue} onChange={(e) => this.onChoiceClick(value, e)}
+                            <input name="choice" id={index} type="radio" defaultChecked={value.defaultValue} onChange={(e) => this.onChoiceClick(value, e)}
                               style={{
                                 marginTop: 3,
                                 verticalAlign: "top"
                               }}
                             /> :
                             selectedQuestion.properties.multilevel === 0 && selectedQuestion.properties.choice_type === "multiple" ?
-                              <input type="checkbox" defaultChecked={value.defaultValue} onChange={(e) => this.onChoiceClick(value, e)}
+                              <input type="checkbox" id={index} defaultChecked={value.defaultValue} onChange={(e) => this.onChoiceClick(value, e)}
                                 style={{
                                   marginTop: 3,
                                   verticalAlign: "top"
@@ -992,7 +993,8 @@ class ModalPopUp extends Component {
                               />
                               : ""
                           }
-                          {value.label} {value.label_image && value.label_image.length > 0 &&
+                          <label for={index}>{value.label}</label>
+                          {value.label_image && value.label_image.length > 0 &&
                             <img src={value.label_image}
                               alt="label"
                               style={{
@@ -1020,13 +1022,14 @@ class ModalPopUp extends Component {
                             {value.sublabel
                               ? value.sublabel.map(
                                 function (subval, key) {
+                                  increasingIndex = increasingIndex + 1
                                   return (
                                     <div
                                       style={{
                                         position: "relative"
                                       }}
                                     >
-                                      {selectedQuestion.properties.choice_type === "single" ? <input name="choice" type="radio" defaultChecked={subval.defaultValue} onChange={(e) => this.onSubChoiceClick(value, subval, e)} /> : <input type="checkbox" defaultChecked={subval.defaultValue} onChange={(e) => this.onSubChoiceClick(value, subval, e)} />}
+                                      {selectedQuestion.properties.choice_type === "single" ? <input name="choice" id={increasingIndex} type="radio" defaultChecked={subval.defaultValue} onChange={(e) => this.onSubChoiceClick(value, subval, e)} /> : <input type="checkbox" id={increasingIndex} defaultChecked={subval.defaultValue} onChange={(e) => this.onSubChoiceClick(value, subval, e)} />}
                                       {subval.label_image && subval.label_image.length > 0 &&
                                         <img src={subval.label_image}
                                           alt="label"
@@ -1034,7 +1037,8 @@ class ModalPopUp extends Component {
                                             position: "absolute",
                                             right: 0
                                           }}
-                                        />} {subval.sublabel}
+                                        />}
+                                      <label for={increasingIndex}>{subval.sublabel}</label>
                                       {selectedQuestion.properties.multilevel === 1 && subval.id === "other" &&
                                         <TextField style={{
                                           display: "flex"
