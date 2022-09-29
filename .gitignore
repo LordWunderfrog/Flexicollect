@@ -23,6 +23,8 @@ yarn-error.log*
 #ide
 /.idea
 /.vscode
-src/helpers/constants.jsx
+
+#constants
+/src/helpers/api2.jsx
+/src/helpers/constants.jsx
 package.json
-src/helpers/api2.jsx
