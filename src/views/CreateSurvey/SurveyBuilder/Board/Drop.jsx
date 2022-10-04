@@ -3954,41 +3954,45 @@ class Card extends React.Component {
                                     <input
                                         type="radio"
                                         value="none"
+                                        id="infonone"
                                         checked={this.state.fieldprops.properties.info_type === "none"}
                                         // name="icon_type"
                                         onChange={e => this.updateprops(e, "info_type")}
                                     />
-                                    <label>None</label>
+                                    <label for={"infonone"}>None</label>
                                 </span>
                                 <span className="widthfifty widththirty">
                                     <input
                                         type="radio"
                                         value="image"
+                                        id="infoimage"
                                         checked={this.state.fieldprops.properties.info_type === "image"}
                                         // name="icon_type"
                                         onChange={e => this.updateprops(e, "info_type")}
                                     />
-                                    <label>Image</label>
+                                    <label for={"infoimage"}>Image</label>
                                 </span>
                                 <span className="widthfifty widththirty">
                                     <input
                                         type="radio"
                                         value="video"
+                                        id="infovideo"
                                         checked={this.state.fieldprops.properties.info_type === "video"}
                                         //  name="icon_type"
                                         onChange={e => this.updateprops(e, "info_type")}
                                     />
-                                    <label>Video</label>
+                                    <label for={"infovideo"}>Video</label>
                                 </span>
                                 <span className="widthfifty widththirty">
                                     <input
                                         type="radio"
+                                        id="infoaudio"
                                         value="audio"
                                         checked={this.state.fieldprops.properties.info_type === "audio"}
                                         //   name="icon_type"
                                         onChange={e => this.updateprops(e, "info_type")}
                                     />
-                                    <label>Audio</label>
+                                    <label for={"infoaudio"}>Audio</label>
                                 </span>
                             </div>
                             <div className="t-i-v-wrap">
