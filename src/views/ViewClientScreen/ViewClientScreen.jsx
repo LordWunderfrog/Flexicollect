@@ -2206,7 +2206,7 @@ class ViewClientScreen extends Component {
         // rowsPerPage: rowsPerPage,
       })
     }
-    colDef.forEach(c => {
+/*colDef.forEach(c => {
       if ((getFilterModel[c.field] !== undefined && getFilterModel[c.field].value && getFilterModel[c.field].value.length > 0)
         || (getFilterModel[c.field].filter && getFilterModel[c.field].filter !== undefined)) {
         activemenu.push(c.field)
@@ -2217,6 +2217,20 @@ class ViewClientScreen extends Component {
           activemenu.push(c.field + "_1")
         }
       }
+    })*/
+
+    //Changing the above to the below to match the format of same code block in the Admin Mission Response screen
+    //This is due to an error that occurs when filtering on a client view
+    //Hopefully replacing the forEach with map will resolve the issue
+
+    colDef.map(c => {
+      if (getFilterModel[c.field] !== undefined) {
+        if ((getFilterModel[c.field].value && getFilterModel[c.field].value.length > 0)
+          || (getFilterModel[c.field].filter && getFilterModel[c.field].filter !== undefined)) {
+          activemenu.push(c.field)
+        }
+      }
+      return 0;
     })
     this.setState({
       activefiltermenu: activemenu
