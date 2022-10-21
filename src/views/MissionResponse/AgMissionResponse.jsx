@@ -3262,7 +3262,7 @@ class AgMissionResponse extends React.Component {
             <Fragment key={index}>
               <Grid container alignItems="center">
                 <Typography gutterBottom variant="h6" style={{ marginLeft: 20, fontSize: 12, fontWeight: 600 }}>
-                  &bull; {c.headerName}
+                  &bull; {c.id ? 'ID_' + c.id + '_' + c.headerName : c.headerName}
                 </Typography>
               </Grid>
               <Grid container alignItems="center" style={{ marginLeft: 40, fontSize: 12 }}>

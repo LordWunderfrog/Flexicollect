@@ -2180,6 +2180,9 @@ class Card extends React.Component {
         fieldprops.properties.image_size = "small";
         fieldprops.properties.other = 0;
         fieldprops.properties.multilevel = 0;
+        fieldprops.properties.setlimit = 0;
+        fieldprops.properties.noneofabove = 0;
+        fieldprops.properties.setlimit_type = ""
         this.setState({
             fieldprops
         },
@@ -2187,6 +2190,8 @@ class Card extends React.Component {
                 this.props.autosave();
                 this.updatepropschecked(0, "other");
                 this.updatepropschecked(0, "multilevel");
+                this.updatepropschecked(0, "setlimit");
+                this.updatepropschecked(0, "noneofabove");
             }
         );
         // this.setState(
@@ -2228,7 +2233,101 @@ class Card extends React.Component {
             }
         })
     };
+    setLimitRadioChange = event => {
+        let fieldprops = this.state.fieldprops;
+        fieldprops.properties.setlimit_type = event.target.value;
+        fieldprops.properties.minlimit = 0
+        fieldprops.properties.maxlimit = 0
+        this.setState({
+            fieldprops
+        }, this.props.autosave()
+        );
+        let selectedlanguage = this.props.selectedlanguage
+        let languages_drop = this.props.languages_drop;
+        selectedlanguage.forEach((a, b) => {
+            if (a.label !== 'English') {
+                languages_drop[a.label].content[this.props.index].properties.setlimit_type = event.target.value;
+            }
+        })
+        if (event.target.value == 'noneofabove') {
+            this.updatepropschecked(1, 'noneofabove')
+        }
+        else {
+            this.updatepropschecked(0, 'noneofabove')
+        }
+    };
+    setMinLimitOption = (e, i, index, key) => {
+        this.checkValue(e);
 
+        let optionlength = this.state.fieldprops.properties.options && this.state.fieldprops.properties.options.length
+        if (optionlength > 0) {
+            if (evalue < 0) {
+                evalue = 0
+            }
+            else if (evalue > this.state.fieldprops.properties.maxlimit && this.state.fieldprops.properties.maxlimit != 0) {
+                evalue = this.state.fieldprops.properties.maxlimit
+            }
+            else if (evalue > optionlength) {
+                evalue = optionlength
+            }
+            else {
+                evalue = (typeof evalue === 'string') ? Number(evalue) : evalue
+            }
+        }
+        else {
+            //if there is no option then value should be 0
+            evalue = 0
+        }
+
+        let fieldprops = this.state.fieldprops;
+        fieldprops.properties.minlimit = evalue;
+        let selectedlanguage = this.props.selectedlanguage
+        let languages_drop = this.props.languages_drop;
+        selectedlanguage.forEach((a, b) => {
+            if (a.label !== 'English') {
+                languages_drop[a.label].content[this.props.index].properties.minlimit = evalue;
+            }
+        })
+        this.setState({
+            fieldprops
+        });
+    }
+    setMaxLimitOption = (e, i, index, key) => {
+        this.checkValue(e);
+        let optionlength = this.state.fieldprops.properties.options && this.state.fieldprops.properties.options.length
+        if (optionlength > 0) {
+            if (evalue < 0) {
+                evalue = 0
+            }
+            else if (evalue < this.state.fieldprops.properties.minlimit) {
+                evalue = this.state.fieldprops.properties.minlimit
+            }
+            else if (evalue > optionlength) {
+                evalue = optionlength
+            }
+            else {
+                evalue = (typeof evalue === 'string') ? Number(evalue) : evalue
+            }
+        }
+        else {
+            //if there is no option then value should be 0
+            evalue = 0
+        }
+
+        let fieldprops = this.state.fieldprops;
+        fieldprops.properties.maxlimit = evalue;
+        let selectedlanguage = this.props.selectedlanguage
+        let languages_drop = this.props.languages_drop;
+        selectedlanguage.forEach((a, b) => {
+            if (a.label !== 'English') {
+                languages_drop[a.label].content[this.props.index].properties.maxlimit = evalue;
+            }
+        })
+
+        this.setState({
+            fieldprops
+        });
+    }
 
     /* Handles the event to update the value.   */
     radioFunction = name => event => {
@@ -3223,6 +3322,39 @@ class Card extends React.Component {
         }
     };
 
+    setlimit = name => event => {
+        updateProperties = true;
+        let checkval;
+        event.target.checked === true ? (checkval = 1) : (checkval = 0);
+        if (name === "setlimit" && checkval === 0) {
+            let fieldprops = this.state.fieldprops
+            this.setState(
+                {
+                    [name]: checkval
+                },
+                () => {
+                    if (fieldprops) {
+                        /** if set limit false then do all flag 0*/
+                        fieldprops.properties.maxlimit = 0
+                        fieldprops.properties.minlimit = 0
+                        fieldprops.properties.noneofabove = 0
+                        fieldprops.properties.setlimit_type = ""
+                        this.updatepropschecked(0, 'noneofabove'); //clear non of above
+                    }
+                    this.updatepropschecked(checkval, name);
+                }
+            );
+        } else if (name === "setlimit" && checkval === 1) {
+            this.setState(
+                {
+                    [name]: checkval
+                },
+                () => {
+                    this.updatepropschecked(checkval, name);
+                }
+            );
+        }
+    }
 
     /* Handles the event to update the props.   */
     updatepropschecked(e, i) {
@@ -3422,6 +3554,167 @@ class Card extends React.Component {
                 }
             }
         }
+        if (i === 'noneofabove') {
+            if (oldprops.multilevel) {
+                if (oldprops.multilevel === 0) {
+                    if (e === 1) {
+                        if (!oldprops.options) {
+                            oldprops.options = []
+                        }
+                        oldprops.options.push({
+                            id: 'noneofabove',
+                            label: "none of above",
+                            label_image: "",
+                            label_text: '<p>none of above</p>'
+                        })
+                        selectedlanguage.forEach((a, b) => {
+                            if (a.label !== 'English') {
+                                if (!languages_drop[a.label].content[this.props.index].properties.options) {
+                                    languages_drop[a.label].content[this.props.index].properties.options = []
+                                }
+                                languages_drop[a.label].content[this.props.index].properties.options.push({
+                                    id: 'noneofabove',
+                                    label: "none of above",
+                                    label_image: "",
+                                    label_text: '<p>none of above</p>'
+                                })
+                            }
+                        })
+                    }
+                    else if (e === 0) {
+                        let arr = oldprops.options;
+
+                        for (let j = 0; j < arr.length; j++) {
+                            if (arr[j].id === 'noneofabove') {
+                                arr.splice(j, 1);
+                            }
+                        }
+                        oldprops.options = arr;
+                        selectedlanguage.forEach((a, b) => {
+                            if (a.label !== 'English') {
+                                var arr1 = languages_drop[a.label].content[this.props.index].properties.options;
+                                for (var j = 0; j < arr1.length; j++) {
+                                    if (arr1[j].id === 'noneofabove') {
+                                        arr1.splice(j, 1);
+                                    }
+                                }
+                                languages_drop[a.label].content[this.props.index].properties.options = arr1;
+                            }
+                        })
+                    }
+                }
+                else if (oldprops.multilevel === 1) {
+                    if (e === 1) {
+                        if (!oldprops.options) {
+                            oldprops.options = []
+                        }
+                        oldprops.options.push({
+                            id: 'noneofabove',
+                            label: "none of above",
+                            label_image: "",
+                            label_text: '<p>none of above</p>',
+                            sublabel: [{
+                                id: 'noneofabove',
+                                label_image: "",
+                                sublabel: "none of above",
+                                sublabel_text: '<p>none of above</p>'
+                            }]
+                        })
+                        selectedlanguage.forEach((a, b) => {
+                            if (a.label !== 'English') {
+                                if (!languages_drop[a.label].content[this.props.index].properties.options) {
+                                    languages_drop[a.label].content[this.props.index].properties.options = []
+                                }
+                                languages_drop[a.label].content[this.props.index].properties.options.push({
+                                    id: 'noneofabove',
+                                    label: "none of above",
+                                    label_image: "",
+                                    label_text: '<p>none of above</p>',
+                                    sublabel: [{
+                                        id: 'noneofabove',
+                                        label_image: "",
+                                        sublabel: "none of above",
+                                        sublabel_text: '<p>none of above</p>'
+                                    }]
+                                })
+                            }
+                        })
+                    }
+                    else if (e === 0) {
+                        let arr = oldprops.options;
+
+                        for (let j = 0; j < arr.length; j++) {
+                            if (arr[j].id === 'noneofabove') {
+                                arr.splice(j, 1);
+                            }
+                        }
+                        oldprops.options = arr;
+                        selectedlanguage.forEach((a, b) => {
+                            if (a.label !== 'English') {
+                                var arr1 = languages_drop[a.label].content[this.props.index].properties.options;
+                                for (var j = 0; j < arr1.length; j++) {
+                                    if (arr1[j].id === 'noneofabove') {
+                                        arr1.splice(j, 1);
+                                    }
+                                }
+                                languages_drop[a.label].content[this.props.index].properties.options = arr1;
+                            }
+                        })
+                    }
+                }
+            }
+            else {
+                if (oldprops.choice_type === "single" || oldprops.choice_type === "multiple") {
+                    if (e === 1) {
+                        if (!oldprops.options) {
+                            oldprops.options = []
+                        }
+                        oldprops.options.push({
+                            id: 'noneofabove',
+                            label: "none of above",
+                            label_image: "",
+                            label_text: '<p>none of above</p>',
+                        })
+                        selectedlanguage.forEach((a, b) => {
+                            if (a.label !== 'English') {
+                                if (!languages_drop[a.label].content[this.props.index].properties.options) {
+                                    languages_drop[a.label].content[this.props.index].properties.options = []
+                                }
+                                languages_drop[a.label].content[this.props.index].properties.options.push({
+                                    id: 'noneofabove',
+                                    label: "none of above",
+                                    label_image: "",
+                                    label_text: '<p>none of above</p>',
+                                })
+                            }
+                        })
+                    }
+                    else if (e === 0) {
+                        let arr = oldprops.options;
+                        if (arr) {
+                            for (let j = 0; j < arr.length; j++) {
+                                if (arr[j].id === 'noneofabove') {
+                                    arr.splice(j, 1);
+                                }
+                            }
+
+                            oldprops.options = arr;
+                            selectedlanguage.forEach((a, b) => {
+                                if (a.label !== 'English') {
+                                    var arr1 = languages_drop[a.label].content[this.props.index].properties.options;
+                                    for (var j = 0; j < arr1.length; j++) {
+                                        if (arr1[j].id === 'noneofabove') {
+                                            arr1.splice(j, 1);
+                                        }
+                                    }
+                                    languages_drop[a.label].content[this.props.index].properties.options = arr1;
+                                }
+                            })
+                        }
+                    }
+                }
+            }
+        }
         if (i === 'multilevel' && e === 1) {
             oldprops[`${i}`] = e;
             oldprops[`${'image_size'}`] = 'small';
@@ -3510,7 +3803,11 @@ class Card extends React.Component {
             }
 
             /** if other option available then push at second last position otherwise last */
-            if (fieldprops.properties[`${e}`].some(obj => obj.id === "other")) {
+            if (fieldprops.properties[`${e}`].some(obj => obj.id === "other") && fieldprops.properties[`${e}`].some(obj => obj.id === "noneofabove")) {
+                let indexToInsert = fieldprops.properties[`${e}`].length - 2
+                fieldprops.properties[`${e}`].splice(indexToInsert, 0, { id: manual, label: "", label_image: "" });
+            }
+            else if (fieldprops.properties[`${e}`].some(obj => obj.id === "other") || fieldprops.properties[`${e}`].some(obj => obj.id === "noneofabove")) {
                 let indexToInsert = fieldprops.properties[`${e}`].length - 1
                 fieldprops.properties[`${e}`].splice(indexToInsert, 0, { id: manual, label: "", label_image: "" });
             }
@@ -5969,6 +6266,73 @@ class Card extends React.Component {
                             <li>
                                 <div className="below-lanbel-body">
                                     <div className="switch-text-boxes switch-text-boxes-mandatory clear">
+                                        <div className="switch-textboxes xtboxestext"
+                                            style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
+                                        >Set Selection Limit</div>
+                                        <div className="switches-boxes"
+                                            style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
+                                        >
+                                            <Switch checked={Boolean(this.state.fieldprops.properties.setlimit)}
+                                                style={this.state.fieldprops.properties.display_type === "dropdown" ? disabledive : null}
+                                                onChange={this.setlimit('setlimit')} value="setlimit" color="primary" />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        {this.state.fieldprops.properties.setlimit == 1 ? (
+                                            <div>
+                                                <div className="radioForm clearfix"
+                                                    style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
+                                                >
+                                                    <div className="block">
+                                                        <input type="radio" value="noneofabove" checked={this.state.fieldprops.properties.setlimit_type === "noneofabove"}
+                                                            onChange={this.setLimitRadioChange} />
+                                                        <span>None Of Above</span>
+                                                    </div>
+                                                    <div className="block">
+                                                        <input type="radio" value="setminmaxlimit" checked={this.state.fieldprops.properties.setlimit_type === "setminmaxlimit"}
+                                                            style={(this.state.fieldprops.properties.choice_type == "single" || this.state.fieldprops.properties.multilevel == 1) ? disabledive : {}}
+                                                            onChange={this.setLimitRadioChange} />
+                                                        <span style={(this.state.fieldprops.properties.choice_type == "single" || this.state.fieldprops.properties.multilevel == 1) ? disabledive : {}}>Set Limit</span>
+                                                    </div>
+                                                </div>
+
+                                                {this.state.fieldprops.properties.setlimit_type === "setminmaxlimit" ? (
+                                                    <div className="newdivlabp clear clearfix"
+                                                        style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
+                                                    >
+                                                        <div className="scaletxt newdivsetlimit clear clearfix">
+                                                            <p className="newtxt">
+                                                                <span style={(this.state.fieldprops.properties.choice_type == "single" || this.state.fieldprops.properties.multilevel == 1) ? disabledive : {}}>MIN</span>
+                                                                <input
+                                                                    style={(this.state.fieldprops.properties.choice_type == "single" || this.state.fieldprops.properties.multilevel == 1) ? disabledive : {}}
+                                                                    type="number"
+                                                                    value={this.state.fieldprops.properties.minlimit}
+                                                                    name="setlimitmin"
+                                                                    onChange={e => this.setMinLimitOption(e)}
+                                                                />{" "}
+                                                            </p>
+                                                            <p className="newtxt">
+                                                                <span style={(this.state.fieldprops.properties.choice_type == "single" || this.state.fieldprops.properties.multilevel == 1) ? disabledive : {}}>MAX</span>
+                                                                <input
+                                                                    style={(this.state.fieldprops.properties.choice_type == "single" || this.state.fieldprops.properties.multilevel == 1) ? disabledive : {}}
+                                                                    disabled={this.state.fieldprops.properties.minlimit >= 0 ? "" : "disabled"}
+                                                                    type="number"
+                                                                    value={this.state.fieldprops.properties.maxlimit}
+                                                                    name="setlimitmax"
+                                                                    onChange={e => this.setMaxLimitOption(e)}
+                                                                />{" "}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                ) : ""}
+                                            </div>
+                                        ) : ""}
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div className="below-lanbel-body">
+                                    <div className="switch-text-boxes switch-text-boxes-mandatory clear">
                                         <h3
                                             style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                                         >Options</h3>
@@ -6078,7 +6442,7 @@ class Card extends React.Component {
                                                                             style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
 
                                                                         >
-                                                                            {value.id !== 'other' && <i className="fa fa-trash" onClick={() => this.deletefun(index, "parentlabel")} />}
+                                                                            {(value.id !== 'other' && value.id !== 'noneofabove') ? <i className="fa fa-trash" onClick={() => this.deletefun(index, "parentlabel")} /> : ""}
                                                                         </div>
                                                                         {/* <img src={value.label_image} alt="label" width="50" /> */}
                                                                     </div>
@@ -6128,7 +6492,7 @@ class Card extends React.Component {
                                                                                                     style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
 
                                                                                                 >
-                                                                                                    {value.id !== 'other' && <i className="fa fa-trash" onClick={() => this.deletefun(index, "childlabel", key)} />}
+                                                                                                    {(value.id !== 'other' && value.id !== 'noneofabove') ? <i className="fa fa-trash" onClick={() => this.deletefun(index, "childlabel", key)} /> : ""}
                                                                                                 </div>
                                                                                                 {/* <img src={value.label_image} alt="label" width="50" /> */}
                                                                                             </div>
