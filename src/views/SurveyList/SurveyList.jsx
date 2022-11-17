@@ -34,6 +34,7 @@ import { Button, Form } from "react-bootstrap";
 
 /* Scroll. */
 import PerfectScrollbar from "react-perfect-scrollbar";
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 /* API. */
 import api2 from "../../helpers/api2";
@@ -110,7 +111,7 @@ const styles = {
 };
 
 
-
+const pageSize = 100
 class SurveyList extends React.Component {
   constructor(props, context) {
     super(props, context);
@@ -132,7 +133,8 @@ class SurveyList extends React.Component {
       cloneSurveyId: "",
       /* Snackbar props */
       msgColor: "info",
-      br: false
+      br: false,
+      hasMoreData: true
     };
   }
 
@@ -149,7 +151,8 @@ class SurveyList extends React.Component {
 
         self.setState({
           surveys: resp.data,
-          filteredSurveys: resp.data,
+          filteredSurveys: resp.data.slice(0, pageSize),
+          hasMoreData: true,
           response: true
         });
       })
@@ -340,6 +343,23 @@ class SurveyList extends React.Component {
     this.setState({ dialogOpen: false });
   };
 
+  /** pagination of data */
+  fetchMoreData = () => {
+    if (this.state.filteredSurveys.length == this.state.surveys.length) {
+      this.setState({ hasMoreData: false });
+      return;
+    }
+    setTimeout(() => {
+      let start = this.state.filteredSurveys.length
+      let end = this.state.filteredSurveys.length + pageSize
+      let spliceArray = this.state.surveys.slice(start, end)
+      let concatedArray = this.state.filteredSurveys.concat(spliceArray)
+      this.setState({
+        filteredSurveys: concatedArray
+      });
+    }, 500);
+  };
+
   render() {
     const { classes } = this.props;
     const { msgColor, br, message } = this.state;
@@ -454,31 +474,45 @@ class SurveyList extends React.Component {
             ) : (
               <Fragment>
                 {this.state.view === "grid" ? (
-                  <PerfectScrollbar>
-                    <div className="list-box">
-                      <Grid container spacing={8}>
-                        {this.state.filteredSurveys.map((survey, i) => (
-                          <Grid
-                            item
-                            md={4}
-                            key={i}
-                            style={{
-                              width: this.props.isMobile ? "100%" : "auto",
-                              marginLeft: this.props.isMobile ? "-1%" : "0"
-                            }}
-                          >
-                            <SurveyCard
+                  // <PerfectScrollbar id="scrollableDiv">
+                  <div id="scrollableDiv" style={{ height: "calc(100vh - 80px)", overflow: "auto" }}>
+                    <InfiniteScroll
+                      dataLength={this.state.filteredSurveys.length}
+                      next={this.fetchMoreData}
+                      hasMore={this.state.hasMoreData}
+                      // height={800}
+                      loader={
+                        <h5 className="pt-4 text-center">Loading...</h5>
+                      }
+                      endMessage={<div></div>}
+                      scrollableTarget="scrollableDiv"
+                    >
+                      <div className="list-box float-none">
+                        <Grid container spacing={8}>
+                          {this.state.filteredSurveys.map((survey, i) => (
+                            <Grid
+                              item
+                              md={4}
                               key={i}
-                              survey={survey}
-                              index={i}
-                              deleteItem={this.deleteItem}
-                              cloneItem={this.cloneItem}
-                            />
-                          </Grid>
-                        ))}
-                      </Grid>
-                    </div>
-                  </PerfectScrollbar>
+                              style={{
+                                width: this.props.isMobile ? "100%" : "auto",
+                                marginLeft: this.props.isMobile ? "-1%" : "0"
+                              }}
+                            >
+                              <SurveyCard
+                                key={i}
+                                survey={survey}
+                                index={i}
+                                deleteItem={this.deleteItem}
+                                cloneItem={this.cloneItem}
+                              />
+                            </Grid>
+                          ))}
+                        </Grid>
+                      </div>
+                    </InfiniteScroll>
+                  </div>
+                  // </PerfectScrollbar>
                 ) : (
                   <PerfectScrollbar>
                     <div className="list-box">
