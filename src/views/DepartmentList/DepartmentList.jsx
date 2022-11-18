@@ -33,6 +33,7 @@ import { Button, Form } from "react-bootstrap";
 
 /* Scroll. */
 import PerfectScrollbar from "react-perfect-scrollbar";
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 /* API. */
 import api2 from "../../helpers/api2";
@@ -79,6 +80,7 @@ const styles = {
   }
 };
 
+const pageSize = 50
 class DepartmentList extends React.Component {
   constructor(props, context) {
     super(props, context);
@@ -94,7 +96,8 @@ class DepartmentList extends React.Component {
       dialogOpen: false,
       deleteDepartmentName: "",
       deleteDepartmentId: "",
-      deleteDepartmentIndex: ""
+      deleteDepartmentIndex: "",
+      hasMoreDepartmentData: true
     };
     //this.props.handleCollapseScreen(true);
   }
@@ -112,7 +115,8 @@ class DepartmentList extends React.Component {
       .then(response => {
         self.setState({
           departments: response.data,
-          filteredDepartments: response.data,
+          filteredDepartments: response.data.slice(0, pageSize),
+          hasMoreDepartmentData: response.data && response.data.length >= pageSize ? true : false,
           response: true
         });
       })
@@ -195,6 +199,23 @@ class DepartmentList extends React.Component {
         });
     }
     this.setState({ dialogOpen: false });
+  };
+
+  /** pagination of data */
+  fetchMoreDepartmentData = () => {
+    if (this.state.filteredDepartments.length == this.state.departments.length) {
+      this.setState({ hasMoreDepartmentData: false });
+      return;
+    }
+    setTimeout(() => {
+      let start = this.state.filteredDepartments.length
+      let end = this.state.filteredDepartments.length + pageSize
+      let spliceArray = this.state.departments.slice(start, end)
+      let concatedArray = this.state.filteredDepartments.concat(spliceArray)
+      this.setState({
+        filteredDepartments: concatedArray
+      });
+    }, 500);
   };
 
   render() {
@@ -320,33 +341,47 @@ class DepartmentList extends React.Component {
             ) : (
               <Fragment>
                 {this.state.view === "grid" ? (
-                  <PerfectScrollbar>
-                    <div className="list-box">
-                      <Grid container spacing={8}>
-                        {this.state.filteredDepartments.map((department, i) => (
-                          <Grid
-                            item
-                            md={4}
-                            key={i}
-                            style={{
-                              width: this.props.isMobile ? "100%" : "auto",
-                              marginLeft: this.props.isMobile ? "-1%" : "0"
-                            }}
-                          >
-                            <DepartmentCard
-                              key={department.departmentName}
-                              department={department}
-                              index={i}
-                              deleteItem={this.deleteItem}
-                              canDelete={
-                                this.state.userRole === "ADMIN" ? true : false
-                              }
-                            />
-                          </Grid>
-                        ))}
-                      </Grid>
-                    </div>
-                  </PerfectScrollbar>
+                  // <PerfectScrollbar>
+                  <div id="scrollableDiv" style={{ height: "calc(100vh - 80px)", overflow: "auto" }}>
+                    <InfiniteScroll
+                      dataLength={this.state.filteredDepartments.length}
+                      next={this.fetchMoreDepartmentData}
+                      hasMore={this.state.hasMoreDepartmentData}
+                      // height={800}
+                      loader={
+                        <h5 className="pt-4 text-center">Loading...</h5>
+                      }
+                      endMessage={<div></div>}
+                      scrollableTarget="scrollableDiv"
+                    >
+                      <div className="list-box float-none">
+                        <Grid container spacing={8}>
+                          {this.state.filteredDepartments.map((department, i) => (
+                            <Grid
+                              item
+                              md={4}
+                              key={i}
+                              style={{
+                                width: this.props.isMobile ? "100%" : "auto",
+                                marginLeft: this.props.isMobile ? "-1%" : "0"
+                              }}
+                            >
+                              <DepartmentCard
+                                key={department.departmentName}
+                                department={department}
+                                index={i}
+                                deleteItem={this.deleteItem}
+                                canDelete={
+                                  this.state.userRole === "ADMIN" ? true : false
+                                }
+                              />
+                            </Grid>
+                          ))}
+                        </Grid>
+                      </div>
+                    </InfiniteScroll>
+                  </div>
+                  // </PerfectScrollbar>
                 ) : (
                   <PerfectScrollbar>
                     <div className="list-box">

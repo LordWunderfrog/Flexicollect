@@ -152,7 +152,7 @@ class SurveyList extends React.Component {
         self.setState({
           surveys: resp.data,
           filteredSurveys: resp.data.slice(0, pageSize),
-          hasMoreData: true,
+          hasMoreData: resp.data && resp.data.length >= pageSize ? true : false,
           response: true
         });
       })

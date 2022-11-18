@@ -31,6 +31,7 @@ import { Button, Form } from "react-bootstrap";
 
 /* Scrollbar. */
 import PerfectScrollbar from "react-perfect-scrollbar";
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 /* API. */
 import api2 from "../../helpers/api2";
@@ -79,6 +80,7 @@ const styles = {
   }
 };
 
+const pageSize = 50
 class ClientList extends React.Component {
   constructor(props, context) {
     super(props, context);
@@ -93,7 +95,8 @@ class ClientList extends React.Component {
       dialogOpen: false,
       deleteClientName: "",
       deleteClientId: "",
-      deleteClientIndex: ""
+      deleteClientIndex: "",
+      hasMoreClientData: true
     };
   }
 
@@ -110,7 +113,8 @@ class ClientList extends React.Component {
       .then(response => {
         self.setState({
           clients: response.data,
-          filteredClients: response.data,
+          filteredClients: response.data.slice(0, pageSize),
+          hasMoreClientData: response.data && response.data.length >= pageSize ? true : false,
           response: true
         });
       })
@@ -192,6 +196,22 @@ class ClientList extends React.Component {
     this.filterClient(value);
   };
 
+  /** pagination of data */
+  fetchMoreClientData = () => {
+    if (this.state.filteredClients.length == this.state.clients.length) {
+      this.setState({ hasMoreClientData: false });
+      return;
+    }
+    setTimeout(() => {
+      let start = this.state.filteredClients.length
+      let end = this.state.filteredClients.length + pageSize
+      let spliceArray = this.state.clients.slice(start, end)
+      let concatedArray = this.state.filteredClients.concat(spliceArray)
+      this.setState({
+        filteredClients: concatedArray
+      });
+    }, 500);
+  };
 
   render() {
     const { classes } = this.props;
@@ -304,30 +324,44 @@ class ClientList extends React.Component {
             ) : (
               <Fragment>
                 {this.state.view === "grid" ? (
-                  <PerfectScrollbar>
-                    <div className="list-box">
-                      <Grid container spacing={8}>
-                        {this.state.filteredClients.map((client, i) => (
-                          <Grid
-                            item
-                            md={4}
-                            key={i}
-                            style={{
-                              width: this.props.isMobile ? "100%" : "auto",
-                              marginLeft: this.props.isMobile ? "-1%" : "0"
-                            }}
-                          >
-                            <ClientCard
-                              key={client.clientName}
-                              client={client}
-                              index={i}
-                              deleteItem={this.deleteItem}
-                            />
-                          </Grid>
-                        ))}
-                      </Grid>
-                    </div>
-                  </PerfectScrollbar>
+                  // <PerfectScrollbar>
+                  <div id="scrollableDiv" style={{ height: "calc(100vh - 80px)", overflow: "auto" }}>
+                    <InfiniteScroll
+                      dataLength={this.state.filteredClients.length}
+                      next={this.fetchMoreClientData}
+                      hasMore={this.state.hasMoreClientData}
+                      // height={800}
+                      loader={
+                        <h5 className="pt-4 text-center">Loading...</h5>
+                      }
+                      endMessage={<div></div>}
+                      scrollableTarget="scrollableDiv"
+                    >
+                      <div className="list-box float-none">
+                        <Grid container spacing={8}>
+                          {this.state.filteredClients.map((client, i) => (
+                            <Grid
+                              item
+                              md={4}
+                              key={i}
+                              style={{
+                                width: this.props.isMobile ? "100%" : "auto",
+                                marginLeft: this.props.isMobile ? "-1%" : "0"
+                              }}
+                            >
+                              <ClientCard
+                                key={client.clientName}
+                                client={client}
+                                index={i}
+                                deleteItem={this.deleteItem}
+                              />
+                            </Grid>
+                          ))}
+                        </Grid>
+                      </div>
+                    </InfiniteScroll>
+                  </div>
+                  //</PerfectScrollbar>
                 ) : (
                   <PerfectScrollbar>
                     <div className="list-box">
