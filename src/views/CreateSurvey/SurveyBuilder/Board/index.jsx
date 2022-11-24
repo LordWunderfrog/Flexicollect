@@ -1178,7 +1178,7 @@ import Card from "./Drop";
 import DropList from "./DropList";
 
 import "./Board.css";
-import update from 'immutability-helper';
+
 import api2 from "helpers/api2";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import cloneDeep from 'lodash/cloneDeep';
@@ -1218,7 +1218,7 @@ class Board extends Component {
     this.ropen = this.ropen.bind(this);
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
 
     this.checkrefcode()
     this.gallerrfun();
@@ -2291,7 +2291,7 @@ class Board extends Component {
           <div className="new-btn pointer" onClick={() => this.openevent()}>
             <div className='relativepos'>
               <p>Add Elements</p>
-              <a href="#" className="bdr-ripple-ani-btn rippleff rotator"><i class="fa fa-plus"></i></a>
+              <a href="#" className="bdr-ripple-ani-btn rippleff rotator"><i className="fa fa-plus"></i></a>
             </div>
           </div>
 
@@ -2420,7 +2420,7 @@ class Board extends Component {
               )}
             </Droppable>
             {this.state.drops.map((drop, index) => (drops[index] ? (
-              <div>
+              <div key={index}>
                 <Card
                   index={index}
                   color={drop.color}

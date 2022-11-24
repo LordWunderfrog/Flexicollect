@@ -4256,7 +4256,7 @@ class Card extends React.Component {
                                         // name="icon_type"
                                         onChange={e => this.updateprops(e, "info_type")}
                                     />
-                                    <label for={"infonone"}>None</label>
+                                    <label htmlFor={"infonone"}>None</label>
                                 </span>
                                 <span className="widthfifty widththirty">
                                     <input
@@ -4267,7 +4267,7 @@ class Card extends React.Component {
                                         // name="icon_type"
                                         onChange={e => this.updateprops(e, "info_type")}
                                     />
-                                    <label for={"infoimage"}>Image</label>
+                                    <label htmlFor={"infoimage"}>Image</label>
                                 </span>
                                 <span className="widthfifty widththirty">
                                     <input
@@ -4278,7 +4278,7 @@ class Card extends React.Component {
                                         //  name="icon_type"
                                         onChange={e => this.updateprops(e, "info_type")}
                                     />
-                                    <label for={"infovideo"}>Video</label>
+                                    <label htmlFor={"infovideo"}>Video</label>
                                 </span>
                                 <span className="widthfifty widththirty">
                                     <input
@@ -4289,7 +4289,7 @@ class Card extends React.Component {
                                         //   name="icon_type"
                                         onChange={e => this.updateprops(e, "info_type")}
                                     />
-                                    <label for={"infoaudio"}>Audio</label>
+                                    <label htmlFor={"infoaudio"}>Audio</label>
                                 </span>
                             </div>
                             <div className="t-i-v-wrap">
@@ -4540,7 +4540,7 @@ class Card extends React.Component {
 
                                 </div>
                             </div>
-                            <li>
+                            <div>
                                 <h3>Product Number</h3>
                                 <Select
                                     placeholder={'select Product Number'}
@@ -4572,7 +4572,7 @@ class Card extends React.Component {
                                 <div className="below-lanbel-body" style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
                                     <input type="text" name="productNum" className="mediumfm" value={this.state.fieldprops.properties.productNumber ? this.state.fieldprops.properties.productNumber : ""} onChange={e => this.inputtypeProductNum(e, "inputtypeProductNum")} />
                                 </div>
-                            </li>
+                            </div>
                         </li>
 
                         <li>
@@ -4809,7 +4809,7 @@ class Card extends React.Component {
                                     onClick={() => this.setState({ disabled: false })}
                                 > Ref Code
                                 </div>
-                                <li>
+                                <div>
                                     <h3>Product Number</h3>
                                     <Select
                                         placeholder={'select Product Number'}
@@ -4841,7 +4841,7 @@ class Card extends React.Component {
                                     <div className="below-lanbel-body" style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
                                         <input type="text" name="productNum" className="mediumfm" value={this.state.fieldprops.properties.productNumber ? this.state.fieldprops.properties.productNumber : ""} onChange={e => this.inputtypeProductNum(e, "inputtypeProductNum")} />
                                     </div>
-                                </li>
+                                </div>
                             </div>
                         </li>
 
@@ -5162,7 +5162,7 @@ class Card extends React.Component {
                                 > Ref Code
 
                                 </div>
-                                <li>
+                                <div>
                                     <h3>Product Number</h3>
                                     <Select
                                         placeholder={'select Product Number'}
@@ -5194,7 +5194,7 @@ class Card extends React.Component {
                                     <div className="below-lanbel-body" style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
                                         <input type="text" name="productNum" className="mediumfm" value={this.state.fieldprops.properties.productNumber ? this.state.fieldprops.properties.productNumber : ""} onChange={e => this.inputtypeProductNum(e, "inputtypeProductNum")} />
                                     </div>
-                                </li>
+                                </div>
                             </div>
                         </li>
                         <li
@@ -5250,7 +5250,7 @@ class Card extends React.Component {
                                     <div className="switch-textboxes xtboxestext">Markers</div>
                                     <div className="switches-boxes">
                                         <Switch
-                                            checked={this.state.fieldprops.properties.marker_enabled ? this.state.fieldprops.properties.marker_enabled : 0}
+                                            checked={Boolean(this.state.fieldprops.properties.marker_enabled)}
                                             onChange={this.marker_enabled("marker_enabled")}
                                             value="marker_enabled"
                                             color="primary"
@@ -5285,7 +5285,7 @@ class Card extends React.Component {
                                         <div className="switch-textboxes xtboxestext">Explanation</div>
                                         <div className="switches-boxes">
                                             <Switch
-                                                checked={this.state.fieldprops.properties.instruction_enabled}
+                                                checked={Boolean(this.state.fieldprops.properties.instruction_enabled)}
                                                 onChange={this.instruction_enabled("instruction_enabled")}
                                                 value="instruction_enabled"
                                                 color="primary"
@@ -5498,7 +5498,7 @@ class Card extends React.Component {
                                     onClick={() => this.setState({ disabled: false })}
                                 > Ref Code
                                 </div>
-                                <li>
+                                <div>
                                     <h3>Product Number</h3>
                                     <Select
                                         placeholder={'select Product Number'}
@@ -5530,7 +5530,7 @@ class Card extends React.Component {
                                     <div className="below-lanbel-body" style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
                                         <input type="text" name="productNum" className="mediumfm" value={this.state.fieldprops.properties.productNumber ? this.state.fieldprops.properties.productNumber : ""} onChange={e => this.inputtypeProductNum(e, "inputtypeProductNum")} />
                                     </div>
-                                </li>
+                                </div>
                             </div>
                         </li>
                         <li
@@ -5850,7 +5850,7 @@ class Card extends React.Component {
                                                             ? this.state.fieldprops.properties.table_content.table_value.map((value, index) => (
                                                                 <div className="" key={index}>
                                                                     {value.image.map((val, i) => (
-                                                                        <div>
+                                                                        <div key={i}>
                                                                             <div key={i} className="twocol dropboxer dropboxeredits">
                                                                                 <div className="dropper ">
                                                                                     <div className="droppertotalcls clearfix">
@@ -6112,7 +6112,7 @@ class Card extends React.Component {
                                         onClick={() => this.setState({ disabled: false })}
                                     > Ref Code
                                     </div>
-                                    <li>
+                                    <div>
                                         <h3>Product Number</h3>
                                         <Select
                                             placeholder={'select Product Number'}
@@ -6144,7 +6144,7 @@ class Card extends React.Component {
                                         <div className="below-lanbel-body" style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
                                             <input type="text" name="productNum" className="mediumfm" value={this.state.fieldprops.properties.productNumber ? this.state.fieldprops.properties.productNumber : ""} onChange={e => this.inputtypeProductNum(e, "inputtypeProductNum")} />
                                         </div>
-                                    </li>
+                                    </div>
                                 </div>
                             </li>
                             <li
@@ -6657,7 +6657,7 @@ class Card extends React.Component {
                                     onClick={() => this.setState({ disabled: false })}
                                 > Ref Code
                                 </div>
-                                <li>
+                                <div>
                                     <h3>Product Number</h3>
                                     <Select
                                         placeholder={'select Product Number'}
@@ -6689,7 +6689,7 @@ class Card extends React.Component {
                                     <div className="below-lanbel-body" style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
                                         <input type="text" name="productNum" className="mediumfm" value={this.state.fieldprops.properties.productNumber ? this.state.fieldprops.properties.productNumber : ""} onChange={e => this.inputtypeProductNum(e, "inputtypeProductNum")} />
                                     </div>
-                                </li>
+                                </div>
                             </div>
                         </li>
 

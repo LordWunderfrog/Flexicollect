@@ -403,7 +403,7 @@ class DropList extends React.Component {
                             {this.state.fieldprops.properties.question_text ?
                                 <>  {React.createElement("div", { className: 'questionText', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.question_text ? 'ID_' + this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question_text : "" } })}</>
                                 : <Textarea minRows={1} maxRows={10} value={this.state.fieldprops.properties.question ? 'ID_' + this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question : ""} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth"
-                                    style={{ resize: "none" }} onFocus={this.handleFocus} readonly />}
+                                    style={{ resize: "none" }} onFocus={this.handleFocus} readOnly />}
                             {/* <Textarea minRows={1} maxRows={10} value={this.state.fieldprops.properties.question} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth"
                                 style={{ resize: "none" }} onFocus={this.handleFocus} /> */}
 
@@ -447,7 +447,7 @@ class DropList extends React.Component {
                             {this.state.fieldprops.properties.question_text ?
                                 <>{React.createElement("div", { className: 'questionText', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.question_text ? 'ID_' + this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question_text : "" } })}</>
                                 : <Textarea minRows={1} maxRows={10} value={this.state.fieldprops.properties.question ? 'ID_' + this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question : ""} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth"
-                                    style={{ resize: "none" }} onFocus={this.handleFocus} onBlur={this.handleBlur} readonly />}
+                                    style={{ resize: "none" }} onFocus={this.handleFocus} onBlur={this.handleBlur} readOnly />}
                             {/* <Textarea minRows={1} maxRows={10} value={this.state.fieldprops.properties.question} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth"
                                 style={{ resize: "none" }} onFocus={this.handleFocus} onBlur={this.handleBlur} /> */}
                             {this.state.fieldprops.properties.subheading_text ?
@@ -493,7 +493,7 @@ class DropList extends React.Component {
                         <div className="label customlbl">
                             {this.state.fieldprops.properties.question_text ?
                                 <>{React.createElement("div", { className: 'questionText', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.question_text ? 'ID_' + this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question_text : "" } })}</>
-                                : <Textarea minRows={1} maxRows={10} onFocus={this.handleFocus} onBlur={this.handleBlur} value={this.state.fieldprops.properties.question ? 'ID_' + this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question : ""} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} readonly />}
+                                : <Textarea minRows={1} maxRows={10} onFocus={this.handleFocus} onBlur={this.handleBlur} value={this.state.fieldprops.properties.question ? 'ID_' + this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question : ""} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} readOnly />}
 
                             {/* <Textarea minRows={1} maxRows={10} onFocus={this.handleFocus} onBlur={this.handleBlur} value={this.state.fieldprops.properties.question} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} /> */}
                             {this.state.fieldprops.properties.subheading_text ?
@@ -531,7 +531,7 @@ class DropList extends React.Component {
                         <div className="label customlbl">
                             {this.state.fieldprops.properties.question_text ?
                                 <>{React.createElement("div", { className: 'questionText', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.question_text ? 'ID_' + this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question_text : "" } })}</>
-                                : <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question ? 'ID_' + this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question : ""} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} readonly />}
+                                : <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question ? 'ID_' + this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question : ""} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} readOnly />}
                             {/* <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} /> */}
                             {this.state.fieldprops.properties.subheading_text ?
                                 <>  {React.createElement("h6", { className: 'subheading', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.subheading_text } })}</>
@@ -567,7 +567,7 @@ class DropList extends React.Component {
                         <div className="label customlbl">
                             {this.state.fieldprops.properties.question_text ?
                                 <>{React.createElement("div", { className: 'questionText', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.question_text ? 'ID_' + this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question_text : "" } })}</>
-                                : <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question ? 'ID_' + this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question : ""} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} readonly />}
+                                : <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question ? 'ID_' + this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question : ""} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} readOnly />}
                             {/* <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} /> */}
                             {this.state.fieldprops.properties.subheading_text ?
                                 <>  {React.createElement("h6", { className: 'subheading', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.subheading_text } })}</>
@@ -603,7 +603,7 @@ class DropList extends React.Component {
                         <div className="label customlbl">
                             {this.state.fieldprops.properties.question_text ?
                                 <>{React.createElement("div", { className: 'questionText', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.question_text ? 'ID_' + this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question_text : "" } })}</>
-                                : <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question ? 'ID_' + this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question : ""} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} readonly />}
+                                : <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question ? 'ID_' + this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question : ""} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} readOnly />}
                             {/* <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} /> */}
                             {this.state.fieldprops.properties.subheading_text ?
                                 <>  {React.createElement("h6", { className: 'subheading', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.subheading_text } })}</>
@@ -704,7 +704,7 @@ class DropList extends React.Component {
                         <div className="label customlbl">
                             {this.state.fieldprops.properties.question_text ?
                                 <>{React.createElement("div", { className: 'questionText', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.question_text ? 'ID_' + this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question_text : "" } })}</>
-                                : <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question ? 'ID_' + this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question : ""} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} readonly />}
+                                : <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question ? 'ID_' + this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question : ""} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} readOnly />}
 
                             {/* <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} /> */}
                             {this.state.fieldprops.properties.subheading_text ?
@@ -742,7 +742,7 @@ class DropList extends React.Component {
                         <div className="label customlbl">
                             {this.state.fieldprops.properties.question_text ?
                                 <>{React.createElement("div", { className: 'questionText', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.question_text ? 'ID_' + this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question_text : "" } })}</>
-                                : <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question ? 'ID_' + this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question : ""} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} readonly />}
+                                : <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question ? 'ID_' + this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question : ""} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} readOnly />}
                             {/* <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} /> */}
                             {this.state.fieldprops.properties.subheading_text ?
                                 <>{React.createElement("h6", { className: 'subheading', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.subheading_text } })}</>

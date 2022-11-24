@@ -168,7 +168,7 @@ class WebLink extends React.Component {
 
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         values = queryString.parse(this.props.location.search);
         let keys = Object.keys(values);
         if (keys.length > 0) {
