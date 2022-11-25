@@ -37,6 +37,9 @@ import axios from 'axios';
 import cloneDeep from 'lodash/cloneDeep';
 
 const theme = createMuiTheme({
+    typography: {
+        useNextVariants: true,
+    },
     palette: {
         primary: {
             main: "#074e9e"

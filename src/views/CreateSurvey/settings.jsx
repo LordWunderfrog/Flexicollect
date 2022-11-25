@@ -1372,7 +1372,7 @@ class Settings extends React.Component {
                                         </div>
                                         {
                                             drop.source.map((source, idx) => (
-                                                <div className="dinamic_quest_block">
+                                                <div key={idx} className="dinamic_quest_block">
                                                     <div className="form-group clear clearfix">
                                                         <div className="label-part">If</div>
                                                         <div className="ans-part">

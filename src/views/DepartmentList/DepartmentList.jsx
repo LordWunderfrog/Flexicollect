@@ -121,7 +121,7 @@ class DepartmentList extends React.Component {
         });
       })
       .catch(error => {
-        console.error(error);
+        console.error('eror dept', error);
         self.setState({
           response: true
         });

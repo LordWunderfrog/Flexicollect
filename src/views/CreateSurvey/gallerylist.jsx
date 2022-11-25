@@ -92,7 +92,6 @@ class Gallerylist extends React.Component {
             })
             .catch(error => {
                 console.error(error);
-                console.log("NN")
                 self.setState({
                     response: true
                 });
@@ -110,7 +109,6 @@ class Gallerylist extends React.Component {
             })
             .catch(error => {
                 console.error(error);
-                console.log("NN")
                 self.setState({
                     response: true
                 });
@@ -245,7 +243,6 @@ class Gallerylist extends React.Component {
 
     render() {
         const { msgColor, br, message } = this.state;
-        console.log(this.props.tag)
         let gallery = this.state.gallery.images
         return (
             <div className="gallerydivwrap">
@@ -255,9 +252,9 @@ class Gallerylist extends React.Component {
 
                     {gallery.map((image, index) => (
 
-                        <div className="listofgallery listofgalleryalters"><img src={image.image} alt="gallery" />
-                            {console.log("image")}
-                            {console.log(image)}
+                        <div key={index} className="listofgallery listofgalleryalters"><img src={image.image} alt="gallery" />
+                            {/* {console.log("image")}
+                            {console.log(image)} */}
 
                             <div onClick={() => this.setState({ open: true, image: image })}><i className="fa fa-close"></i>
                             </div>

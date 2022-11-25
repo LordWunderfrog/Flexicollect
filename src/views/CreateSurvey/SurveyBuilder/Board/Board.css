@@ -152,7 +152,7 @@
   overflow-y: scroll;
   border: 1px dashed rgb(51, 51, 51);
   min-height: 100px;
-  max-height: 350px;
+  max-height: 500px;
   padding: 15px;
 }
 
