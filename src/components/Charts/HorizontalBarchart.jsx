@@ -84,7 +84,7 @@ class HorizontalBarchart extends React.Component {
         >
           <h5
             className={classes.cardTitleWhite}
-            style={{ fontSize: "1rem", marginTop: "-0.2rem" }}
+            style={{ fontSize: "1rem", marginTop: "-0.2rem", color: "#fff" }}
           >
             {this.props.title}
           </h5>

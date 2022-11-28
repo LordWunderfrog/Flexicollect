@@ -546,6 +546,46 @@ class WebLink extends React.Component {
       }
     }
 
+    /** Logic for non of above and set selection limit */
+    let queProperty = this.state.selectedQuestion.properties
+    if (queProperty && queProperty.setlimit == 1) {
+      if (queProperty.setlimit_type == "setminmaxlimit") {
+        var filteredArray = updatedChoiceOptions.filter(function (element) { return element.defaultValue == true })
+        let selectedObjLenth = filteredArray && filteredArray.length
+        if (selectedObjLenth > queProperty.maxlimit) {
+          value.defaultValue = false
+          for (var i = 0; i < selectedChoiceOptions.length; i++) {
+            if (selectedChoiceOptions[i].id === value.id) {
+              selectedChoiceOptions.splice(i, 1);
+              break;
+            }
+          }
+          this.showNotification('Please select maximum ' + queProperty.maxlimit + ' options only')
+        }
+      }
+      else {
+        updatedChoiceOptions.map((obj, pos) => {
+          if (value.id == "noneofabove" && obj.id != "noneofabove") {
+            obj.defaultValue = false
+            for (var i = 0; i < selectedChoiceOptions.length; i++) {
+              if (selectedChoiceOptions[i].id === obj.id) {
+                selectedChoiceOptions.splice(i, 1);
+                break;
+              }
+            }
+          }
+          else if (value.id != "noneofabove" && obj.id == "noneofabove") {
+            obj.defaultValue = false
+            for (var i = 0; i < selectedChoiceOptions.length; i++) {
+              if (selectedChoiceOptions[i].id === obj.id) {
+                selectedChoiceOptions.splice(i, 1);
+                break;
+              }
+            }
+          }
+        })
+      }
+    }
 
     this.setState({
       selectedChoiceOptions: selectedChoiceOptions,
@@ -601,6 +641,35 @@ class WebLink extends React.Component {
           updatedChoiceOptions[i].sublabel[j].defaultValue = !subvalue.defaultValue;
           break;
         }
+      }
+    }
+
+    /** Logic for non of above */
+    let queProperty = this.state.selectedQuestion.properties
+    if (queProperty && queProperty.setlimit == 1) {
+      if (queProperty.setlimit_type == "noneofabove") {
+        updatedChoiceOptions.map((obj, index) => {
+          obj.sublabel && obj.sublabel.map((subObj, subIndex) => {
+            if (subvalue.id == "noneofabove" && subObj.id != "noneofabove") {
+              for (let i = 0; i < selectedChoiceOptions.length; i++) {
+                if (selectedChoiceOptions[i].sublabel_id === subObj.id) {
+                  selectedChoiceOptions.splice(i, 1);
+                  break;
+                }
+              }
+              subObj.defaultValue = false
+            }
+            else if (subvalue.id != "noneofabove" && subObj.id == "noneofabove") {
+              for (let i = 0; i < selectedChoiceOptions.length; i++) {
+                if (selectedChoiceOptions[i].sublabel_id === subObj.id) {
+                  selectedChoiceOptions.splice(i, 1);
+                  break;
+                }
+              }
+              subObj.defaultValue = false
+            }
+          })
+        })
       }
     }
 
@@ -1191,6 +1260,17 @@ class WebLink extends React.Component {
   * ii) If it is an info it validate the question is no return or not and then move to next question
   */
   handleNext = () => {
+
+    /** check choice type element set limit */
+    if (this.state.selectedQuestion.type === 'choice' && this.state.selectedQuestion.properties.hasOwnProperty('setlimit') && this.state.selectedQuestion.properties.setlimit == 1) {
+      let count = this.state.selectedChoiceOptions ? this.state.selectedChoiceOptions.length : 0
+      let objProperty = this.state.selectedQuestion.properties
+      if (count < objProperty.minlimit) {
+        this.showNotification('Please select minimum ' + objProperty.minlimit + ' options')
+        return
+      }
+    }
+
     this.setState(() => ({ show: true }));
     if (this.state.selectedQuestion.type == "input") {
       document.getElementById("inputTypeQuestion").focus()
@@ -3768,6 +3848,7 @@ class WebLink extends React.Component {
                                           type="checkbox"
                                           id={index}
                                           defaultChecked={value.defaultValue}
+                                          checked={value.defaultValue}
                                           onChange={(e) => this.onChoiceClick(value, e)}
                                           style={{
                                             //marginTop: 3,
@@ -3779,7 +3860,7 @@ class WebLink extends React.Component {
                                         ""
                                       )}
 
-                                      <label for={index}>{value.label}</label>{" "}
+                                      <label htmlFor={index}>{value.label}</label>{" "}
                                       {value.label_image &&
                                         value.label_image.length > 0 && (
                                           <img
@@ -3850,6 +3931,7 @@ class WebLink extends React.Component {
                                                     defaultChecked={
                                                       subval.defaultValue
                                                     }
+                                                    checked={subval.defaultValue}
                                                     onChange={(e) =>
                                                       this.onSubChoiceClick(
                                                         value,
@@ -3870,7 +3952,7 @@ class WebLink extends React.Component {
                                                       }}
                                                     />
                                                   )}{" "}
-                                                <label for={increasingIndex}>{subval.sublabel}</label>
+                                                <label htmlFor={increasingIndex}>{subval.sublabel}</label>
                                                 {selectedQuestion.properties.multilevel === 1 && subval.id === "other" &&
                                                   <TextField style={{
                                                     display: "flex"

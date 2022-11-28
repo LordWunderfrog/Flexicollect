@@ -70,7 +70,7 @@ class ClientCard extends React.Component {
     const { client } = this.props;
     const { index } = this.props;
 
-    const defaultImg = "";
+    const defaultImg = "http://dummyimage";
 
     let clientImg =
       client.clientImage != null ? client.clientImage : defaultImg;

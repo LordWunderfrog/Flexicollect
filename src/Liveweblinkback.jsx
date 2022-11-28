@@ -37,6 +37,9 @@ import axios from 'axios';
 import cloneDeep from 'lodash/cloneDeep';
 
 const theme = createMuiTheme({
+    typography: {
+        useNextVariants: true,
+    },
     palette: {
         primary: {
             main: "#074e9e"
@@ -168,7 +171,7 @@ class WebLink extends React.Component {
 
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         values = queryString.parse(this.props.location.search);
         let keys = Object.keys(values);
         if (keys.length > 0) {

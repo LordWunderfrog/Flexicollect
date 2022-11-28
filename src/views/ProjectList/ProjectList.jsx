@@ -33,6 +33,7 @@ import { Button, Form } from "react-bootstrap";
 
 /* Scroll. */
 import PerfectScrollbar from "react-perfect-scrollbar";
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 /* CSS. */
 import "./ProjectList.css";
@@ -81,6 +82,7 @@ const styles = {
   }
 };
 
+const pageSize = 50
 class ProjectList extends React.Component {
   constructor(props, context) {
     super(props, context);
@@ -95,7 +97,8 @@ class ProjectList extends React.Component {
       dialogOpen: false,
       deleteProjectName: "",
       deleteProjectId: "",
-      deleteProjectIndex: ""
+      deleteProjectIndex: "",
+      hasMoreProjectData: true
     };
   }
 
@@ -112,7 +115,8 @@ class ProjectList extends React.Component {
 
         self.setState({
           projects: resp.data,
-          filteredProjects: resp.data,
+          filteredProjects: resp.data.slice(0, pageSize),
+          hasMoreProjectData: resp.data && resp.data.length >= pageSize ? true : false,
           response: true
         });
       })
@@ -199,6 +203,23 @@ class ProjectList extends React.Component {
       });
     }
     this.setState({ dialogOpen: false });
+  };
+
+  /** pagination of data */
+  fetchMoreProjectData = () => {
+    if (this.state.filteredProjects.length == this.state.projects.length) {
+      this.setState({ hasMoreProjectData: false });
+      return;
+    }
+    setTimeout(() => {
+      let start = this.state.filteredProjects.length
+      let end = this.state.filteredProjects.length + pageSize
+      let spliceArray = this.state.projects.slice(start, end)
+      let concatedArray = this.state.filteredProjects.concat(spliceArray)
+      this.setState({
+        filteredProjects: concatedArray
+      });
+    }, 500);
   };
 
   render() {
@@ -312,30 +333,44 @@ class ProjectList extends React.Component {
             ) : (
               <Fragment>
                 {this.state.view === "grid" ? (
-                  <PerfectScrollbar>
-                    <div className="list-box">
-                      <Grid container spacing={8}>
-                        {this.state.filteredProjects.map((project, i) => (
-                          <Grid
-                            item
-                            md={4}
-                            key={i}
-                            style={{
-                              width: this.props.isMobile ? "100%" : "auto",
-                              marginLeft: this.props.isMobile ? "-1%" : "0"
-                            }}
-                          >
-                            <ProjectCard
+                  // <PerfectScrollbar>
+                  <div id="scrollableDiv" style={{ height: "calc(100vh - 80px)", overflow: "auto" }}>
+                    <InfiniteScroll
+                      dataLength={this.state.filteredProjects.length}
+                      next={this.fetchMoreProjectData}
+                      hasMore={this.state.hasMoreProjectData}
+                      // height={800}
+                      loader={
+                        <h5 className="pt-4 text-center">Loading...</h5>
+                      }
+                      endMessage={<div></div>}
+                      scrollableTarget="scrollableDiv"
+                    >
+                      <div className="list-box float-none">
+                        <Grid container spacing={8}>
+                          {this.state.filteredProjects.map((project, i) => (
+                            <Grid
+                              item
+                              md={4}
                               key={i}
-                              project={project}
-                              index={i}
-                              deleteItem={this.deleteItem}
-                            />
-                          </Grid>
-                        ))}
-                      </Grid>
-                    </div>
-                  </PerfectScrollbar>
+                              style={{
+                                width: this.props.isMobile ? "100%" : "auto",
+                                marginLeft: this.props.isMobile ? "-1%" : "0"
+                              }}
+                            >
+                              <ProjectCard
+                                key={i}
+                                project={project}
+                                index={i}
+                                deleteItem={this.deleteItem}
+                              />
+                            </Grid>
+                          ))}
+                        </Grid>
+                      </div>
+                    </InfiniteScroll>
+                  </div>
+                  //</PerfectScrollbar>
                 ) : (
                   <PerfectScrollbar>
                     <div className="list-box">

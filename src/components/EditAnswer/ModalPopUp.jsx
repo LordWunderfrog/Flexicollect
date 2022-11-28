@@ -993,7 +993,7 @@ class ModalPopUp extends Component {
                               />
                               : ""
                           }
-                          <label for={index}>{value.label}</label>
+                          <label htmlFor={index}>{value.label}</label>
                           {value.label_image && value.label_image.length > 0 &&
                             <img src={value.label_image}
                               alt="label"
@@ -1038,7 +1038,7 @@ class ModalPopUp extends Component {
                                             right: 0
                                           }}
                                         />}
-                                      <label for={increasingIndex}>{subval.sublabel}</label>
+                                      <label htmlFor={increasingIndex}>{subval.sublabel}</label>
                                       {selectedQuestion.properties.multilevel === 1 && subval.id === "other" &&
                                         <TextField style={{
                                           display: "flex"

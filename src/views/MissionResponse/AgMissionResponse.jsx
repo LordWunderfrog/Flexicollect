@@ -92,7 +92,7 @@ const Entities = require('html-entities').AllHtmlEntities;
 const entities = new Entities();
 
 let loadedlistItems = [];
-const defaultApiPage = 500;
+const defaultApiPage = 1500;
 const defaultApirecordId = 0;
 
 const styles = {
@@ -3262,7 +3262,7 @@ class AgMissionResponse extends React.Component {
             <Fragment key={index}>
               <Grid container alignItems="center">
                 <Typography gutterBottom variant="h6" style={{ marginLeft: 20, fontSize: 12, fontWeight: 600 }}>
-                  &bull; {c.headerName}
+                  &bull; {c.id ? 'ID_' + c.id + '_' + c.headerName : c.headerName}
                 </Typography>
               </Grid>
               <Grid container alignItems="center" style={{ marginLeft: 40, fontSize: 12 }}>

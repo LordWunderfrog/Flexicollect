@@ -1178,7 +1178,7 @@ import Card from "./Drop";
 import DropList from "./DropList";
 
 import "./Board.css";
-import update from 'immutability-helper';
+
 import api2 from "helpers/api2";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import cloneDeep from 'lodash/cloneDeep';
@@ -1199,6 +1199,7 @@ const getListStyle = isDraggingOver => ({
   background: isDraggingOver ? '' : '',
 
 });
+let selectedIndex = 0
 class Board extends Component {
   constructor(props) {
     super(props);
@@ -1218,7 +1219,7 @@ class Board extends Component {
     this.ropen = this.ropen.bind(this);
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
 
     this.checkrefcode()
     this.gallerrfun();
@@ -1510,7 +1511,7 @@ class Board extends Component {
    *
    */
   ropen(e, status, i, index) {
-
+    selectedIndex = index
     let selectedlanguage = this.props.selectedlanguage
     let languages_drop = this.props.languages_drop;
     let defaultdrop = this.props.defaultdrops
@@ -2291,7 +2292,7 @@ class Board extends Component {
           <div className="new-btn pointer" onClick={() => this.openevent()}>
             <div className='relativepos'>
               <p>Add Elements</p>
-              <a href="#" className="bdr-ripple-ani-btn rippleff rotator"><i class="fa fa-plus"></i></a>
+              <a href="#" className="bdr-ripple-ani-btn rippleff rotator"><i className="fa fa-plus"></i></a>
             </div>
           </div>
 
@@ -2419,8 +2420,49 @@ class Board extends Component {
 
               )}
             </Droppable>
-            {this.state.drops.map((drop, index) => (drops[index] ? (
+            {this.state.drops && this.state.drops.length > 0 ?
               <div>
+                <Card
+                  index={selectedIndex}
+                  color={this.state.drops[selectedIndex].color}
+                  key={selectedIndex}
+                  question_id={this.state.drops[selectedIndex].question_id}
+                  id={this.state.drops[selectedIndex].id}
+                  shape={this.state.drops[selectedIndex].shape}
+                  text={this.state.drops[selectedIndex].label}
+                  type={this.state.drops[selectedIndex].type}
+                  attrib={() => this.updateattrib()}
+                  deleteddrops={(e) => this.deleteDrops(e)}
+                  dropstate={this.state.drops}
+                  rightStatus={this.state.drops[selectedIndex].rightStatus}
+                  rightOpen={this.ropen}
+                  labelprop={this.state.drops[selectedIndex]}
+                  oldprop={this.state.drops[selectedIndex]}
+                  test={this.state.drops[selectedIndex].question}
+                  oldconditions={this.props.oldconditions}
+                  autosave={() => this.autoSave()}
+                  upArrowFunc={e => this.upArrowFun(e)}
+                  downArrowFunc={e => this.downArrowFun(e)}
+                  scaleico={this.state.scaleico}
+                  infoico={this.state.infoico}
+                  emojis={this.state.emojis}
+                  gallery={this.state.gallery.images}
+                  refcode={this.props.refcode}
+                  selectedlanguage={this.props.selectedlanguage}
+                  changedroplanguage={this.props.changedroplanguage}
+                  dropcurrentlanguage={this.props.dropcurrentlanguage}
+                  defaultdrops={this.props.defaultdrops[selectedIndex]}
+                  defaultdropsstatus={this.props.defaultdrops}
+                  updatelanguageproperties={this.props.updatelanguageproperties}
+                  languages_drop={this.props.languages_drop}
+                  downArrowFuncLanguage={this.props.downArrowFuncLanguage}
+                  upArrowFuncLanguage={this.props.upArrowFuncLanguage}
+                  updateProperties={() => this.updateProperties()}
+                />
+              </div> : ""}
+
+            {/* {this.state.drops.map((drop, index) => (drops[index] ? (
+              <div key={index}>
                 <Card
                   index={index}
                   color={drop.color}
@@ -2460,7 +2502,7 @@ class Board extends Component {
                 />
               </div>
             ) : ""
-            ))}
+            ))} */}
 
           </div>
 

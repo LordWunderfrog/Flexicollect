@@ -729,7 +729,6 @@ class ProjectPageTwo extends Component {
                     <Form.Group
                       controlId="validationFormiksurvey"
                       as={Row}
-                      md="3"
 
                     >
                       <div style={{ flexDirection: 'column', width: '80%', marginLeft: '15px' }}>
@@ -759,7 +758,7 @@ class ProjectPageTwo extends Component {
                     </Form.Group>
 
 
-                    <Form.Group as={Row} md="4">
+                    <Form.Group as={Row}>
                       <div style={{ padding: "0% 0% 0% 0%", marginLeft: '15px', width: '80%' }}>
                         <Form.Label>Upload Mission Image </Form.Label>
                         {/* {values.missionImageName === "" ? null : (

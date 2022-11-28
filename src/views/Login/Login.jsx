@@ -63,6 +63,9 @@ const styles = theme => ({
   }
 });
 const theme = createMuiTheme({
+  typography: {
+    useNextVariants: true,
+  },
   palette: {
     primary: { main: "#fff" }
   }
@@ -86,7 +89,7 @@ class Login extends Component {
   }
 
   /* Validates the access token to retrieve the user attributes and group information */
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     values = queryString.parse(this.props.location.hash);
 
     let keys = Object.keys(values);
