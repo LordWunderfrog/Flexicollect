@@ -775,7 +775,7 @@ class DropList extends React.Component {
 
 
         const type = this.props.type;
-        const { msgColor, br, message, MandatoryStyle } = this.state;
+        const { msgColor, br, message } = this.state;
         const { isDragging } = this.props
         const opacity = isDragging ? 0 : 1
         return (

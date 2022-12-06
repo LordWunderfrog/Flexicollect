@@ -1481,7 +1481,7 @@ class CreateSurvey extends React.Component {
                             type = "Table";
                             break;
                         }
-                        else if ((optionObject && optionObject.length > 0) || valueObject && valueObject.length > 0) {
+                        else if (((optionObject && optionObject.length) > 0) || (valueObject && valueObject.length) > 0) {
                             scalecheck = false;
                             labelname = q.label;
                             type = "Table";

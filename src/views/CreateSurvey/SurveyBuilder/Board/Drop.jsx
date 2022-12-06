@@ -34,7 +34,6 @@ const style = {
 }
 
 let updateProperties = false;
-let otheroption;
 let newupdatevalue;
 let stripedHtml;
 let evalue;
@@ -274,7 +273,6 @@ class Card extends React.Component {
             Mandatory_style = this.getMandatoryStyle(nextProps.labelprop)
         }
         let fieldprops = nextProps.labelprop;
-        //otheroption = fieldprops.properties.other;
         if (!fieldprops.properties.question_text && fieldprops.type !== "dropdown") {
             fieldprops.properties.question_text = "<p>" + fieldprops.properties.question + "</p>";
         }
@@ -1319,7 +1317,6 @@ class Card extends React.Component {
 
     /* Handle the event to update the props.    */
     updateprops = (e, i, index, key) => {
-        let novalu;
         let evalu;
         if (e.target) {
             evalu = e.target.value;
@@ -1328,7 +1325,6 @@ class Card extends React.Component {
             evalu = e
         }
         var stripedHtml = evalu.replace(/<[^>]+>/g, '');
-        novalu = evalu;
         updateProperties = true;
         localStorage.setItem('updateProperties', true);
         if (stripedHtml === "") {
@@ -2964,8 +2960,6 @@ class Card extends React.Component {
         updateProperties = true;
         let checkval;
         event.target.checked === true ? (checkval = 1) : (checkval = 0);
-        let selectedlanguage = this.props.selectedlanguage
-        let languages_drop = this.props.languages_drop;
 
         if (name === "instruction_enabled" && checkval === 1) {
             let fieldprops = this.state.fieldprops;
@@ -2994,8 +2988,6 @@ class Card extends React.Component {
         updateProperties = true;
         let checkval;
         event.target.checked === true ? (checkval = 1) : (checkval = 0);
-        let selectedlanguage = this.props.selectedlanguage
-        let languages_drop = this.props.languages_drop;
 
         if (name === "barcode_enabled" && checkval === 1) {
             let fieldprops = this.state.fieldprops;
@@ -3124,8 +3116,6 @@ class Card extends React.Component {
         updateProperties = true;
         let checkval;
         event.target.checked === true ? (checkval = 1) : (checkval = 0);
-        let selectedlanguage = this.props.selectedlanguage
-        let languages_drop = this.props.languages_drop;
 
         if (name === "scale_enabled" && checkval === 1) {
             let fieldprops = this.state.fieldprops;
@@ -3154,8 +3144,6 @@ class Card extends React.Component {
         updateProperties = true;
         let checkval;
         event.target.checked === true ? (checkval = 1) : (checkval = 0);
-        let selectedlanguage = this.props.selectedlanguage
-        let languages_drop = this.props.languages_drop;
 
         if (name === "other" && checkval === 1) {
             let fieldprops = this.state.fieldprops;
@@ -3184,8 +3172,6 @@ class Card extends React.Component {
         updateProperties = true;
         let checkval;
         event.target.checked === true ? (checkval = 1) : (checkval = 0);
-        let selectedlanguage = this.props.selectedlanguage
-        let languages_drop = this.props.languages_drop;
 
         if (name === "allow_gallery" && checkval === 1) {
             let fieldprops = this.state.fieldprops;
@@ -3214,8 +3200,6 @@ class Card extends React.Component {
         updateProperties = true;
         let checkval;
         event.target.checked === true ? (checkval = 1) : (checkval = 0);
-        let selectedlanguage = this.props.selectedlanguage
-        let languages_drop = this.props.languages_drop;
 
         if (name === "mandatory" && checkval === 1) {
             this.setState(
@@ -3242,8 +3226,6 @@ class Card extends React.Component {
         updateProperties = true;
         let checkval;
         event.target.checked === true ? (checkval = 1) : (checkval = 0);
-        let selectedlanguage = this.props.selectedlanguage
-        let languages_drop = this.props.languages_drop;
 
         if (name === "noreturn" && checkval === 1) {
             this.setState(
@@ -3270,8 +3252,6 @@ class Card extends React.Component {
         updateProperties = true;
         let checkval;
         event.target.checked === true ? (checkval = 1) : (checkval = 0);
-        let selectedlanguage = this.props.selectedlanguage
-        let languages_drop = this.props.languages_drop;
 
         if (name === "multilevel" && checkval === 1) {
             this.setState(
@@ -3298,8 +3278,6 @@ class Card extends React.Component {
         updateProperties = true;
         let checkval;
         event.target.checked === true ? (checkval = 1) : (checkval = 0);
-        let selectedlanguage = this.props.selectedlanguage
-        let languages_drop = this.props.languages_drop;
 
         if (name === "random" && checkval === 0) {
             this.setState(
