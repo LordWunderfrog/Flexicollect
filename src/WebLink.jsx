@@ -3440,29 +3440,32 @@ class WebLink extends React.Component {
                       marginBottom: "30px"
                     }}
                   >
-                    <h4
-                      align="center"
-                      style={{
-                        fontSize: "20px",
-                        fontWeight: 600,
-                        // textTransform: "capitalize",
-                        marginBottom: "10px",
-                        color: "#1A385B",
-                        fontStyle: "Roboto"
-                      }}
-                    >
-                      {selectedQuestion.properties.question}
-                      <span
+                    <div className="mandetory-title">
+                      <h4
+                        align="center"
+                        style={{
+                          fontSize: "20px",
+                          fontWeight: 600,
+                          // textTransform: "capitalize",
+                          marginBottom: "10px",
+                          color: "#1A385B",
+                          fontStyle: "Roboto"
+                        }}
+                      >
+                        {selectedQuestion.properties.question}
+                      </h4>
+                      {selectedQuestion.properties.mandatory && selectedQuestion.properties.mandatory === 1 ? <h4
                         align="center"
                         style={{
                           fontSize: "18px",
                           fontWeight: 600,
                           // textTransform: "capitalize",
                           marginBottom: "10px",
+                          marginLeft: "2px",
                           color: "red"
                         }}
-                      >{selectedQuestion.properties.mandatory ? selectedQuestion.properties.mandatory === 1 ? "*" : "" : ""} </span>
-                    </h4>
+                      >{"*"}</h4> : ""}
+                    </div>
                     <h6
                       style={{
                         fontSize: "12px",
@@ -3806,6 +3809,7 @@ class WebLink extends React.Component {
                               function (value, index) {
                                 return (
                                   <li
+                                    key={index}
                                     style={{
                                       fontSize: "12px",
                                       position: "relative",
@@ -3848,7 +3852,7 @@ class WebLink extends React.Component {
                                           type="checkbox"
                                           id={index}
                                           defaultChecked={value.defaultValue}
-                                          checked={value.defaultValue}
+                                          //checked={value.defaultValue}
                                           onChange={(e) => this.onChoiceClick(value, e)}
                                           style={{
                                             //marginTop: 3,
@@ -3931,7 +3935,7 @@ class WebLink extends React.Component {
                                                     defaultChecked={
                                                       subval.defaultValue
                                                     }
-                                                    checked={subval.defaultValue}
+                                                    // checked={subval.defaultValue}
                                                     onChange={(e) =>
                                                       this.onSubChoiceClick(
                                                         value,
