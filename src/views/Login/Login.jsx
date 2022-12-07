@@ -7,7 +7,7 @@
  *
  */
 
-import React, { Component, Fragment } from "react";
+import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
 
 /* Resources. */
@@ -18,22 +18,15 @@ import jwt from 'jwt-decode';
 /* Material UI. */
 import {
   withStyles,
-  MuiThemeProvider,
   createMuiTheme
 } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
-import TextField from "@material-ui/core/TextField";
-import Person from "@material-ui/icons/Person";
-import InputAdornment from "@material-ui/core/InputAdornment";
 
 /* Custom components. */
 import Loading from "components/Loading/Loading.jsx";
 
 /* Bootstrap 1.0. */
 import { Alert, Row } from "react-bootstrap";
-
-/* MUI Icons */
-import LockOpen from "@material-ui/icons/LockOpen";
 
 /* API */
 import api2 from "../../helpers/api2";
@@ -93,13 +86,8 @@ class Login extends Component {
     values = queryString.parse(this.props.location.hash);
 
     let keys = Object.keys(values);
-    console.log(JSON.stringify(values) + " values")
-    console.log(keys + "keys ")
-    console.log(JSON.stringify(this.props) + "props")
-    console.log(this.context)
+
     this.ismedia = window.location.search;
-    console.log(this.state.pathname + "search location")
-    console.log(queryString + "querystring")
     if (keys.length > 0) {
       for (var i = 0; i < keys.length; i++) {
         if (values[keys[i]].length > 0) {
@@ -199,7 +187,6 @@ class Login extends Component {
 
     const { isAuthenticated } = this.state;
 
-    const { classes } = this.props;
 
     /* Based on logged in user's group, redirect to respective page */
     if (((isAuthenticated === "ADMIN" || isAuthenticated === "EMPLOYEE" || isAuthenticated === "CLIENT")) && (this.state.pathname != null)) {

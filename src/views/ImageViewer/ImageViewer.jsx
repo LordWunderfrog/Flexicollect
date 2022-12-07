@@ -7,39 +7,32 @@
  */
 
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
-//import "./Dashboard.css";
-import api2 from "../../helpers/api2";
-/* Bootstrap 1.0. */
-import {
-  Col,
-  Row,
-  ButtonToolbar,
-  DropdownButton,
-  Dropdown
-} from "react-bootstrap";
+// import { Link } from "react-router-dom";
+// //import "./Dashboard.css";
+// import api2 from "../../helpers/api2";
+// /* Bootstrap 1.0. */
+// import {
+//   Col,
+//   Row,
+//   ButtonToolbar,
+//   DropdownButton,
+//   Dropdown
+// } from "react-bootstrap";
 
 /* Material UI. */
-import GridList from "@material-ui/core/GridList";
-import GridListTile from "@material-ui/core/GridListTile";
+// import GridList from "@material-ui/core/GridList";
+// import GridListTile from "@material-ui/core/GridListTile";
 
 /* Custom charts. */
 import "chartjs-plugin-datalabels";
-import Piechart from "components/Charts/Piechart";
-import HorizontalBarchart from "components/Charts/HorizontalBarchart";
-import StackedBarchart from "components/Charts/StackedBarchart";
-import GroupedHorizontalBarchart from "components/Charts/GroupedHorizontalBarchart";
 
 /* Font awesome icons. */
 import { library } from "@fortawesome/fontawesome-svg-core";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserTie } from "@fortawesome/free-solid-svg-icons";
-import { useState, useEffect } from "react";
 library.add(faUserTie);
 
 class ImageViewer extends Component {
   constructor(props) {
-    console.log("consturctor imageviewer")
     super(props);
     //this.path = localStorage.getItem("path")
     this.apikey = 1;
@@ -61,7 +54,6 @@ class ImageViewer extends Component {
     this.url = localStorage.getItem("path");
     localStorage.removeItem("path")
     //this.props.handleCollapseScreen(true);
-
   }
 
   render() {

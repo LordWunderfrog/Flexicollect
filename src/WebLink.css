@@ -1,21 +1,24 @@
-
 /* Styles used in WebLink component. */
 
-.scaleTable tr td > div {
+.scaleTable tr td>div {
   padding-top: unset !important;
 }
+
 .App div::-webkit-scrollbar {
   /*display: none;*/
 }
+
 .scaleTable tr td {
   width: 100px;
   text-align: center;
   padding: 0;
   min-width: 100px;
 }
-.scaleTable tr td > div {
+
+.scaleTable tr td>div {
   margin: 0 auto;
 }
+
 /* .scaleTable tr td > div img {
   width: 30px;
   height: 30px;
@@ -28,13 +31,16 @@
   padding-top: unset;
   left: calc(50% - 10px) !important;
 }
-.image-style > div {
+
+.image-style>div {
   padding-top: unset !important;
 }
+
 .button-style {
   background-color: #3f51b5;
   color: white;
 }
+
 .content {
   position: absolute;
   left: 50%;
@@ -42,10 +48,12 @@
   /* -webkit-transform: translate(-50%, -50%); */
   transform: translate(-50%, -50%);
 }
+
 .login-page {
   width: 100%;
   height: 100%;
 }
+
 .videoOver {
   position: fixed;
   right: 0;
@@ -69,6 +77,7 @@
   height: 100%;
   object-fit: cover;
 }
+
 /* default text borders */
 .MuiInput-underline-140:before {
   display: none;
@@ -88,7 +97,7 @@
 
 .scrollVisible::-webkit-scrollbar-thumb {
   background-color: #000000;
-} 
+}
 
 .scaleTableClass,
 .scaleClass {
@@ -96,19 +105,23 @@
   display: flex;
   overflow-x: auto;
 }
+
 .uploadClass {
   text-align: center;
 }
+
 .uploadClass .new-img-prev-up {
   min-width: 300px;
   display: inline-block;
 }
+
 .uploadClass .new-div-parts {
   max-height: 60vh;
   overflow-y: auto;
   padding: 0 !important;
   margin: 8px 0px 0;
 }
+
 .choiceClass {
   display: flex;
   overflow-x: auto;
@@ -121,27 +134,33 @@
 .inputClass {
   text-align: center;
 }
+
 .inputClass {
   display: block;
 }
+
 .infoClass {
   /* max-height: 70vh; */
 }
+
 .infoClass div:first-child {
   display: inline-block;
 }
 
-div.infoClass > div, div.infoClass p {
-	overflow-wrap: break-word;
-	max-width: 100%;
+div.infoClass>div,
+div.infoClass p {
+  overflow-wrap: break-word;
+  max-width: 100%;
 }
 
 .gpsClass {
   min-height: 60vh;
 }
+
 .mapClass h4 {
   font-size: 14px;
 }
+
 .mapAddressClass h4 {
   background: #000;
   color: #fff;
@@ -149,14 +168,17 @@ div.infoClass > div, div.infoClass p {
   min-height: 42px;
   padding: 15%;
 }
+
 .scaleTableClass tbody tr td {
   border: 3px solid #fff;
   background: #fafafa;
 }
+
 .scaleTableClass tbody tr:first-child td {
   border: none;
   background: transparent;
 }
+
 .coloredInput input[type="radio"]:checked:after {
   width: 20px;
   height: 20px;
@@ -248,95 +270,121 @@ div.infoClass > div, div.infoClass p {
   padding: 0.5em;
   cursor: pointer;
 }
+
 .DropZone:hover {
   background-color: rgba(0, 0, 0, 0.025);
 }
+
 .DropZone--over-document {
   border: 3px dashed #599eff;
 }
+
 .DropZone--over {
   border: 3px solid #259925;
 }
-.new-div-info{
+
+.new-div-info {
   overflow-x: auto;
   overflow-y: hidden;
 }
 
-.coloredInput{
+.coloredInput {
   width: 100%;
   max-height: 90%;
   overflow-y: auto;
   overflow-x: hidden;
 }
+
+.mandetory-title {
+  display: flex;
+  justify-content: center;
+}
+
 @media only screen and (max-width: 799px) {
   .scaleTable tr {
     display: flex !important;
   }
+
   .scaleTable tr td {
     padding: 6px;
     display: inline-block;
   }
+
   .scaleTable tr td:first-child {
     min-width: 56px;
   }
-  .scaleTable tr td > div {
+
+  .scaleTable tr td>div {
     padding-top: 0 !important;
   }
-  .scaleTable tr td > div img {
+
+  .scaleTable tr td>div img {
     width: 20px;
     height: 20px;
   }
+
   li div img {
     object-fit: contain;
   }
+
   .App div div:nth-child(2) {
     justify-content: unset !important;
   }
 
-  .App > div{
-    overflow:auto;
+  .App>div {
+    overflow: auto;
   }
 
   .head-style h4 {
     font-size: 12px;
   }
+
   .head-style h6 {
     font-size: 12px;
   }
+
   .login-style {
     width: "20%";
     margin: 0 auto;
   }
+
   .mapClass {
     height: 70vh !important;
     width: 70% !important;
   }
+
   .gpsClass {
     min-height: 70vh;
   }
+
   .infoClass {
     max-height: 70vh;
   }
+
   .choiceClass {
     min-height: 45vh;
   }
+
   .uploadClass {
     min-height: 45vh;
   }
+
   .uploadClass .new-div-parts {
-          max-height: 40vh;
-          margin-left: 8px;
-          margin-right: 8px;
-        }
+    max-height: 40vh;
+    margin-left: 8px;
+    margin-right: 8px;
+  }
 
   .inputClass div:first-child {
     width: 300px !important;
   }
+
   .mapClass h4 {
     font-size: 14px;
   }
-.new-div-info{
-  overflow-x: auto;
-  overflow-y: hidden;
-} 
+
+  .new-div-info {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
 }

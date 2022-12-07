@@ -1314,7 +1314,7 @@ class Board extends Component {
     this.props.olddrops.map((p, i) => {
       let fieldprops = p;
       if (fieldprops.type !== "info" && fieldprops.type !== "gps") {
-        if (fieldprops.properties.refcode && fieldprops.properties.refcode === "" || !fieldprops.properties.refcode) {
+        if ((fieldprops.properties.refcode && fieldprops.properties.refcode === "") || !fieldprops.properties.refcode) {
           let type = ""
           if (fieldprops.type === "input") {
             type = "TXT"
