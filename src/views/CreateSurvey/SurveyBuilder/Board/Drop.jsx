@@ -574,6 +574,12 @@ class Card extends React.Component {
                         //this.props.updatelanguageproperties(this.props.index, 'info_image', true, data)
                         this.setState({ fieldprops, br: false });
                     }
+                    /** added by k - for persistant image */
+                    selectedlanguage.forEach((a, b) => {
+                        if (a.label !== 'English') {
+                            languages_drop[a.label].content[this.props.index].properties.info_image = data;
+                        }
+                    })
                 }
                 else {
                     this.setState({ msgColor: 'warning', message: 'The image you selected is too large. Please upload an image that is less than 2 MB', br: true });
@@ -1333,36 +1339,38 @@ class Card extends React.Component {
         const oldprops = this.state.fieldprops.properties;
         let value = e.target.value;
         if (i === "minimum" || i === "maximum" || i === "addscale") value = parseInt(value);
-        if (i === "info_type") {
-            delete oldprops['info_image']
-            delete oldprops['info_video']
-            delete oldprops['info_audio']
-            oldprops[`${i}`] = value;
-        } else {
-            oldprops[`${i}`] = value;
-            let selectedlanguage = this.props.selectedlanguage
-            let languages_drop = this.props.languages_drop;
-            selectedlanguage.forEach((a, b) => {
-                if (a.label !== 'English') {
-                    languages_drop[a.label].content[this.props.index].properties[`${i}`] = value;
-                    //  languages_drop[a.label].content[this.props.index].properties[`${i}`] ? languages_drop[a.label].content[this.props.index].properties[`${i}`] : ""
-                }
-            })
-            if (i === "gps_stats" && value === "hide") {
-                this.setState(
-                    {
-                        'mandatory': 0
-                    },
-                    () => {
-                        this.updatepropschecked(0, 'mandatory');
-                    }
-                );
-            }
 
-            //     if(this.state.currentlanguage.value !== "English"){
-            //     this.props.updatelanguageproperties(this.props.index,`${i}`,false,value)
-            // }
+        /** added by k - for persistant image */
+        // if (i === "info_type") {
+        //     delete oldprops['info_image']
+        //     delete oldprops['info_video']
+        //     delete oldprops['info_audio']
+        //     oldprops[`${i}`] = value;
+        // } else {
+        oldprops[`${i}`] = value;
+        let selectedlanguage = this.props.selectedlanguage
+        let languages_drop = this.props.languages_drop;
+        selectedlanguage.forEach((a, b) => {
+            if (a.label !== 'English') {
+                languages_drop[a.label].content[this.props.index].properties[`${i}`] = value;
+                //  languages_drop[a.label].content[this.props.index].properties[`${i}`] ? languages_drop[a.label].content[this.props.index].properties[`${i}`] : ""
+            }
+        })
+        if (i === "gps_stats" && value === "hide") {
+            this.setState(
+                {
+                    'mandatory': 0
+                },
+                () => {
+                    this.updatepropschecked(0, 'mandatory');
+                }
+            );
         }
+
+        if (this.state.currentlanguage.value !== "English") {
+            this.props.updatelanguageproperties(this.props.index, `${i}`, false, value)
+        }
+        // }
         this.setState({ oldprops });
         // this.props.updateProperties(this.state.fieldprops)
         // this.props.autosave()
@@ -3975,7 +3983,8 @@ class Card extends React.Component {
 
                 let fieldprops = this.state.fieldprops;
                 fieldprops.properties[`${name}`] = resp.data.url;
-                //this.props.updatelanguageproperties(this.props.index, `${name}`, true, resp.data.url)
+                /** added by k - for persistant image */
+                this.props.updatelanguageproperties(this.props.index, `${name}`, true, resp.data.url)
                 this.setState({
                     selectedFile: null,
                     loaded: 0,
@@ -4218,7 +4227,8 @@ class Card extends React.Component {
                         )}
 
                         <li
-                        //style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
+                            /** added by k - for persistant image */
+                            style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                         >
                             <h3>Information Type</h3>
                             <div className="belownewtext clearfix"

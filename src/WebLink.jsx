@@ -3308,7 +3308,7 @@ class WebLink extends React.Component {
               <div>
                 <div>
                   <picture>
-                    <source media="(max-width: 760px)" srcset={background} />
+                    <source media="(max-width: 760px)" srcSet={background} />
                     <img
                       id="myVideo"
                       style={{
@@ -3391,7 +3391,7 @@ class WebLink extends React.Component {
                           onChange={e => this.handleChangeMobile(e)}
                           //required
                           pattern="[0-9]*"
-                          inputmode="numeric"
+                          inputMode="numeric"
                         />
                         <br />
                         <div
@@ -3517,6 +3517,7 @@ class WebLink extends React.Component {
                             function (value, index) {
                               return (
                                 <li
+                                  key={index}
                                   className="image-style"
                                   style={{
                                     height: "35px",
@@ -3616,7 +3617,7 @@ class WebLink extends React.Component {
                                       .table_options
                                     ? this.state.selectedQuestion.properties.table_content.table_options.map(
                                       (options, index) => (
-                                        <TableCell>{options.value}</TableCell>
+                                        <TableCell key={index}>{options.value}</TableCell>
                                       )
                                     )
                                     : ""}
@@ -3700,7 +3701,7 @@ class WebLink extends React.Component {
                                       .table_options
                                     ? this.state.selectedQuestion.properties.table_content.table_options.map(
                                       (options, index) => (
-                                        <TableCell>{options.value}</TableCell>
+                                        <TableCell key={index}>{options.value}</TableCell>
                                       )
                                     )
                                     : ""}
@@ -3851,8 +3852,8 @@ class WebLink extends React.Component {
                                         <input
                                           type="checkbox"
                                           id={index}
-                                          defaultChecked={value.defaultValue}
-                                          //checked={value.defaultValue}
+                                          // defaultChecked={value.defaultValue}
+                                          checked={value.defaultValue}
                                           onChange={(e) => this.onChoiceClick(value, e)}
                                           style={{
                                             //marginTop: 3,
@@ -3902,6 +3903,7 @@ class WebLink extends React.Component {
                                             increasingIndex = increasingIndex + 1
                                             return (
                                               <div
+                                                key={key}
                                                 style={{
                                                   position: "relative",
                                                   fontStyle: "Roboto",
@@ -3932,10 +3934,10 @@ class WebLink extends React.Component {
                                                   <input
                                                     type="checkbox"
                                                     id={increasingIndex}
-                                                    defaultChecked={
-                                                      subval.defaultValue
-                                                    }
-                                                    // checked={subval.defaultValue}
+                                                    // defaultChecked={
+                                                    //   subval.defaultValue
+                                                    // }
+                                                    checked={subval.defaultValue}
                                                     onChange={(e) =>
                                                       this.onSubChoiceClick(
                                                         value,
