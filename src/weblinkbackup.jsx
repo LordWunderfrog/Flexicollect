@@ -3188,7 +3188,7 @@ class WebLink extends React.Component {
                             <div>
                                 <div>
                                     <picture>
-                                        <source media="(max-width: 760px)" srcset={background} />
+                                        <source media="(max-width: 760px)" srcSet={background} />
                                         <img
                                             id="myVideo"
                                             style={{
@@ -3271,7 +3271,7 @@ class WebLink extends React.Component {
                                                     onChange={e => this.handleChangeMobile(e)}
                                                     //required
                                                     pattern="[0-9]*"
-                                                    inputmode="numeric"
+                                                    inputMode="numeric"
                                                 />
                                                 <br />
                                                 <div
