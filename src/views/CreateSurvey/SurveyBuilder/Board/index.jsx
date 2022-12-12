@@ -1769,9 +1769,9 @@ class Board extends Component {
       ...newDrop.properties,
       ...this.state.drops[index].properties,
       refcode: "",
-      question: "Copy of " + String(this.state.drops[index].properties.question).trim()
+      question: String(this.state.drops[index].properties.question).trim()
     }
-    newDrop['question'] = "Copy of " + String(this.state.drops[index].properties.question).trim()
+    newDrop['question'] = String(this.state.drops[index].properties.question).trim()
     newDrop.question_id = Number([...this.state.drops].sort((a, b) => Number(b.question_id) - Number(a.question_id))[0].question_id) + 1
 
     let dropindex = newDropsArray.findIndex((element) => element.question_id === question_id);

@@ -106,7 +106,7 @@ export default class CustomHeader extends Component {
 
                 <div className="customHeaderLabel"
                     onClick={this.HandlingEvent.bind(this)}
-                >{this.props.column.colDef.id ? 'ID_' + this.props.column.colDef.id + '_' + this.props.displayName : this.props.displayName}</div>
+                >{this.props.column.colDef.id ? this.props.column.colDef.id + '_' + this.props.displayName : this.props.displayName}</div>
                 {menu}
                 <div>
 
