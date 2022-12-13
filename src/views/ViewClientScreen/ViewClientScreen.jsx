@@ -69,7 +69,7 @@ const Entities = require('html-entities').AllHtmlEntities;
 const entities = new Entities();
 
 let loadedlistItems = [];
-const defaultApiPage = 150;
+const defaultApiPage = 2000;
 const defaultApirecordId = 0;
 
 const styles = {
