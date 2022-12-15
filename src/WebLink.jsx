@@ -1462,7 +1462,9 @@ class WebLink extends React.Component {
           answer["selected_option"] = updatedChoiceOptions;
           answer["choice_type"] = this.state.selectedQuestion.properties.choice_type;
           answer["multilevel"] = this.state.selectedQuestion.properties.multilevel;
-
+          if (this.state.selectedQuestion.properties.other) {
+            answer["other_value"] = this.state.otheroptionvalue;
+          }
         }
       }
       else {
