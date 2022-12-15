@@ -222,8 +222,10 @@ class ProjectPageOne extends Component {
 
   /* Handles the event during save/navigation to next page. */
   callPageOneFromParent(activeStep) {
-    this.form.setFieldValue("activeStep", activeStep);
-    this.form.submitForm();
+    setTimeout(() => {
+      this.form.setFieldValue("activeStep", activeStep);
+      this.form.submitForm();
+    }, 100);
   }
 
   /* Handles the event during submission of this page. */
