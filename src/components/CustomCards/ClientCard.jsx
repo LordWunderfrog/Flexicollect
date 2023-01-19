@@ -20,6 +20,7 @@ import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
 import Tooltip from "@material-ui/core/Tooltip";
 import CardMedia from "@material-ui/core/CardMedia";
 import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
+import dummyImage from "assets/img/dd.jpg";
 
 const theme = createMuiTheme({
   typography: {
@@ -70,22 +71,19 @@ class ClientCard extends React.Component {
     const { client } = this.props;
     const { index } = this.props;
 
-    const defaultImg = "http://dummyimage";
-
-    let clientImg =
-      client.clientImage != null ? client.clientImage : defaultImg;
+    let clientImg = client.clientImage != null ? client.clientImage : dummyImage;
 
     return (
       <MuiThemeProvider theme={theme}>
         <Card className={classes.card}>
           <CardMedia
             className={classes.media}
-            image={clientImg ? clientImg : ""}
+            image={clientImg ? clientImg : dummyImage}
           >
             <CardContent style={{ padding: "16px 16px 0px 16px" }}>
               <Grid container>
                 <Grid item xs={12}>
-                  <img src={clientImg} height="50px" alt={client.id} />
+                  <img src={clientImg ? clientImg : dummyImage} height="50px" alt={client.id} />
                   <Typography variant="h5"
                     style={{
                       padding: "5px 0px",
