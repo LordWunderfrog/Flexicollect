@@ -1199,7 +1199,7 @@ const getListStyle = isDraggingOver => ({
   background: isDraggingOver ? '' : '',
 
 });
-let selectedIndex = 0
+//let selectedIndex = 0
 class Board extends Component {
   constructor(props) {
     super(props);
@@ -1213,7 +1213,7 @@ class Board extends Component {
       elementsDefined: false,
       SourceArray: [],
       dropAction: "reorder",
-
+      selectedIndex: 0
     };
 
     this.ropen = this.ropen.bind(this);
@@ -1511,7 +1511,8 @@ class Board extends Component {
    *
    */
   ropen(e, status, i, index) {
-    selectedIndex = index
+    this.setState({ selectedIndex: index })
+    // selectedIndex = index
     let selectedlanguage = this.props.selectedlanguage
     let languages_drop = this.props.languages_drop;
     let defaultdrop = this.props.defaultdrops
@@ -2280,7 +2281,7 @@ class Board extends Component {
     // let gpslength = filteredupload.length + 1;
     let disable = this.props.dropcurrentlanguage.value !== "English" ? { 'pointer-events': 'none', opacity: 0.4, 'cursor': "none" } : {}
 
-    const { drops, sidebox, dropAction } = this.state;
+    const { drops, sidebox, dropAction, selectedIndex } = this.state;
     const boardval = (sidebox) ? "openbox" : 'closebox';
 
 
