@@ -2414,7 +2414,7 @@ class Board extends Component {
                     </Draggable>
                   ) : ""
                   ))}
-                  <div style={{ height: 100 }}>
+                  <div style={{ height: 50 }}>
                   </div>
                   {provided.placeholder}
                 </div>

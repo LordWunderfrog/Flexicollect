@@ -926,10 +926,10 @@ class Settings extends React.Component {
             return
         } else if (selectedChoice[0].properties.multilevel === 1 && selectedChoice[0].properties.options) {
             return selectedChoice[0].properties.options.map((option, index) => (
-                <optgroup label={option.label}>
+                <optgroup key={index} label={option.label}>
                     {option.sublabel
                         ? option.sublabel.map((suboption, subindex) => (
-                            <option selected={((pid !== null && pid === option.id && matchVal === suboption.sublabel) || (pid === null && matchVal === suboption.sublabel)) ? "selected" : ""} value={option.id + "###id##" + suboption.sublabel}>
+                            <option key={subindex} selected={((pid !== null && pid === option.id && matchVal === suboption.sublabel) || (pid === null && matchVal === suboption.sublabel)) ? "selected" : ""} value={option.id + "###id##" + suboption.sublabel}>
                                 {suboption.sublabel}
                             </option>
                         ))
@@ -938,7 +938,7 @@ class Settings extends React.Component {
             ));
         } else if (selectedChoice[0].properties.options) {
             return selectedChoice[0].properties.options.map((option, index) => (
-                <option selected={matchVal === option.label ? "selected" : ""} value={option.label}>
+                <option key={index} selected={matchVal === option.label ? "selected" : ""} value={option.label}>
                     {option.label}
                 </option>
             ));
@@ -958,7 +958,7 @@ class Settings extends React.Component {
 
         if (selectedChoice && selectedChoice[0] && selectedChoice[0].properties.scale_content) {
             return selectedChoice[0].properties.scale_content.map((option, index) => (
-                <option selected={matchVal === option.value ? "selected" : ""} value={option.value}>
+                <option key={index} selected={matchVal === option.value ? "selected" : ""} value={option.value}>
                     {option.value}
                 </option>
             ));
@@ -978,7 +978,7 @@ class Settings extends React.Component {
 
         if (selectedChoice[0].properties.barcode_ids) {
             return selectedChoice[0].properties.barcode_ids.map((option, index) => (
-                <option selected={matchVal === option ? "selected" : ""} value={option}>
+                <option key={index} selected={matchVal === option ? "selected" : ""} value={option}>
                     {option}
                 </option>
             ));
@@ -999,7 +999,7 @@ class Settings extends React.Component {
 
         if (selectedChoice && selectedChoice[0] && selectedChoice[0].properties.table_content.table_value) {
             return selectedChoice[0].properties.table_content.table_value.map((option, index) => (
-                <option selected={matchVal === option.value ? "selected" : ""} value={option.value}>
+                <option key={index} selected={matchVal === option.value ? "selected" : ""} value={option.value}>
                     {option.value}
                 </option>
             ));
@@ -1018,7 +1018,7 @@ class Settings extends React.Component {
 
         if (selectedChoice && selectedChoice[0] && selectedChoice[0].properties.table_content.table_options) {
             return selectedChoice[0].properties.table_content.table_options.map((option, index) => (
-                <option selected={matchVal === option.value ? "selected" : ""} value={option.value}>
+                <option key={index} selected={matchVal === option.value ? "selected" : ""} value={option.value}>
                     {option.value}
                 </option>
             ));
@@ -1893,7 +1893,7 @@ class Settings extends React.Component {
                                                                                             Select your option
                                                                                         </option>
                                                                                         {this.selectedElement(drop, source).properties.scale_images.map((subval, subind) => (
-                                                                                            <option selected={source.match_value === subind + 1 ? "selected" : ""} value={subind + 1}>
+                                                                                            <option key={subind} selected={source.match_value === subind + 1 ? "selected" : ""} value={subind + 1}>
                                                                                                 {subind + 1}
                                                                                             </option>
                                                                                         ))}
@@ -1947,7 +1947,7 @@ class Settings extends React.Component {
                                                                                                         Select your option
                                                                                                     </option>
                                                                                                     {this.selectedElement(drop).properties.scale_images.map((subval, subind) => (
-                                                                                                        <option selected={source.match_value === subind + 1 ? "selected" : ""} value={subind + 1}>
+                                                                                                        <option key={subind} selected={source.match_value === subind + 1 ? "selected" : ""} value={subind + 1}>
                                                                                                             {subind + 1}
                                                                                                         </option>
                                                                                                     ))}
@@ -2092,9 +2092,7 @@ class Settings extends React.Component {
                             ))
                         }
                         {(this.state.validate === 1) ? <p className="conditionerror"> <i className="fa fa-exclamation-triangle" aria-hidden="true"></i>  Kindly Fill all the Fields to add more Conditions</p> : ""}
-                        <div className="plus plus-btns" onClick={this.addCondtion}
-
-                        >
+                        <div className="plus plus-btns" onClick={this.addCondtion}>
                             <i className="fa fa-plus-circle" />{" "}
                         </div>
                         {/*  <div className="" onClick={this.saveCondition}>Save</div> */}
