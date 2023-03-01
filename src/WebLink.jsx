@@ -1616,7 +1616,11 @@ class WebLink extends React.Component {
         // console.log("answer.selected_option.length " + answer.selected_option.length)
         // console.log("answer.label " + answer.label)
         // if (answer && ((answer.selected_option && answer.selected_option.length >= question.properties.table_content.value_length) || (answer.label && answer.label !== ""))) {
-        if (answer && ((answer.selected_option && answer.selected_option.length > 0)
+        let scaleType = question.properties.scale_type
+        if (scaleType == "table" && (answer && (answer.selected_option && answer.selected_option.length < question.properties.table_content.table_value.length))) {
+          mandatoryError = true;
+        }
+        else if (answer && ((answer.selected_option && answer.selected_option.length > 0)
           || (answer.label && answer.label != ""))) {
           mandatoryError = false;
         }
