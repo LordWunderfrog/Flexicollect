@@ -1582,6 +1582,22 @@ class Card extends React.Component {
         });
         // this.props.updateProperties(this.state.fieldprops)this.props.updateProperties(this.state.fieldprops)
     }
+    onBlurName = (e, i, index, key) => {
+        this.checkValue(e);
+        /** code for change the question in condition of Hide/show if lable is change */
+        if (this.state.conditions.length > 0) {
+            this.state.conditions.map((conditionObj) => {
+                if (conditionObj.target.do == 'hide_multiple' || conditionObj.target.do == 'show_multiple') {
+                    let multifileddata = conditionObj.target.multifield
+                    multifileddata && multifileddata.map((objMul) => {
+                        if (this.state.fieldprops.handler == objMul.value) {
+                            objMul["label"] = this.state.fieldprops.label
+                        }
+                    })
+                }
+            })
+        }
+    }
 
     handleQuestionGroupChange = (e, i, index, key) => {
         let fieldprops = this.state.fieldprops;
@@ -4111,7 +4127,7 @@ class Card extends React.Component {
                             <div className="below-lanbel-body"
                                 style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                             >
-                                <input type="text" name="name" className="mediumfm" value={this.state.fieldprops.label ? this.state.fieldprops.label : ""} onChange={e => this.inputtypename(e, "inputtypename")} />
+                                <input type="text" name="name" className="mediumfm" value={this.state.fieldprops.label ? this.state.fieldprops.label : ""} onChange={e => this.inputtypename(e, "inputtypename")} onBlur={e => this.onBlurName(e, "onBlurName")} />
                                 <label> Edit your Name </label>
                             </div>
                         </li>
@@ -4480,7 +4496,7 @@ class Card extends React.Component {
                             <div className="below-lanbel-body"
                                 style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                             >
-                                <input type="text" name="name" className="mediumfm" value={this.state.fieldprops.label ? this.state.fieldprops.label : ""} onChange={e => this.inputtypename(e, "inputtypename")} />
+                                <input type="text" name="name" className="mediumfm" value={this.state.fieldprops.label ? this.state.fieldprops.label : ""} onChange={e => this.inputtypename(e, "inputtypename")} onBlur={e => this.onBlurName(e, "onBlurName")} />
                                 <label> Edit your Name </label>
                             </div>
                         </li>
@@ -4751,7 +4767,7 @@ class Card extends React.Component {
                             <h3>Name</h3>
                             <div className="below-lanbel-body"
                             >
-                                <input type="text" name="name" className="mediumfm" value={this.state.fieldprops.label} onChange={e => this.inputtypename(e, "inputtypename")} />
+                                <input type="text" name="name" className="mediumfm" value={this.state.fieldprops.label} onChange={e => this.inputtypename(e, "inputtypename")} onBlur={e => this.onBlurName(e, "onBlurName")} />
                                 <label> Edit your Name </label>
                             </div>
                         </li>
@@ -5105,7 +5121,7 @@ class Card extends React.Component {
                             <div className="below-lanbel-body"
                                 style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                             >
-                                <input type="text" name="name" className="mediumfm" value={this.state.fieldprops.label} onChange={e => this.inputtypename(e, "inputtypename")} />
+                                <input type="text" name="name" className="mediumfm" value={this.state.fieldprops.label} onChange={e => this.inputtypename(e, "inputtypename")} onBlur={e => this.onBlurName(e, "onBlurName")} />
                                 <label> Edit Your Name </label>
                             </div>
                         </li>
@@ -5442,7 +5458,7 @@ class Card extends React.Component {
                         >
                             <h3>Name</h3>
                             <div className="below-lanbel-body">
-                                <input type="text" name="name" className="mediumfm" value={this.state.fieldprops.label} onChange={e => this.inputtypename(e, "inputtypename")} />
+                                <input type="text" name="name" className="mediumfm" value={this.state.fieldprops.label} onChange={e => this.inputtypename(e, "inputtypename")} onBlur={e => this.onBlurName(e, "onBlurName")} />
                                 <label> Edit Your Name </label>
                             </div>
                         </li>
@@ -6056,7 +6072,7 @@ class Card extends React.Component {
                                 <div className="below-lanbel-body"
                                     style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                                 >
-                                    <input type="text" name="name" className="mediumfm" value={this.state.fieldprops.label} onChange={e => this.inputtypename(e, "inputtypename")} />
+                                    <input type="text" name="name" className="mediumfm" value={this.state.fieldprops.label} onChange={e => this.inputtypename(e, "inputtypename")} onBlur={e => this.onBlurName(e, "onBlurName")} />
                                     <label> Edit your Name </label>
                                 </div>
                             </li>
@@ -6601,7 +6617,7 @@ class Card extends React.Component {
                             <div className="below-lanbel-body"
                                 style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                             >
-                                <input type="text" name="name" className="mediumfm" value={this.state.fieldprops.label} onChange={e => this.inputtypename(e, "inputtypename")} />
+                                <input type="text" name="name" className="mediumfm" value={this.state.fieldprops.label} onChange={e => this.inputtypename(e, "inputtypename")} onBlur={e => this.onBlurName(e, "onBlurName")} />
                                 <label> Edit Your Name </label>
                             </div>
                         </li>
@@ -6861,7 +6877,7 @@ class Card extends React.Component {
                                 style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
 
                             >
-                                <input type="text" name="name" className="mediumfm" value={this.state.fieldprops.label} onChange={e => this.inputtypename(e, "inputtypename")} />
+                                <input type="text" name="name" className="mediumfm" value={this.state.fieldprops.label} onChange={e => this.inputtypename(e, "inputtypename")} onBlur={e => this.onBlurName(e, "onBlurName")} />
                                 <label> Edit Your Name </label>
                             </div>
                         </li>

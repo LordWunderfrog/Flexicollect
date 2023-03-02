@@ -434,7 +434,7 @@ export default class CustomFilter extends Component {
           if (slicevalue === value.value) {
             newValue.splice(index, 1);
             let scaleFilterValue = this.state.scaleFilterValue
-            scaleFilterValue[index1].checked = true
+            scaleFilterValue[index1].checked = false
             this.setState({ scaleFilterValue })
 
           }
