@@ -248,9 +248,12 @@ class Settings extends React.Component {
             let targethandlercheck = conditions.filter((condition) => (
                 condition.target.handler === ""
             ))
-
-
-            if (sourcehandlercheck.length >= 1 || sourcestatecheck.length >= 1 || sourcetargetcheck.length >= 1 || targetdocheck.length >= 1 || targethandlercheck.length >= 1 || valuecheck.length >= 1) {
+            let targetmultifieldcheck = conditions.filter((condition) => {
+                if (condition.target.do === 'hide_multiple' || condition.target.do === 'show_multiple') {
+                    return condition.target.multifield === undefined || (condition.target.multifield && condition.target.multifield.length <= 0)
+                }
+            })
+            if (sourcehandlercheck.length >= 1 || sourcestatecheck.length >= 1 || sourcetargetcheck.length >= 1 || targetdocheck.length >= 1 || targethandlercheck.length >= 1 || valuecheck.length >= 1 || targetmultifieldcheck.length >= 1) {
                 this.setState({
                     validate: 1
                 });
@@ -747,7 +750,7 @@ class Settings extends React.Component {
             else {
                 let multipleDrops = this.multiList(drop)
                 if (multipleDrops.length > 0) {
-                    var startIndex = multipleDrops.findIndex(p => p.value == (this.state.rangeStartElement && this.state.rangeStartElement[0].value));
+                    var startIndex = multipleDrops.findIndex(p => p.value == (this.state.rangeStartElement.length > 0 && this.state.rangeStartElement[0].value));
                     var endIndex = multipleDrops.findIndex(p => p.value == event.value);
                     if (startIndex > 0 && startIndex < endIndex) {
                         let sliceArray = multipleDrops.slice(startIndex, endIndex + 1)
@@ -1438,10 +1441,9 @@ class Settings extends React.Component {
                                                                         fontSize: 14,
                                                                     }),
                                                                 }}
-                                                                isDisabled={this.state.rangeStartElement && this.state.rangeStartElement.length <= 0 ? true : false}
                                                                 name="ToField"
                                                                 options={this.multiList(drop)}
-                                                                value={drop.target.multifield && drop.target.multifield[drop.target.multifield.length - 1]}
+                                                                value={drop.target.multifield && drop.target.multifield[drop.target.multifield.length - 1] || ""}
                                                                 className="basic-single"
                                                                 classNamePrefix="select"
                                                                 onChange={e => this.addNewCondtionsMulti(e, drop, "multifield", "target", "ToField")}
