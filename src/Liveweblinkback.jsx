@@ -3708,7 +3708,7 @@ class WebLink extends React.Component {
                                         <li
                                             style={{
                                                 height: "35px",
-                                                width: "30px",
+                                                //width: "30px",
                                                 flexDirection: "row",
                                                 justifyContent: "center",
                                                 resizeMode: "stretch",
