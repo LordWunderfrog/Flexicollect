@@ -356,6 +356,44 @@ class Card extends React.Component {
             fieldans.question_text = message_text
             this.setState({ fieldprops: fieldprops });
         }
+        else {
+            let fieldprops = this.state.fieldprops;
+            let fieldans = fieldprops.properties;
+            fieldans.question = fieldans.question.replace(/&nbsp;/gi, '')
+            fieldans.question_text = fieldans.question_text.replace(/&nbsp;/gi, '')
+            this.setState({ fieldprops: fieldprops });
+        }
+    }
+    handleOnBlurData = (e, index, subindex) => {
+        let fieldprops = this.state.fieldprops;
+        let fieldans = fieldprops.properties;
+        if (e === "SUBHEADING") {
+            fieldans.subheading = fieldans.subheading ? fieldans.subheading.replace(/&nbsp;/gi, '') : ""
+            fieldans.subheading_text = fieldans.subheading_text ? fieldans.subheading_text.replace(/&nbsp;/gi, '') : ""
+        }
+        else if (e === "INFOCONTENT") {
+            fieldans.info_text = fieldans.info_text ? fieldans.info_text.replace(/&nbsp;/gi, '') : ""
+        }
+        else if (e === "SUBLABLE") {
+            fieldans.sublabel = fieldans.sublabel ? fieldans.sublabel.replace(/&nbsp;/gi, '') : ""
+            fieldans.sublabel_text = fieldans.sublabel_text ? fieldans.sublabel_text.replace(/&nbsp;/gi, '') : ""
+        }
+        else if (e === "SUBLABLE") {
+            fieldans.sublabel = fieldans.sublabel ? fieldans.sublabel.replace(/&nbsp;/gi, '') : ""
+            fieldans.sublabel_text = fieldans.sublabel_text ? fieldans.sublabel_text.replace(/&nbsp;/gi, '') : ""
+        }
+        else if (e === "CHOICELABLE") {
+            fieldans.options[index].label = fieldans.options[index].label ? fieldans.options[index].label.replace(/&nbsp;/gi, '') : ""
+            fieldans.options[index].label_text = fieldans.options[index].label_text ? fieldans.options[index].label_text.replace(/&nbsp;/gi, '') : ""
+        }
+        else if (e === "CHOICESUBLABLE") {
+            let sublabel = fieldans.options[index].sublabel[subindex].sublabel
+            let sublabel_text = fieldans.options[index].sublabel[subindex].sublabel_text
+            fieldans.options[index].sublabel[subindex].sublabel = sublabel ? sublabel.replace(/&nbsp;/gi, '') : ""
+            fieldans.options[index].sublabel[subindex].sublabel_text = sublabel_text ? sublabel_text.replace(/&nbsp;/gi, '') : ""
+        }
+        console.log('this.state. => ', fieldprops)
+        this.setState({ fieldprops: fieldprops });
     }
 
     /* Handles the api to validate the ref code. */
@@ -4149,6 +4187,7 @@ class Card extends React.Component {
                                             this.inputsubheading(html, "inputsubheading")
                                         }
                                     }}
+                                    onBlur={() => this.handleOnBlurData("SUBHEADING")}
                                 />
                                 {/* <input type="text" name="name" value={this.state.fieldprops.properties.subheading ? this.state.fieldprops.properties.subheading : ""} className="mediumfm" onChange={e => this.updateprops(e, "inputsubheading")} /> */}
                                 {/* <label> Add a sub heading below main title. </label> */}
@@ -4200,6 +4239,7 @@ class Card extends React.Component {
                                                     this.info_text(html, "info_text")
                                                 }
                                             }}
+                                            onBlur={() => this.handleOnBlurData("INFOCONTENT")}
                                         // onChange={e => this.updateprops(e, "info_text")}
                                         />
                                         {/* <ReactQuill
@@ -4519,6 +4559,7 @@ class Card extends React.Component {
                                             //   this.updateprops(html, "inputsubheading")
                                         }
                                     }}
+                                    onBlur={() => this.handleOnBlurData("SUBHEADING")}
                                 // onChange={e => this.updateprops(e, "inputsubheading")}
                                 />
                                 {/* <input type="text" name="name" value={this.state.fieldprops.properties.subheading} className="mediumfm" onChange={e => this.updateprops(e, "inputsubheading")} /> */}
@@ -4668,6 +4709,7 @@ class Card extends React.Component {
                                             this.inputsublabel(html, "inputsublabel")
                                         }
                                     }}
+                                    onBlur={() => this.handleOnBlurData("SUBLABLE")}
                                 // onChange={e => this.updateprops(e, "inputsublabel")}
                                 />
                                 {/* <input type="text" name="name" value={this.state.fieldprops.properties.sublabel} className="mediumfm" onChange={e => this.updateprops(e, "inputsublabel")} /> */}
@@ -4789,6 +4831,7 @@ class Card extends React.Component {
                                             this.inputsubheading(html, "inputsubheading")
                                         }
                                     }}
+                                    onBlur={() => this.handleOnBlurData("SUBHEADING")}
                                 // onChange={e => this.updateprops(e, "inputsubheading")}
                                 // onChange={e => this.updateprops(e, "inputquestion")}
                                 />
@@ -5142,6 +5185,7 @@ class Card extends React.Component {
                                             this.inputsubheading(html, "inputsubheading")
                                         }
                                     }}
+                                    onBlur={() => this.handleOnBlurData("SUBHEADING")}
                                 // onChange={e => this.updateprops(e, "inputsubheading")}
                                 />
                                 {/* <input type="text" name="name" value={this.state.fieldprops.properties.subheading} className="mediumfm" onChange={e => this.updateprops(e, "inputsubheading")} /> */}
@@ -5479,6 +5523,7 @@ class Card extends React.Component {
                                             this.inputsubheading(html, "inputsubheading")
                                         }
                                     }}
+                                    onBlur={() => this.handleOnBlurData("SUBHEADING")}
                                 // onChange={e => this.updateprops(e, "inputsubheading")}
                                 />
                                 {/* <input type="text" name="name" value={this.state.fieldprops.properties.subheading ? this.state.fieldprops.properties.subheading : ""} className="mediumfm" onChange={e => this.updateprops(e, "inputsubheading")} /> */}
@@ -6093,6 +6138,7 @@ class Card extends React.Component {
                                                 this.inputsubheading(html, "inputsubheading")
                                             }
                                         }}
+                                        onBlur={() => this.handleOnBlurData("SUBHEADING")}
                                     // onChange={e => this.updateprops(e, "inputsubheading")}
                                     />
                                     {/* <input type="text" name="name" value={this.state.fieldprops.properties.subheading ? this.state.fieldprops.properties.subheading : ""} className="mediumfm" onChange={e => this.updateprops(e, "inputsubheading")} />
@@ -6422,6 +6468,7 @@ class Card extends React.Component {
                                                                                 this.label(html, "label", index)
                                                                             }
                                                                         }}
+                                                                        onBlur={() => this.handleOnBlurData("CHOICELABLE", index)}
                                                                     //  onChange={e => this.updateprops(e, "label", index)}
                                                                     />
                                                                     {this.state.fieldprops.properties.multilevel ?
@@ -6475,6 +6522,7 @@ class Card extends React.Component {
                                                                                                         this.childlabel(html, "childlabel", index, key)
                                                                                                     }
                                                                                                 }}
+                                                                                                onBlur={() => this.handleOnBlurData("CHOICESUBLABLE", index, key)}
                                                                                             // onChange={e => this.updateprops(e, "childlabel", index,key)}
                                                                                             />
                                                                                             {/* <input
@@ -6638,6 +6686,7 @@ class Card extends React.Component {
                                             this.inputsubheading(html, "inputsubheading")
                                         }
                                     }}
+                                    onBlur={() => this.handleOnBlurData("SUBHEADING")}
                                 // onChange={e => this.updateprops(e, "inputsubheading")}
                                 />
                                 {/* <input type="text" name="name" value={this.state.fieldprops.properties.subheading} className="mediumfm" onChange={e => this.updateprops(e, "inputsubheading")} />
@@ -6991,6 +7040,7 @@ class Card extends React.Component {
                                                 this.inputsubheading(html, "inputsubheading")
                                             }
                                         }}
+                                        onBlur={() => this.handleOnBlurData("SUBHEADING")}
                                     // onChange={e => this.updateprops(e, "inputsubheading")}
                                     />
                                     {/* <input type="text" name="name" value={this.state.fieldprops.properties.subheading} className="mediumfm" onChange={e => this.updateprops(e, "inputsubheading")} /> */}
