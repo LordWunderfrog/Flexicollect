@@ -804,7 +804,7 @@ class ModalPopUp extends Component {
               {selectedQuestion.properties.grid_type === "image" ? (
                 <Table
                   style={tableContainer}
-                  borderStyle={{ borderColor: "#fff" }}
+                  borderstyle={{ borderColor: "#fff" }}
                 >
                   <TableBody>
                     <TableRow>
@@ -824,7 +824,7 @@ class ModalPopUp extends Component {
                     {this.state.tableData.map((rowData, index) => (
                       <TableRow
                         key={index}
-                        textStyle={tableRowText}
+                        textstyle={tableRowText}
                         style={tableRow}
                       >
                         {rowData.map((cellData, cellIndex) => (
@@ -867,7 +867,7 @@ class ModalPopUp extends Component {
               {selectedQuestion.properties.grid_type === "radio" ? (
                 <Table
                   style={tableContainer}
-                  borderStyle={{ borderColor: "#fff" }}
+                  borderstyle={{ borderColor: "#fff" }}
                 >
                   <TableBody>
                     <TableRow>
@@ -887,7 +887,7 @@ class ModalPopUp extends Component {
                     {this.state.tableDataRadio.map((rowData, index) => (
                       <TableRow
                         key={index}
-                        textStyle={tableRowText}
+                        textstyle={tableRowText}
                         style={tableRow}
                       >
                         {rowData.map((cellData, cellIndex) => (

@@ -3722,7 +3722,7 @@ class WebLink extends React.Component {
                                             {selectedQuestion.properties.grid_type === "image" ? (
                                                 <Table
                                                     style={tableContainer}
-                                                    borderStyle={{ borderColor: "#fff" }}
+                                                    borderstyle={{ borderColor: "#fff" }}
                                                     className="scaleTable"
                                                 >
                                                     <TableBody>
@@ -3744,7 +3744,7 @@ class WebLink extends React.Component {
                                                         {this.state.tableData.map((rowData, index) => (
                                                             <TableRow
                                                                 key={index}
-                                                                textStyle={tableRowText}
+                                                                textstyle={tableRowText}
                                                                 style={tableRow}
                                                             >
                                                                 {rowData.map((cellData, cellIndex) => (
@@ -3792,7 +3792,7 @@ class WebLink extends React.Component {
                                             {selectedQuestion.properties.grid_type === "radio" ? (
                                                 <Table
                                                     style={tableContainer}
-                                                    borderStyle={{ borderColor: "#fff" }}
+                                                    borderstyle={{ borderColor: "#fff" }}
                                                 >
                                                     <TableBody>
                                                         <TableRow>
@@ -3813,7 +3813,7 @@ class WebLink extends React.Component {
                                                         {this.state.tableDataRadio.map((rowData, index) => (
                                                             <TableRow
                                                                 key={index}
-                                                                textStyle={tableRowText}
+                                                                textstyle={tableRowText}
                                                                 style={tableRow}
                                                             >
                                                                 {rowData.map((cellData, cellIndex) => (

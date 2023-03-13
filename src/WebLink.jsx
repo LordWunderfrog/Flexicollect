@@ -895,7 +895,8 @@ class WebLink extends React.Component {
         if (answerRadio.length > 0) {
           for (let k = 0; k < answerRadio.length; k++) {
             if (answerRadio[k].id === table_value[i].id) {
-              if (answerRadio[k].image && answerRadio[k].image.id && answerRadio[k].image.id === table_value[i].image[j].id) {
+              //if (answerRadio[k].image && answerRadio[k].image.id && answerRadio[k].image.id === table_value[i].image[j].id) {
+              if (answerRadio[k].image && answerRadio[k].image.id === table_value[i].image[j].id) {
                 tempObj.isChecked = true;
               } else {
                 tempObj.isChecked = false;
@@ -3017,9 +3018,9 @@ class WebLink extends React.Component {
           isMatch = true;
         }
       }
-      if (selected[valueId] !== undefined && selected[valueId].image.id === optionId) {
-        isMatch = true;
-      }
+      // if (selected[valueId] !== undefined && selected[valueId].image.id === optionId) {
+      //   isMatch = true;
+      // }
     } else if (condition === 'notequal') {
       let notEqual = true;
       for (let i = 0; i < selected.length; i++) {
@@ -3159,38 +3160,38 @@ class WebLink extends React.Component {
         case 'equal':
           if (target === "Value_Multiple_Any") {
             for (let mv = 0; mv < matchVal.length; mv++) {
-              if (matchVal[mv].value === val) {
+              if (matchVal[mv].value == val) {
                 isMatch = true;
               }
             }
           } else if (target === "Value_Multiple_All") {
             for (let mv = 0; mv < matchVal.length; mv++) {
-              if (matchVal[mv].value !== value) {
+              if (matchVal[mv].value != value) {
                 multiple_value = false;
               }
             }
             isMatch = multiple_value
           } else {
-            isMatch = value === matchValue;
+            isMatch = value == matchValue;
           }
           break;
         case 'notequal':
           if (target === "Value_Multiple_Any") {
             for (let mv = 0; mv < matchVal.length; mv++) {
-              if (matchVal[mv].value === val) {
+              if (matchVal[mv].value == val) {
                 multiple_value = false;
               }
             }
             isMatch = multiple_value
           } else if (target === "Value_Multiple_All") {
             for (let mv = 0; mv < matchVal.length; mv++) {
-              if (matchVal[mv].value !== value) {
+              if (matchVal[mv].value != value) {
                 multiple_value = false;
               }
             }
             isMatch = multiple_value
           } else {
-            isMatch = value !== matchValue;
+            isMatch = value != matchValue;
           }
           break;
         case 'contain':
@@ -3610,7 +3611,7 @@ class WebLink extends React.Component {
                           {selectedQuestion.properties.grid_type === "image" ? (
                             <Table
                               style={tableContainer}
-                              borderStyle={{ borderColor: "#fff" }}
+                              borderstyle={{ borderColor: "#fff" }}
                               className="scaleTable"
                             >
                               <TableBody>
@@ -3632,7 +3633,7 @@ class WebLink extends React.Component {
                                 {this.state.tableData.map((rowData, index) => (
                                   <TableRow
                                     key={index}
-                                    textStyle={tableRowText}
+                                    textstyle={tableRowText}
                                     style={tableRow}
                                   >
                                     {rowData.map((cellData, cellIndex) => (
@@ -3695,7 +3696,7 @@ class WebLink extends React.Component {
                           {selectedQuestion.properties.grid_type === "radio" ? (
                             <Table
                               style={tableContainer}
-                              borderStyle={{ borderColor: "#fff" }}
+                              borderstyle={{ borderColor: "#fff" }}
                             >
                               <TableBody>
                                 <TableRow>
@@ -3716,7 +3717,7 @@ class WebLink extends React.Component {
                                 {this.state.tableDataRadio.map((rowData, index) => (
                                   <TableRow
                                     key={index}
-                                    textStyle={tableRowText}
+                                    textstyle={tableRowText}
                                     style={tableRow}
                                   >
                                     {rowData.map((cellData, cellIndex) => (
