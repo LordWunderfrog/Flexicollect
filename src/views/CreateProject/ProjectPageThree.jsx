@@ -144,7 +144,6 @@ class ProjectPageThree extends Component {
     api2
       .get("survey?id=" + this.props.mainSurveyId)
       .then(resp => {
-
         this.setState({
           platformType: resp.data.platform_type
         });
@@ -681,7 +680,9 @@ class ProjectPageThree extends Component {
       let arr = this.state.missionConsumersId.filter(function (item) {
         return item !== temp[index].id
       })
-      this.setState({ missionConsumersId: arr })
+      //this.setState({ missionConsumersId: arr })
+      this.state.missionConsumersId = arr
+      this.setState({})
     }
     this.props.handleInput("consumer_ids", this.state.missionConsumersId);
   }
