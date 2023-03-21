@@ -1657,10 +1657,10 @@ class Board extends Component {
 
                 defaultdrops.completed = 0;
               }
-              else if (fieldprops.properties.end_text.trim() !== "" && defaultdrops.properties.end_text.trim() === "") {
+              else if (fieldprops.properties.scale_type == "scale" && fieldprops.properties.end_text.trim() !== "" && defaultdrops.properties.end_text.trim() === "") {
                 defaultdrops.completed = 0;
               }
-              else if (fieldprops.properties.start_text.trim() !== "" && defaultdrops.properties.start_text.trim() === "") {
+              else if (fieldprops.properties.scale_type == "scale" && fieldprops.properties.start_text.trim() !== "" && defaultdrops.properties.start_text.trim() === "") {
                 defaultdrops.completed = 0;
               }
               else {
