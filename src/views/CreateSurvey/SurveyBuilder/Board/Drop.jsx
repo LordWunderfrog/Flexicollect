@@ -1589,6 +1589,105 @@ class Card extends React.Component {
         // this.props.updateProperties(this.state.fieldprops)
     }
 
+    /** handle Attribute selection  */
+    handleAttribute = (e, i, index, key) => {
+        console.log('e', e)
+        let fieldprops = this.state.fieldprops;
+        fieldprops.properties.e = e
+        this.setState({
+            fieldprops
+        });
+        this.props.autosave()
+    }
+    addAttributefun = (e, index) => {
+        let fieldprops = this.state.fieldprops
+        let selectedlanguage = this.props.selectedlanguage
+        let languages_drop = this.props.languages_drop;
+        let manual = fieldprops.properties.attribute_data ? fieldprops.properties.attribute_data.length : 0;
+
+
+        if (fieldprops.properties.attribute_data) {
+            let attribute = fieldprops.properties.attribute_data;
+            let id = 0;
+            for (let i = 0; i < attribute.length; i++) {
+                if (attribute[i].id > id) {
+                    id = attribute[i].id
+                }
+            }
+            manual = id + 1;
+        }
+
+        if (!fieldprops.properties.attribute_data) {
+            fieldprops.properties.attribute_data = []
+        }
+        else {
+            fieldprops.properties.attribute_data.push({
+                id: manual,
+                label: "",
+            })
+        }
+
+
+        selectedlanguage.forEach((a, b) => {
+            if (a.label !== 'English') {
+                let manual1 = languages_drop[a.label].content[this.props.index].properties.attribute_data ? languages_drop[a.label].content[this.props.index].properties.attribute_data.length : 0;
+                if (languages_drop[a.label].content[this.props.index].properties.attribute_data) {
+                    let attribute = languages_drop[a.label].content[this.props.index].properties.attribute_data;
+                    let id = 0;
+                    for (let i = 0; i < attribute.length; i++) {
+                        if (attribute[i].id > id) {
+                            id = attribute[i].id
+                        }
+                    }
+                    manual1 = id + 1;
+                }
+
+                if (!languages_drop[a.label].content[this.props.index].properties.attribute_data) {
+                    languages_drop[a.label].content[this.props.index].properties.attribute_data = []
+                }
+                languages_drop[a.label].content[this.props.index].properties.attribute_data.push({
+                    id: manual1,
+                    label: "",
+                })
+
+                console.log('Language drops', languages_drop)
+            }
+        })
+
+        this.setState({
+            fieldprops
+        }, () => {
+            this.props.autosave()
+        });
+        console.log('saved filed propes', this.state.fieldprops)
+    }
+    attributeChangeEvent = (e, index) => {
+        console.log('change event00', e)
+        console.log('change event00', index)
+
+        this.checkValue(e);
+        let fieldprops = this.state.fieldprops;
+        fieldprops.properties.attribute_data[index]['label'] = evalue;
+        this.setState({
+            fieldprops
+        });
+        console.log('saved filed propes', this.state.fieldprops)
+
+    }
+    deleteAttribute = (index) => {
+        let fieldprops = this.state.fieldprops;
+        let selectedlanguage = this.props.selectedlanguage
+        let languages_drop = this.props.languages_drop;
+
+        fieldprops.properties.attribute_data.splice(index, 1);
+        this.setState({ fieldprops });
+        selectedlanguage.forEach((a, b) => {
+            if (a.label !== 'English') {
+                languages_drop[a.label].content[this.props.index].properties.attribute_data.splice(index, 1);
+            }
+        })
+    }
+
     /*handleQuestionGroupChange(name, event) {
         console.log('hi')
         //this.checkValue(e);
@@ -2476,7 +2575,18 @@ class Card extends React.Component {
 
                 }
             })
-        } else {
+        } else if (evalue === "maxdiff") {
+            fieldprops.properties.scale_type = evalue;
+            fieldprops.properties.attribute_data = [];
+            selectedlanguage.forEach((a, b) => {
+                if (a.label !== 'English') {
+                    languages_drop[a.label].content[this.props.index].properties.scale_type = evalue;
+                    languages_drop[a.label].content[this.props.index].properties.attribute_data = [];
+
+                }
+            })
+        }
+        else {
             fieldprops.properties.scale_type = evalue;
             fieldprops.properties.scale_content = [];
 
@@ -5632,6 +5742,11 @@ class Card extends React.Component {
                                                 onChange={this.radioFunction("scale_type")} />
                                             <span>Table</span>
                                         </div>
+                                        <div className="block">
+                                            <input type="radio" value="maxdiff" checked={this.state.fieldprops.properties.scale_type === "maxdiff"}
+                                                onChange={this.radioFunction("scale_type")} />
+                                            <span>MaxDiff</span>
+                                        </div>
                                         {/*
                                                     <div className="block">
                                                         <input
@@ -5989,6 +6104,74 @@ class Card extends React.Component {
                                                     <label>Yes</label>
                                                     <input type="text" value={this.state.fieldprops.properties.scale_content[1].text} onChange={e => this.binary(e, "binary", 1)} />
                                                     <StyledDropZone label="Scale Sliding image" onDrop={this.onDrop.bind(this, "binary_ico", 1, "")} />
+                                                </div>
+                                            </div>
+                                        ) : this.state.fieldprops.properties.scale_type === "maxdiff" ? (
+                                            <div>
+                                                <h3>Maximum Attributes</h3>
+                                                <Select
+                                                    placeholder={'Maximum Attributes'}
+                                                    value={this.state.fieldprops.properties.currentProductNumber}
+                                                    options={this.state.Attributes}
+                                                    onChange={e => this.handleAttribute(e, "Maximum_Attributes")}
+                                                    name="Maximum_Attributes"
+                                                    className="language_list"
+                                                />
+                                                <h3>Attributes Per Task</h3>
+                                                <Select
+                                                    placeholder={'Attributes Per Task'}
+                                                    value={this.state.fieldprops.properties.currentQuestionGroup}
+                                                    options={this.state.Attributes}
+                                                    onChange={e => this.handleAttribute(e, "Attribute_PerTask")}
+                                                    name="Attribute_PerTask"
+                                                    className="language_list"
+                                                />
+                                                <h3>Repeate Attribute</h3>
+                                                <Select
+                                                    placeholder={'Repeate Attribute'}
+                                                    value={this.state.fieldprops.properties.currentOtherGroup}
+                                                    options={this.state.Attributes}
+                                                    onChange={e => this.handleAttribute(e, "Repeate_Attribute")}
+                                                    name="Repeate_Attribute"
+                                                    className="language_list"
+                                                />
+                                                <div style={{ height: "20px" }}></div>
+                                                {this.state.fieldprops.properties.attribute_data
+                                                    ? this.state.fieldprops.properties.attribute_data.map(
+                                                        function (value, index) {
+                                                            return (
+                                                                <div className="twocol dropboxer" key={index}>
+                                                                    <div className="choicedropper dropper">
+                                                                        <div className="parentlabel clear clearfix d-flex align-items-center"
+                                                                            style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops.properties.attribute_data && this.state.defaultdrops.properties.attribute_data[index] && this.state.defaultdrops.properties.attribute_data[index].label === "" ? disabledive : {} : {}}
+                                                                        >
+                                                                            <span>{alphabet[index]}</span>
+                                                                            <input
+                                                                                type="text"
+                                                                                name="name"
+                                                                                value={this.state.fieldprops.properties.attribute_data[index].label}
+                                                                                className="mediumfm mx-2"
+                                                                                onChange={e => this.attributeChangeEvent(e, index)}
+                                                                            />
+                                                                            <div className="addimgs"
+                                                                                style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
+                                                                                <i className="fa fa-trash pl-0" onClick={() => this.deleteAttribute(index)} />
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        }.bind(this)
+                                                    )
+                                                    : ""}
+
+                                                <div className="options"
+                                                    style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
+                                                >
+                                                    <div className="addmoreimage addmoreimage-big" onClick={() => this.addAttributefun()}>
+                                                        {" "}
+                                                        <i className="fa fa-plus" /> Add Attribute{" "}
+                                                    </div>
                                                 </div>
                                             </div>
                                         ) : (

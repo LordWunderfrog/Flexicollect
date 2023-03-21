@@ -1488,6 +1488,15 @@ class CreateSurvey extends React.Component {
                             break;
                         }
                     }
+                    else if (q.properties.scale_type === "maxdiff" && q.properties.attribute_data) {
+                        /**TODO Still some condition may requrired to check */
+                        if (q.properties.attribute_data.length <= 0) {
+                            scalecheck = false;
+                            labelname = q.label;
+                            type = "maxdiff";
+                            break;
+                        }
+                    }
                     else {
                         scalecheck = false;
                         labelname = q.label;
