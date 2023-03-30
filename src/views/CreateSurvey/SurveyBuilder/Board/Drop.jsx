@@ -1604,6 +1604,9 @@ class Card extends React.Component {
                 fieldprops.properties.Attribute_PerTask = ""
                 fieldprops.properties.Repeate_Attribute = ""
             }
+            else if (attributename == "Attribute_PerTask") {
+                fieldprops.properties.Repeate_Attribute = ""
+            }
             this.setState({
                 fieldprops
             }, () => {

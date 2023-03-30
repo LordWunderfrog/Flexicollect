@@ -36,6 +36,9 @@ import axios from 'axios';
 import cloneDeep from 'lodash/cloneDeep';
 import { Card } from "@material-ui/core";
 import imageCompression from 'browser-image-compression';
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 const styles = {
   //style for font size
@@ -109,6 +112,16 @@ var values;
 var idExists = false;
 var mission_id = 0;
 
+const settingsSlider = {
+  dots: false,
+  arrows: true,
+  infinite: false,
+  speed: 500,
+  swipe: true,
+  slidesToShow: 1,
+  slidesToScroll: 1
+};
+
 class WebLink extends React.Component {
   constructor(props) {
     super(props);
@@ -149,9 +162,11 @@ class WebLink extends React.Component {
       agree: true,
       enableTermsCond: false,
       otheroptionvalue: "",
-      otheroptiontextbox: false
-
-
+      otheroptiontextbox: false,
+      maxdifftableHead: ["Least", "", "Most"],
+      maxdifftableRow: [],
+      currentSliderPage: 0,
+      selectedmaxdiffOptions: []
     };
     this.handleNext = this.handleNext.bind(this);
     this.WebLinkCredentialValidation = this.WebLinkCredentialValidation.bind(this);
@@ -211,8 +226,10 @@ class WebLink extends React.Component {
       agree: true,
       enableTermsCond: false,
       otheroptionvalue: "",
-      otheroptiontextbox: false
-
+      otheroptiontextbox: false,
+      maxdifftableRow: [],
+      currentSliderPage: 0,
+      selectedmaxdiffOptions: []
     });
   }
 
@@ -234,7 +251,10 @@ class WebLink extends React.Component {
       selectedTableOptions: [],
       Upload: {},
       updatedAnswer: {},
-      updatedText: ""
+      updatedText: "",
+      maxdifftableRow: [],
+      currentSliderPage: 0,
+      selectedmaxdiffOptions: []
     })
   }
   /* Handles the validation of question type and update the response based on question type. */
@@ -265,6 +285,12 @@ class WebLink extends React.Component {
       this.state.selectedQuestion.properties.grid_type === "radio"
     ) {
       this.setSelectedScaleTableRadioOptions();
+    } else if (
+      this.state.selectedQuestion.type === "scale" &&
+      this.state.selectedQuestion.properties.scale_type &&
+      this.state.selectedQuestion.properties.scale_type === "maxdiff"
+    ) {
+      this.setSelectedScalemaxdiffTable();
     } else if (this.state.selectedQuestion.type === "choice") {
       this.setSelectedChoiceOptions();
     } else if (this.state.selectedQuestion.type === "upload") {
@@ -915,6 +941,59 @@ class WebLink extends React.Component {
     });
   }
 
+  setSelectedScalemaxdiffTable() {
+    let question = this.state.selectedQuestion.properties
+    let attributesSet = question.attribute_Set
+    let selectedAnswer = this.state.selectedAnswer;
+
+    let tableDatamaxd = [];
+    let selectedmaxdOptions = [];
+    tableDatamaxd = attributesSet && attributesSet.map((item, index) => {
+      return item && item.map((obj, index) => {
+        let arrTemp = []
+        arrTemp[0] = ""    //{ ...obj, isChecked: false, isLeastCheck: true }
+        arrTemp[1] = obj.label
+        arrTemp[2] = ""        //{ ...obj, isChecked: false, isLeastCheck: true }
+        return arrTemp
+      })
+    })
+
+    console.log('tableDatamaxd', tableDatamaxd)
+    // for (let i = 0; i < table_value.length; i++) {
+    //   let tempData = [];
+    //   tempData.push(table_value[i].value);
+    //   for (let j = 0; j < table_value[i].image.length; j++) {
+    //     let tempObj = {};
+    //     tempObj.row_id = table_value[i].id;
+    //     tempObj.id = table_value[i].image[j].id;
+    //     tempObj.isChecked = false;
+    //     tempObj.value = table_value[i].value;
+    //     if (answerRadio.length > 0) {
+    //       for (let k = 0; k < answerRadio.length; k++) {
+    //         if (answerRadio[k].id === table_value[i].id) {
+    //           //if (answerRadio[k].image && answerRadio[k].image.id && answerRadio[k].image.id === table_value[i].image[j].id) {
+    //           if (answerRadio[k].image && answerRadio[k].image.id === table_value[i].image[j].id) {
+    //             tempObj.isChecked = true;
+    //           } else {
+    //             tempObj.isChecked = false;
+    //           }
+    //         }
+    //       }
+    //     }
+    //     tempData.push(tempObj);
+    //   }
+    //   tableDataRadio.push(tempData);
+    // }
+    this.setState({
+      maxdifftableRow: tableDatamaxd,
+      selectedmaxdiffOptions: []
+    });
+  }
+  afterChangeHandler = (currentSlide) => {
+    this.setState({
+      currentSliderPage: currentSlide
+    })
+  }
   /* Handles the snackbar message notification. */
   showNotification = (msg, color) => {
     this.setState({
@@ -3757,6 +3836,65 @@ class WebLink extends React.Component {
                             </Table>
                           ) : null}
                         </li>
+                      </div>
+                    ) : (
+                      ""
+                    )}
+
+                    {this.state.selectedQuestion.type === "scale" &&
+                      this.state.selectedQuestion.properties.scale_type === "maxdiff" ? (
+                      <div className="scaleTableClass maxDiffCss">
+
+                        <div className="slider-arrow">
+                          <h6>{(this.state.currentSliderPage + 1) + " Of " + this.state.maxdifftableRow.length}</h6>
+                        </div>
+
+                        <Slider ref={c => (this.slider = c)} {...settingsSlider} afterChange={this.afterChangeHandler}>
+                          {this.state.maxdifftableRow.map((rowData, index) => (
+                            <Table
+                              key={index}
+                              style={tableContainer}
+                              borderstyle={{ borderColor: "#fff" }}
+                            >
+                              <TableBody>
+                                <TableRow>
+                                  {console.log('MxdHe', this.state.maxdifftableHead)}
+                                  {this.state.maxdifftableHead.map(
+                                    (options, index) => (
+                                      <TableCell className="max-diff-table-header" key={index}>{options}</TableCell>
+                                    )
+                                  )}
+                                </TableRow>
+                                {console.log('Rowd', rowData)}
+                                {rowData && rowData.map((cellData, rowIndex) => (
+                                  <TableRow
+                                    key={rowIndex}
+                                    textstyle={tableRowText}
+                                    style={{ height: 50, width: 50, alignItems: 'center' }}
+                                  >
+                                    {cellData && cellData.map((cellDataobj, cellIndex) => (
+                                      <TableCell
+                                        key={cellIndex}
+                                        style={{ height: 50, width: 50, alignItems: 'center' }}
+                                      >
+                                        {cellIndex !== 1 ? (
+                                          <input
+                                            name={cellDataobj[1]}
+                                            type="radio"
+                                            defaultChecked={cellDataobj.isChecked}
+                                            onChange={event => { }}
+                                          />
+                                        ) : (
+                                          cellDataobj
+                                        )}
+                                      </TableCell>
+                                    ))}
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          ))}
+                        </Slider>
                       </div>
                     ) : (
                       ""
