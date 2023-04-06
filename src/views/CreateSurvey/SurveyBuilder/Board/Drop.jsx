@@ -1763,9 +1763,7 @@ class Card extends React.Component {
         let attr_per_task = fieldprops.properties.Attribute_PerTask ? fieldprops.properties.Attribute_PerTask.value : 0
         let repeat_attr = fieldprops.properties.Repeate_Attribute ? fieldprops.properties.Repeate_Attribute.value : 0
         const num_sets = (max_attr / attr_per_task) * repeat_attr;
-        console.log('setSize', num_sets)
         let tempAtt = fieldprops.properties.attribute_data
-        console.log('Temp Att', tempAtt)
 
         let setOfAttribute = [];
         // Loop through num_sets and generate subarrays
@@ -1787,11 +1785,12 @@ class Card extends React.Component {
                 setOfAttribute = [];
                 i = -1;
             } else {
+                subarray = subarray.map(element => {
+                    return { ...element, attributeSetID: i };
+                });
                 setOfAttribute.push(subarray);
             }
         }
-
-        console.log(setOfAttribute);
 
         fieldprops.properties['attribute_Set'] = setOfAttribute
         this.setState({
