@@ -742,27 +742,27 @@ class ModalPopUp extends Component {
     let selectedmaxdiffOptions = this.state.selectedmaxdiffOptions;
 
     if (selectedmaxdiffOptions.length > 0) {
-      // if (selectedmaxdiffOptions.some(e => e.attributeSetID == cellDataobj.attributeSetID && e.id == cellDataobj.id)) {
-      //   // already added item for same row lest/most item
-      // }
-      // else {
-      let isMatch = false
-      selectedmaxdiffOptions.map((Ansobj, index) => {
-        if (Ansobj.attributeSetID == cellDataobj.attributeSetID && Ansobj.isLeastCheck == cellDataobj.isLeastCheck) {
-          selectedmaxdiffOptions.splice(index, 1);
-          selectedmaxdiffOptions.push(cellDataobj);
-          isMatch = true
-        }
-      })
-      if (isMatch == false) {
-        selectedmaxdiffOptions.push(cellDataobj);
+      if (selectedmaxdiffOptions.some(e => e.attributeSetID == cellDataobj.attributeSetID && e.id == cellDataobj.id)) {
+        // already added item for same row lest/most item
       }
-      // }
+      else {
+        let isMatch = false
+        selectedmaxdiffOptions.map((Ansobj, index) => {
+          if (Ansobj.attributeSetID == cellDataobj.attributeSetID && Ansobj.isLeastCheck == cellDataobj.isLeastCheck) {
+            selectedmaxdiffOptions.splice(index, 1);
+            selectedmaxdiffOptions.push(cellDataobj);
+            isMatch = true
+          }
+        })
+        if (isMatch == false) {
+          selectedmaxdiffOptions.push(cellDataobj);
+        }
+      }
     }
     else {
       this.state.selectedmaxdiffOptions.push(cellDataobj);
     }
-
+    this.setState({ selectedmaxdiffOptions })
   }
   afterChangeHandler = (currentSlide) => {
     this.setState({
@@ -1063,11 +1063,11 @@ class ModalPopUp extends Component {
                             >
                               {cellIndex !== 1 ? (
                                 <input
+                                  className={(this.state.selectedmaxdiffOptions && this.state.selectedmaxdiffOptions.some(e => e.attributeSetID == cellDataobj.attributeSetID && e.id == cellDataobj.id)) ? "pointer-eventsNone" : null}
                                   name={(cellDataobj.name + cellDataobj.attributeSetID)}
                                   type="radio"
-                                  // checked={this.state.selectedmaxdiffOptions.some(e => e.name != cellDataobj.name && e.id != cellDataobj.id)}
                                   defaultChecked={cellDataobj.isChecked}
-                                  //checked={cellDataobj.isChecked}
+                                  //disabled={this.state.selectedmaxdiffOptions && this.state.selectedmaxdiffOptions.some(e => e.attributeSetID == cellDataobj.attributeSetID && e.id == cellDataobj.id)}
                                   onChange={event =>
                                     this.onMaxdiffTableScaleClick(
                                       cellDataobj

@@ -1782,6 +1782,10 @@ h6.prevheading {
   float: left;
 }
 
+.radioSetLimit .block {
+  width: 50%;
+}
+
 /* surya on 10-01-2019 */
 .radioForm span {
   padding-left: 4px;

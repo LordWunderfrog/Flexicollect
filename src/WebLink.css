@@ -171,7 +171,11 @@ div.infoClass p {
 
 .scaleTableClass tbody tr td {
   border: 3px solid #fff;
-  background: #fafafa;
+  /* background: #fafafa; */
+}
+
+.pointer-eventsNone {
+  pointer-events: none;
 }
 
 .scaleTableClass tbody tr:first-child td {

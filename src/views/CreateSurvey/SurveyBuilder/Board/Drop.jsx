@@ -6639,7 +6639,7 @@ class Card extends React.Component {
                                     <div>
                                         {this.state.fieldprops.properties.setlimit == 1 ? (
                                             <div>
-                                                <div className="radioForm clearfix"
+                                                <div className="radioForm clearfix radioSetLimit"
                                                     style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                                                 >
                                                     <div className="block">

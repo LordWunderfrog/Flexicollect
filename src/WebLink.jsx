@@ -586,7 +586,7 @@ class WebLink extends React.Component {
               break;
             }
           }
-          this.showNotification('Please select maximum ' + queProperty.maxlimit + ' options only')
+          this.showNotification('Please select maximum ' + queProperty.maxlimit + ' options only', "info")
         }
       }
       else {
@@ -817,26 +817,27 @@ class WebLink extends React.Component {
     let selectedmaxdiffOptions = this.state.selectedmaxdiffOptions;
 
     if (selectedmaxdiffOptions.length > 0) {
-      // if (selectedmaxdiffOptions.some(e => e.attributeSetID == cellDataobj.attributeSetID && e.id == cellDataobj.id)) {
-      //   // already added item for same row lest/most item
-      // }
-      // else {
-      let isMatch = false
-      selectedmaxdiffOptions.map((Ansobj, index) => {
-        if (Ansobj.attributeSetID == cellDataobj.attributeSetID && Ansobj.isLeastCheck == cellDataobj.isLeastCheck) {
-          selectedmaxdiffOptions.splice(index, 1);
-          selectedmaxdiffOptions.push(cellDataobj);
-          isMatch = true
-        }
-      })
-      if (isMatch == false) {
-        selectedmaxdiffOptions.push(cellDataobj);
+      if (selectedmaxdiffOptions.some(e => e.attributeSetID == cellDataobj.attributeSetID && e.id == cellDataobj.id)) {
+        // already added item for same row lest/most item
       }
-      // }
+      else {
+        let isMatch = false
+        selectedmaxdiffOptions.map((Ansobj, index) => {
+          if (Ansobj.attributeSetID == cellDataobj.attributeSetID && Ansobj.isLeastCheck == cellDataobj.isLeastCheck) {
+            selectedmaxdiffOptions.splice(index, 1);
+            selectedmaxdiffOptions.push(cellDataobj);
+            isMatch = true
+          }
+        })
+        if (isMatch == false) {
+          selectedmaxdiffOptions.push(cellDataobj);
+        }
+      }
     }
     else {
       this.state.selectedmaxdiffOptions.push(cellDataobj);
     }
+    this.setState({ selectedmaxdiffOptions })
   }
 
   /* Used to format the answer data for scale table image type question and update the scale options. */
@@ -1363,7 +1364,7 @@ class WebLink extends React.Component {
       let count = this.state.selectedChoiceOptions ? this.state.selectedChoiceOptions.length : 0
       let objProperty = this.state.selectedQuestion.properties
       if (count < objProperty.minlimit) {
-        this.showNotification('Please select minimum ' + objProperty.minlimit + ' options')
+        this.showNotification('Please select minimum ' + objProperty.minlimit + ' options', "info")
         return
       }
     }
@@ -1375,7 +1376,7 @@ class WebLink extends React.Component {
         let lengthofSet = this.state.selectedQuestion.properties.attribute_Set && this.state.selectedQuestion.properties.attribute_Set.length || 0
         /** logic is every set has least and most selection so its lenth * 2 */
         if (ansObj.length < (lengthofSet * 2)) {
-          this.showNotification('Please select least and most item for all set of question')
+          this.showNotification('Please select least and most item for all set of question', "info")
           return;
         }
       }
@@ -3912,11 +3913,11 @@ class WebLink extends React.Component {
                                       >
                                         {cellIndex !== 1 ? (
                                           <input
+                                            className={(this.state.selectedmaxdiffOptions && this.state.selectedmaxdiffOptions.some(e => e.attributeSetID == cellDataobj.attributeSetID && e.id == cellDataobj.id)) ? "pointer-eventsNone" : null}
                                             name={(cellDataobj.name + cellDataobj.attributeSetID)}
                                             type="radio"
-                                            // checked={this.state.selectedmaxdiffOptions.some(e => e.name != cellDataobj.name && e.id != cellDataobj.id)}
+                                            //disabled={this.state.selectedmaxdiffOptions && this.state.selectedmaxdiffOptions.some(e => e.attributeSetID == cellDataobj.attributeSetID && e.id == cellDataobj.id)}
                                             defaultChecked={cellDataobj.isChecked}
-                                            //checked={cellDataobj.isChecked}
                                             onChange={event =>
                                               this.onMaxdiffTableScaleClick(
                                                 cellDataobj
