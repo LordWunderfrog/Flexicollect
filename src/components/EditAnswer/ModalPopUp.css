@@ -66,3 +66,8 @@ input[type="text"]::before {
 .coloredInput .choiceClass input[type="checkbox"]:after {
   top: 1px;
 }
+
+.maxDiffModal {
+  max-width: 850px;
+  width: 96% !important;
+}

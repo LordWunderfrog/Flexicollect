@@ -1778,8 +1778,12 @@ h6.prevheading {
 }
 
 .radioForm .block {
-  width: 50%;
+  width: 30%;
   float: left;
+}
+
+.radioSetLimit .block {
+  width: 50%;
 }
 
 /* surya on 10-01-2019 */

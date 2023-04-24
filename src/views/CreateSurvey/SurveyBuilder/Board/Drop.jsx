@@ -116,7 +116,9 @@ class Card extends React.Component {
             incomplete: [],
             MandatoryStyle: false,
             show: [false, false, false, false],
-
+            maximumAttribute: [],
+            attributePerTask: [],
+            repeatAttribute: []
         };
         this.handleFocus = this.handleFocus.bind(this);
         this.handleBlur = this.handleBlur.bind(this);
@@ -326,6 +328,8 @@ class Card extends React.Component {
             selectedlanguage: this.props.selectedlanguage,
             defaultdrops: this.props.defaultdrops,
             incomplete: this.props.selectedlanguage,
+        }, () => {
+            this.manageMaxdiffSettingOption()
         });
     }
 
@@ -1589,6 +1593,225 @@ class Card extends React.Component {
         // this.props.updateProperties(this.state.fieldprops)
     }
 
+    /** handle Attribute selection  */
+    handleAttribute = (e, attributename) => {
+        let fieldprops = this.state.fieldprops;
+
+        /** Validation */
+        if (this.validationOfMaxdiffSetting(e, fieldprops, attributename)) {
+            fieldprops.properties[attributename] = e
+            if (attributename == "Maximum_Attributes") {
+                fieldprops.properties.Attribute_PerTask = ""
+                fieldprops.properties.Repeate_Attribute = ""
+            }
+            else if (attributename == "Attribute_PerTask") {
+                fieldprops.properties.Repeate_Attribute = ""
+            }
+            this.setState({
+                fieldprops
+            }, () => {
+                if (attributename == "Repeate_Attribute") {
+                    this.createMaxdiffSet()
+                }
+                this.props.autosave()
+            });
+        }
+    }
+    validationOfMaxdiffSetting = (e, fieldprops, attributename) => {
+        var maxAttribute = fieldprops.properties.Maximum_Attributes
+        if (attributename == 'Attribute_PerTask') {
+            if (!maxAttribute) {
+                this.showNotification('Please select maxium attribute', "danger")
+                return false
+            }
+            else if (maxAttribute.value % e.value !== 0) {
+                this.showNotification('Attribute per task should be divisable by maxium attribute', "danger")
+                return false
+            }
+            else {
+                return true
+            }
+        }
+        else if (attributename == 'Repeate_Attribute') {
+            let attributepertask = fieldprops.properties.Attribute_PerTask
+            if (!maxAttribute) {
+                this.showNotification('Please select maxium attribute', "danger")
+                return false
+            }
+            else if (!attributepertask) {
+                this.showNotification('Please select attribute per task', "danger")
+                return false
+            }
+            else {
+                return true
+            }
+        }
+        else {
+            return true
+        }
+    }
+    addAttributefun = (e, index) => {
+        let fieldprops = this.state.fieldprops
+        let selectedlanguage = this.props.selectedlanguage
+        let languages_drop = this.props.languages_drop;
+        let manual = fieldprops.properties.attribute_data ? fieldprops.properties.attribute_data.length : 0;
+
+
+        if (fieldprops.properties.attribute_data) {
+            let attribute = fieldprops.properties.attribute_data;
+            let id = 0;
+            for (let i = 0; i < attribute.length; i++) {
+                if (attribute[i].id > id) {
+                    id = attribute[i].id
+                }
+            }
+            manual = id + 1;
+        }
+
+        if (!fieldprops.properties.attribute_data) {
+            fieldprops.properties.attribute_data = []
+        }
+        else {
+            fieldprops.properties.attribute_data.push({
+                id: manual,
+                label: "",
+            })
+        }
+
+
+        selectedlanguage.forEach((a, b) => {
+            if (a.label !== 'English') {
+                let manual1 = languages_drop[a.label].content[this.props.index].properties.attribute_data ? languages_drop[a.label].content[this.props.index].properties.attribute_data.length : 0;
+                if (languages_drop[a.label].content[this.props.index].properties.attribute_data) {
+                    let attribute = languages_drop[a.label].content[this.props.index].properties.attribute_data;
+                    let id = 0;
+                    for (let i = 0; i < attribute.length; i++) {
+                        if (attribute[i].id > id) {
+                            id = attribute[i].id
+                        }
+                    }
+                    manual1 = id + 1;
+                }
+
+                if (!languages_drop[a.label].content[this.props.index].properties.attribute_data) {
+                    languages_drop[a.label].content[this.props.index].properties.attribute_data = []
+                }
+                languages_drop[a.label].content[this.props.index].properties.attribute_data.push({
+                    id: manual1,
+                    label: "",
+                })
+            }
+        })
+
+        /**set initail set for setting and set state filed propes */
+        fieldprops.properties.Maximum_Attributes = ""
+        fieldprops.properties.Attribute_PerTask = ""
+        fieldprops.properties.Repeate_Attribute = ""
+        this.setState({
+            fieldprops
+        }, () => {
+            this.props.autosave()
+            this.manageMaxdiffSettingOption()
+        });
+    }
+    manageMaxdiffSettingOption = () => {
+        let tempfieldprops = this.state.fieldprops
+        let lengthOfattribute = tempfieldprops.properties.attribute_data && tempfieldprops.properties.attribute_data.length || 0
+        let temparray = Array.from(Array(lengthOfattribute).keys())
+        let option = []
+        temparray && temparray.map((obj) => {
+            option.push({ label: obj + 1, value: obj + 1 })
+        })
+        this.setState({
+            maximumAttribute: [{ label: "All", value: lengthOfattribute }, ...option],
+            attributePerTask: option,
+            repeatAttribute: option
+        })
+    }
+    attributeChangeEvent = (e, index) => {
+        this.checkValue(e);
+        let fieldprops = this.state.fieldprops;
+        fieldprops.properties.attribute_data[index]['label'] = evalue;
+        this.setState({
+            fieldprops
+        });
+    }
+    deleteAttribute = (index) => {
+        let fieldprops = this.state.fieldprops;
+        let selectedlanguage = this.props.selectedlanguage
+        let languages_drop = this.props.languages_drop;
+
+        fieldprops.properties.attribute_data.splice(index, 1);
+        fieldprops.properties.Maximum_Attributes = ""
+        fieldprops.properties.Attribute_PerTask = ""
+        fieldprops.properties.Repeate_Attribute = ""
+        this.setState({
+            fieldprops
+        }, () => {
+            this.manageMaxdiffSettingOption()
+        });
+        selectedlanguage.forEach((a, b) => {
+            if (a.label !== 'English') {
+                languages_drop[a.label].content[this.props.index].properties.attribute_data.splice(index, 1);
+            }
+        })
+    }
+
+    createMaxdiffSet = () => {
+        let fieldprops = this.state.fieldprops
+        let max_attr = fieldprops.properties.Maximum_Attributes ? fieldprops.properties.Maximum_Attributes.value : 0
+        let attr_per_task = fieldprops.properties.Attribute_PerTask ? fieldprops.properties.Attribute_PerTask.value : 0
+        let repeat_attr = fieldprops.properties.Repeate_Attribute ? fieldprops.properties.Repeate_Attribute.value : 0
+        const num_sets = (max_attr / attr_per_task) * repeat_attr;
+        let tempAtt = fieldprops.properties.attribute_data
+
+        let setOfAttribute = [];
+        // Loop through num_sets and generate subarrays
+        for (let i = 0; i < num_sets; i++) {
+            let subarray = [];
+
+            // Loop until subarray is filled with unique attributes or until maximum attempts is reached
+            let attempts = 0;
+            while (subarray.length < attr_per_task && attempts < max_attr) {
+                let randomItem = tempAtt[Math.floor(Math.random() * max_attr)];
+                if (!subarray.includes(randomItem) && !this.hasOccured(setOfAttribute, randomItem, repeat_attr)) {
+                    subarray.push(randomItem);
+                }
+                attempts++;
+            }
+
+            // If subarray is not filled with unique attributes, reset setOfAttribute and start over from the beginning
+            if (subarray.length < attr_per_task) {
+                setOfAttribute = [];
+                i = -1;
+            } else {
+                subarray = subarray.map(element => {
+                    return { ...element, attributeSetID: i };
+                });
+                setOfAttribute.push(subarray);
+            }
+        }
+
+        fieldprops.properties['attribute_Set'] = setOfAttribute
+        this.setState({
+            fieldprops
+        })
+    }
+
+    // Function to check if an attribute has already occurred in setOfAttribute
+    hasOccured(setOfAttribute, att, repeat_attr) {
+        let count = 0;
+        for (let i = 0; i < setOfAttribute.length; i++) {
+            if (setOfAttribute[i].includes(att)) {
+                count++;
+                if (count >= repeat_attr) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     /*handleQuestionGroupChange(name, event) {
         console.log('hi')
         //this.checkValue(e);
@@ -2476,7 +2699,18 @@ class Card extends React.Component {
 
                 }
             })
-        } else {
+        } else if (evalue === "maxdiff") {
+            fieldprops.properties.scale_type = evalue;
+            fieldprops.properties.attribute_data = [];
+            selectedlanguage.forEach((a, b) => {
+                if (a.label !== 'English') {
+                    languages_drop[a.label].content[this.props.index].properties.scale_type = evalue;
+                    languages_drop[a.label].content[this.props.index].properties.attribute_data = [];
+
+                }
+            })
+        }
+        else {
             fieldprops.properties.scale_type = evalue;
             fieldprops.properties.scale_content = [];
 
@@ -5632,6 +5866,11 @@ class Card extends React.Component {
                                                 onChange={this.radioFunction("scale_type")} />
                                             <span>Table</span>
                                         </div>
+                                        <div className="block">
+                                            <input type="radio" value="maxdiff" checked={this.state.fieldprops.properties.scale_type === "maxdiff"}
+                                                onChange={this.radioFunction("scale_type")} />
+                                            <span>MaxDiff</span>
+                                        </div>
                                         {/*
                                                     <div className="block">
                                                         <input
@@ -5991,6 +6230,76 @@ class Card extends React.Component {
                                                     <StyledDropZone label="Scale Sliding image" onDrop={this.onDrop.bind(this, "binary_ico", 1, "")} />
                                                 </div>
                                             </div>
+                                        ) : this.state.fieldprops.properties.scale_type === "maxdiff" ? (
+                                            <div>
+
+                                                {this.state.fieldprops.properties.attribute_data
+                                                    ? this.state.fieldprops.properties.attribute_data.map(
+                                                        function (value, index) {
+                                                            return (
+                                                                <div className="twocol dropboxer" key={index}>
+                                                                    <div className="choicedropper dropper">
+                                                                        <div className="parentlabel clear clearfix d-flex align-items-center"
+                                                                            style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops.properties.attribute_data && this.state.defaultdrops.properties.attribute_data[index] && this.state.defaultdrops.properties.attribute_data[index].label === "" ? disabledive : {} : {}}
+                                                                        >
+                                                                            <span>{alphabet[index]}</span>
+                                                                            <input
+                                                                                type="text"
+                                                                                name="name"
+                                                                                value={this.state.fieldprops.properties.attribute_data[index].label}
+                                                                                className="mediumfm mx-2"
+                                                                                onChange={e => this.attributeChangeEvent(e, index)}
+                                                                            />
+                                                                            <div className="addimgs"
+                                                                                style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
+                                                                                <i className="fa fa-trash pl-0" onClick={() => this.deleteAttribute(index)} />
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        }.bind(this)
+                                                    )
+                                                    : ""}
+
+                                                <div className="options"
+                                                    style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
+                                                >
+                                                    <div className="addmoreimage addmoreimage-big" onClick={() => this.addAttributefun()}>
+                                                        {" "}
+                                                        <i className="fa fa-plus" /> Add Attribute{" "}
+                                                    </div>
+                                                </div>
+
+                                                <div style={{ height: "20px" }}></div>
+                                                <h3>Maximum Attributes</h3>
+                                                <Select
+                                                    placeholder={'Maximum Attributes'}
+                                                    value={this.state.fieldprops.properties.Maximum_Attributes}
+                                                    options={this.state.maximumAttribute}
+                                                    onChange={e => this.handleAttribute(e, "Maximum_Attributes")}
+                                                    name="Maximum_Attributes"
+                                                    className="language_list"
+                                                />
+                                                <h3>Attributes Per Task</h3>
+                                                <Select
+                                                    placeholder={'Attributes Per Task'}
+                                                    value={this.state.fieldprops.properties.Attribute_PerTask}
+                                                    options={this.state.attributePerTask}
+                                                    onChange={e => this.handleAttribute(e, "Attribute_PerTask")}
+                                                    name="Attribute_PerTask"
+                                                    className="language_list"
+                                                />
+                                                <h3>Repeate Attribute</h3>
+                                                <Select
+                                                    placeholder={'Repeate Attribute'}
+                                                    value={this.state.fieldprops.properties.Repeate_Attribute}
+                                                    options={this.state.repeatAttribute}
+                                                    onChange={e => this.handleAttribute(e, "Repeate_Attribute")}
+                                                    name="Repeate_Attribute"
+                                                    className="language_list"
+                                                />
+                                            </div>
                                         ) : (
                                             ""
                                         )}
@@ -6330,7 +6639,7 @@ class Card extends React.Component {
                                     <div>
                                         {this.state.fieldprops.properties.setlimit == 1 ? (
                                             <div>
-                                                <div className="radioForm clearfix"
+                                                <div className="radioForm clearfix radioSetLimit"
                                                     style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                                                 >
                                                     <div className="block">
