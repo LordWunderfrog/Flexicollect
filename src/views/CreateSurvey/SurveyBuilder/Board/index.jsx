@@ -1753,7 +1753,8 @@ class Board extends Component {
 
 
     this.setState({
-      drops: newdata
+      drops: newdata,
+      selectedIndex: this.state.selectedIndex >= 1 ? this.state.selectedIndex - 1 : 0
     }, function () {
 
       this.props.deteldrops(this.state.drops);
@@ -1801,7 +1802,7 @@ class Board extends Component {
           handler: newDrop.handler,
           question_id: newDrop.question_id
         }
-        languages_drop[a.label].content.splice(index + 1, 0, newDropLang);
+        languages_drop[a.label].content.splice(index + 1, 0, cloneDeep(newDropLang));
       }
     })
     this.props.setDropsLang(languages_drop)
@@ -2423,7 +2424,7 @@ class Board extends Component {
             </Droppable>
             {this.state.drops && this.state.drops.length > 0 ?
               <div>
-                <Card
+                {selectedIndex ? <Card
                   index={selectedIndex}
                   color={this.state.drops[selectedIndex].color}
                   key={selectedIndex}
@@ -2459,7 +2460,7 @@ class Board extends Component {
                   downArrowFuncLanguage={this.props.downArrowFuncLanguage}
                   upArrowFuncLanguage={this.props.upArrowFuncLanguage}
                   updateProperties={() => this.updateProperties()}
-                />
+                /> : ''}
               </div> : ""}
 
             {/* {this.state.drops.map((drop, index) => (drops[index] ? (

@@ -396,7 +396,7 @@ class Card extends React.Component {
             fieldans.options[index].sublabel[subindex].sublabel = sublabel ? sublabel.replace(/&nbsp;/gi, '') : ""
             fieldans.options[index].sublabel[subindex].sublabel_text = sublabel_text ? sublabel_text.replace(/&nbsp;/gi, '') : ""
         }
-        console.log('this.state. => ', fieldprops)
+
         this.setState({ fieldprops: fieldprops });
     }
 
