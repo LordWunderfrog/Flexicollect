@@ -2424,7 +2424,7 @@ class Board extends Component {
             </Droppable>
             {this.state.drops && this.state.drops.length > 0 ?
               <div>
-                {selectedIndex ? <Card
+                <Card
                   index={selectedIndex}
                   color={this.state.drops[selectedIndex].color}
                   key={selectedIndex}
@@ -2460,7 +2460,7 @@ class Board extends Component {
                   downArrowFuncLanguage={this.props.downArrowFuncLanguage}
                   upArrowFuncLanguage={this.props.upArrowFuncLanguage}
                   updateProperties={() => this.updateProperties()}
-                /> : ''}
+                />
               </div> : ""}
 
             {/* {this.state.drops.map((drop, index) => (drops[index] ? (

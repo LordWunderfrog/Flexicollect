@@ -1453,6 +1453,7 @@ class WebLink extends React.Component {
         let newQuestion = this.state.questions.slice(this.state.index + 1);
         let filteredQuestions = this.removeHiddenQuestion(newQuestion);
         this.setState({
+          updatedText: "",
           updatedChoiceOptions: [],
           selectedChoiceOptions: []
         });
