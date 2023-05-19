@@ -1753,7 +1753,8 @@ class Board extends Component {
 
 
     this.setState({
-      drops: newdata
+      drops: newdata,
+      selectedIndex: this.state.selectedIndex >= 1 ? this.state.selectedIndex - 1 : 0
     }, function () {
 
       this.props.deteldrops(this.state.drops);
@@ -1801,7 +1802,7 @@ class Board extends Component {
           handler: newDrop.handler,
           question_id: newDrop.question_id
         }
-        languages_drop[a.label].content.splice(index + 1, 0, newDropLang);
+        languages_drop[a.label].content.splice(index + 1, 0, cloneDeep(newDropLang));
       }
     })
     this.props.setDropsLang(languages_drop)

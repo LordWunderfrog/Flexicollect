@@ -1488,6 +1488,41 @@ class CreateSurvey extends React.Component {
                             break;
                         }
                     }
+                    else if (q.properties.scale_type === "maxdiff" && q.properties.attribute_data) {
+                        let emptyAttribute = q.properties.attribute_data && q.properties.attribute_data.filter((obj) => {
+                            return obj.label.trim().length === 0
+                        })
+                        if (q.properties.attribute_data.length <= 0) {
+                            scalecheck = false;
+                            labelname = q.label;
+                            type = "maxdiff";
+                            break;
+                        }
+                        else if (!q.properties.Maximum_Attributes) {
+                            scalecheck = false;
+                            labelname = q.label;
+                            type = "maxdiff";
+                            break;
+                        }
+                        else if (!q.properties.Attribute_PerTask) {
+                            scalecheck = false;
+                            labelname = q.label;
+                            type = "maxdiff";
+                            break;
+                        }
+                        else if (!q.properties.Repeate_Attribute) {
+                            scalecheck = false;
+                            labelname = q.label;
+                            type = "maxdiff";
+                            break;
+                        }
+                        else if (emptyAttribute.length > 0) {
+                            scalecheck = false;
+                            labelname = q.label;
+                            type = "maxdiff";
+                            break;
+                        }
+                    }
                     else {
                         scalecheck = false;
                         labelname = q.label;

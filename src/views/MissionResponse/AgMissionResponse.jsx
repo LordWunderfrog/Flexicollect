@@ -1308,6 +1308,19 @@ class AgMissionResponse extends React.Component {
         this.state.updatedAnswer["scale_type"] = this.state.selectedQuestion.properties.scale_type;
       }
     }
+    else if (this.state.selectedQuestion.type === "scale" && this.state.selectedQuestion.properties.scale_type === "maxdiff") {
+      let selectedmaxdiffOptions = this.refs.modalPopUp.getSelectedMaxdiffOption();
+      if (
+        this.state.selectedAnswer &&
+        this.state.selectedAnswer.selected_option
+      ) {
+        this.state.updatedAnswer = this.state.selectedAnswer;
+        this.state.updatedAnswer["selected_option"] = selectedmaxdiffOptions;
+      } else {
+        this.state.updatedAnswer["selected_option"] = selectedmaxdiffOptions;
+        this.state.updatedAnswer["scale_type"] = this.state.selectedQuestion.properties.scale_type;
+      }
+    }
     else if (this.state.selectedQuestion.type === "choice") {
       let selectedChoiceOptions = this.refs.modalPopUp.getSelectedChoiceOptions();
       if (this.refs.modalPopUp.getOtherOptionValue !== "") {
@@ -2875,6 +2888,20 @@ class AgMissionResponse extends React.Component {
             ? a.answers.selected_option.map(as => as.image.image_id).join() +
             ","
             : ""
+        ];
+      case a && a.type === "scale" && a.answers.scale_type === "maxdiff":
+        return [
+          a.answers.selected_option.length > 0
+            ? a.answers.selected_option
+              .map(
+                as =>
+                  " " +
+                  as.label +
+                  ":" +
+                  (as.isLeastCheck === true ? "L" : "M")
+              )
+              .join() + ""
+            : "",
         ];
       case a && a.type === "gps":
         return a.answers.address;

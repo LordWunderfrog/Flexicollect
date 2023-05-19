@@ -36,6 +36,9 @@ import axios from 'axios';
 import cloneDeep from 'lodash/cloneDeep';
 import { Card } from "@material-ui/core";
 import imageCompression from 'browser-image-compression';
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 const styles = {
   //style for font size
@@ -109,6 +112,16 @@ var values;
 var idExists = false;
 var mission_id = 0;
 
+const settingsSlider = {
+  dots: false,
+  arrows: true,
+  infinite: false,
+  speed: 500,
+  swipe: true,
+  slidesToShow: 1,
+  slidesToScroll: 1
+};
+
 class WebLink extends React.Component {
   constructor(props) {
     super(props);
@@ -149,9 +162,11 @@ class WebLink extends React.Component {
       agree: true,
       enableTermsCond: false,
       otheroptionvalue: "",
-      otheroptiontextbox: false
-
-
+      otheroptiontextbox: false,
+      maxdifftableHead: ["Least", "", "Most"],
+      maxdifftableRow: [],
+      currentSliderPage: 0,
+      selectedmaxdiffOptions: []
     };
     this.handleNext = this.handleNext.bind(this);
     this.WebLinkCredentialValidation = this.WebLinkCredentialValidation.bind(this);
@@ -211,8 +226,10 @@ class WebLink extends React.Component {
       agree: true,
       enableTermsCond: false,
       otheroptionvalue: "",
-      otheroptiontextbox: false
-
+      otheroptiontextbox: false,
+      maxdifftableRow: [],
+      currentSliderPage: 0,
+      selectedmaxdiffOptions: []
     });
   }
 
@@ -234,7 +251,10 @@ class WebLink extends React.Component {
       selectedTableOptions: [],
       Upload: {},
       updatedAnswer: {},
-      updatedText: ""
+      updatedText: "",
+      maxdifftableRow: [],
+      currentSliderPage: 0,
+      selectedmaxdiffOptions: []
     })
   }
   /* Handles the validation of question type and update the response based on question type. */
@@ -265,6 +285,12 @@ class WebLink extends React.Component {
       this.state.selectedQuestion.properties.grid_type === "radio"
     ) {
       this.setSelectedScaleTableRadioOptions();
+    } else if (
+      this.state.selectedQuestion.type === "scale" &&
+      this.state.selectedQuestion.properties.scale_type &&
+      this.state.selectedQuestion.properties.scale_type === "maxdiff"
+    ) {
+      this.setSelectedScalemaxdiffTable();
     } else if (this.state.selectedQuestion.type === "choice") {
       this.setSelectedChoiceOptions();
     } else if (this.state.selectedQuestion.type === "upload") {
@@ -560,7 +586,7 @@ class WebLink extends React.Component {
               break;
             }
           }
-          this.showNotification('Please select maximum ' + queProperty.maxlimit + ' options only')
+          this.showNotification('Please select maximum ' + queProperty.maxlimit + ' options only', "info")
         }
       }
       else {
@@ -787,6 +813,33 @@ class WebLink extends React.Component {
     }
   };
 
+  onMaxdiffTableScaleClick = (cellDataobj) => {
+    let selectedmaxdiffOptions = this.state.selectedmaxdiffOptions;
+
+    if (selectedmaxdiffOptions.length > 0) {
+      if (selectedmaxdiffOptions.some(e => e.attributeSetID == cellDataobj.attributeSetID && e.id == cellDataobj.id)) {
+        // already added item for same row lest/most item
+      }
+      else {
+        let isMatch = false
+        selectedmaxdiffOptions.map((Ansobj, index) => {
+          if (Ansobj.attributeSetID == cellDataobj.attributeSetID && Ansobj.isLeastCheck == cellDataobj.isLeastCheck) {
+            selectedmaxdiffOptions.splice(index, 1);
+            selectedmaxdiffOptions.push(cellDataobj);
+            isMatch = true
+          }
+        })
+        if (isMatch == false) {
+          selectedmaxdiffOptions.push(cellDataobj);
+        }
+      }
+    }
+    else {
+      this.state.selectedmaxdiffOptions.push(cellDataobj);
+    }
+    this.setState({ selectedmaxdiffOptions })
+  }
+
   /* Used to format the answer data for scale table image type question and update the scale options. */
 
   setSelectedScaleTableImageOptions() {
@@ -915,6 +968,50 @@ class WebLink extends React.Component {
     });
   }
 
+  setSelectedScalemaxdiffTable() {
+    let question = this.state.selectedQuestion.properties
+    let attributesSet = question.attribute_Set
+    let selectedAnswer = this.state.selectedAnswer;
+    let selectedmaxdiffOptions = [];
+
+    let answermaxdiff = [];
+    if (selectedAnswer && selectedAnswer.selected_option) {
+      answermaxdiff = selectedAnswer.selected_option;
+      for (let m = 0; m < answermaxdiff.length; m++) {
+        let obj = answermaxdiff[m];
+        selectedmaxdiffOptions.push(obj);
+      }
+    }
+
+    let tableDatamaxd = [];
+    tableDatamaxd = attributesSet && attributesSet.map((item, index) => {
+      return item && item.map((obj, index) => {
+        let ansObj = selectedmaxdiffOptions.find(aObj => (aObj.id == obj.id && aObj.attributeSetID == obj.attributeSetID));
+        let arrTemp = []
+        if (ansObj) {
+          arrTemp[0] = { ...obj, isLeastCheck: true, isChecked: ansObj.isLeastCheck == true ? true : false, name: 'Left' }
+          arrTemp[1] = obj.label
+          arrTemp[2] = { ...obj, isLeastCheck: false, isChecked: ansObj.isLeastCheck == false ? true : false, name: 'Right' }
+        }
+        else {
+          arrTemp[0] = { ...obj, isChecked: false, isLeastCheck: true, name: 'Left' }
+          arrTemp[1] = obj.label
+          arrTemp[2] = { ...obj, isChecked: false, isLeastCheck: false, name: 'Right' }
+        }
+        return arrTemp
+      })
+    })
+
+    this.setState({
+      maxdifftableRow: tableDatamaxd,
+      selectedmaxdiffOptions: selectedmaxdiffOptions
+    });
+  }
+  afterChangeHandler = (currentSlide) => {
+    this.setState({
+      currentSliderPage: currentSlide
+    })
+  }
   /* Handles the snackbar message notification. */
   showNotification = (msg, color) => {
     this.setState({
@@ -1267,8 +1364,21 @@ class WebLink extends React.Component {
       let count = this.state.selectedChoiceOptions ? this.state.selectedChoiceOptions.length : 0
       let objProperty = this.state.selectedQuestion.properties
       if (count < objProperty.minlimit) {
-        this.showNotification('Please select minimum ' + objProperty.minlimit + ' options')
+        this.showNotification('Please select minimum ' + objProperty.minlimit + ' options', "info")
         return
+      }
+    }
+
+    /** Check max diff all set item is selected */
+    if (this.state.selectedQuestion.type === 'scale' && this.state.selectedQuestion.properties.scale_type == 'maxdiff') {
+      let ansObj = this.state.selectedmaxdiffOptions
+      if (ansObj && ansObj.length > 0) {
+        let lengthofSet = this.state.selectedQuestion.properties.attribute_Set && this.state.selectedQuestion.properties.attribute_Set.length || 0
+        /** logic is every set has least and most selection so its lenth * 2 */
+        if (ansObj.length < (lengthofSet * 2)) {
+          this.showNotification('Please select least and most item for all set of question', "info")
+          return;
+        }
       }
     }
 
@@ -1343,6 +1453,7 @@ class WebLink extends React.Component {
         let newQuestion = this.state.questions.slice(this.state.index + 1);
         let filteredQuestions = this.removeHiddenQuestion(newQuestion);
         this.setState({
+          updatedText: "",
           updatedChoiceOptions: [],
           selectedChoiceOptions: []
         });
@@ -1478,6 +1589,11 @@ class WebLink extends React.Component {
       answer["selected_option"] = selectedTableOptions;
       answer["scale_type"] = this.state.selectedQuestion.properties.scale_type;
 
+    }
+    else if (this.state.selectedQuestion.type === "scale" && this.state.selectedQuestion.properties.scale_type === "maxdiff") {
+      let selectedmaxdiffOptions = this.state.selectedmaxdiffOptions
+      answer["selected_option"] = selectedmaxdiffOptions;
+      answer["scale_type"] = this.state.selectedQuestion.properties.scale_type;
     }
     else if (this.state.selectedQuestion.type === "scale" && this.state.selectedQuestion.properties.scale_type === "scale") {
       let selectedScaleOptions = this.state.selectedScaleOptions
@@ -3757,6 +3873,69 @@ class WebLink extends React.Component {
                             </Table>
                           ) : null}
                         </li>
+                      </div>
+                    ) : (
+                      ""
+                    )}
+
+                    {this.state.selectedQuestion.type === "scale" &&
+                      this.state.selectedQuestion.properties.scale_type === "maxdiff" ? (
+                      <div className="scaleTableClass maxDiffCss">
+
+                        <div className="slider-arrow">
+                          <h6>{(this.state.currentSliderPage + 1) + " Of " + this.state.maxdifftableRow.length}</h6>
+                        </div>
+
+                        <Slider ref={c => (this.slider = c)} {...settingsSlider} afterChange={this.afterChangeHandler}>
+                          {this.state.maxdifftableRow.map((rowData, index) => (
+                            <Table
+                              key={index}
+                              style={tableContainer}
+                              borderstyle={{ borderColor: "#fff" }}
+                            >
+                              <TableBody>
+                                <TableRow>
+                                  {this.state.maxdifftableHead.map(
+                                    (options, index) => (
+                                      <TableCell className="max-diff-table-header" key={index}>{options}</TableCell>
+                                    )
+                                  )}
+                                </TableRow>
+                                {rowData && rowData.map((cellData, rowIndex) => (
+                                  <TableRow
+                                    key={rowIndex}
+                                    textstyle={tableRowText}
+                                    style={{ height: 50, width: 50, alignItems: 'center' }}
+                                  >
+                                    {cellData && cellData.map((cellDataobj, cellIndex) => (
+                                      <TableCell
+                                        key={cellIndex}
+                                        style={{ height: 50, width: 50, alignItems: 'center' }}
+                                      >
+                                        {cellIndex !== 1 ? (
+                                          <input
+                                            className={(this.state.selectedmaxdiffOptions && this.state.selectedmaxdiffOptions.some(e => e.attributeSetID == cellDataobj.attributeSetID && e.id == cellDataobj.id)) ? "pointer-eventsNone" : null}
+                                            name={(cellDataobj.name + cellDataobj.attributeSetID)}
+                                            type="radio"
+                                            //disabled={this.state.selectedmaxdiffOptions && this.state.selectedmaxdiffOptions.some(e => e.attributeSetID == cellDataobj.attributeSetID && e.id == cellDataobj.id)}
+                                            defaultChecked={cellDataobj.isChecked}
+                                            onChange={event =>
+                                              this.onMaxdiffTableScaleClick(
+                                                cellDataobj
+                                              )
+                                            }
+                                          />
+                                        ) : (
+                                          cellDataobj
+                                        )}
+                                      </TableCell>
+                                    ))}
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          ))}
+                        </Slider>
                       </div>
                     ) : (
                       ""

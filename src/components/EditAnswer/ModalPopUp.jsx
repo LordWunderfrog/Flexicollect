@@ -16,6 +16,9 @@ import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableRow from "@material-ui/core/TableRow";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 const styleMedia = {
   opacity: "0.5",
@@ -82,6 +85,15 @@ const styles = {
   }
 };
 
+const settingsSlider = {
+  dots: false,
+  arrows: true,
+  infinite: false,
+  speed: 500,
+  swipe: true,
+  slidesToShow: 1,
+  slidesToScroll: 1
+};
 
 //let updatedAnswer = [];
 class ModalPopUp extends Component {
@@ -105,8 +117,11 @@ class ModalPopUp extends Component {
       selectedTableOptions: [],
       updatedOptions: [],
       otheroptionvalue: "",
-      otheroptiontextbox: false
-
+      otheroptiontextbox: false,
+      maxdifftableHead: ["Least", "", "Most"],
+      maxdifftableRow: [],
+      currentSliderPage: 0,
+      selectedmaxdiffOptions: []
     };
   }
 
@@ -133,7 +148,10 @@ class ModalPopUp extends Component {
       answer: [],
       radioButtonname: [],
       selectedTableOptions: [],
-      updatedOptions: []
+      updatedOptions: [],
+      maxdifftableRow: [],
+      currentSliderPage: 0,
+      selectedmaxdiffOptions: []
     });
   }
 
@@ -162,6 +180,10 @@ class ModalPopUp extends Component {
     return this.state.selectedTableOptions;
   }
 
+  getSelectedMaxdiffOption() {
+    return this.state.selectedmaxdiffOptions
+  }
+
   /* Handles the validation of question type and update the answer based on question type. */
   setInitialState() {
     if (this.state.selectedQuestion.type === "scale" && this.state.selectedQuestion.properties.scale_type && this.state.selectedQuestion.properties.scale_type === 'scale') {
@@ -174,6 +196,12 @@ class ModalPopUp extends Component {
     else if (this.state.selectedQuestion.type === "scale" && this.state.selectedQuestion.properties.scale_type && this.state.selectedQuestion.properties.scale_type === 'table'
       && this.state.selectedQuestion.properties.grid_type === "radio") {
       this.setSelectedScaleTableRadioOptions();
+    } else if (
+      this.state.selectedQuestion.type === "scale" &&
+      this.state.selectedQuestion.properties.scale_type &&
+      this.state.selectedQuestion.properties.scale_type === "maxdiff"
+    ) {
+      this.setSelectedScalemaxdiffTable();
     }
     else if (this.state.selectedQuestion.type === "input" || this.state.selectedQuestion.type === "m") {
       if (this.state.selectedAnswer && this.state.selectedAnswer.text) {
@@ -669,8 +697,78 @@ class ModalPopUp extends Component {
       selectedTableOptions: selectedTableOptions
     });
   }
+  setSelectedScalemaxdiffTable() {
+    let question = this.state.selectedQuestion.properties
+    let attributesSet = question.attribute_Set
+    let selectedAnswer = this.state.selectedAnswer;
+    let selectedmaxdiffOptions = [];
+
+    let answermaxdiff = [];
+    if (selectedAnswer && selectedAnswer.selected_option) {
+      answermaxdiff = selectedAnswer.selected_option;
+      for (let m = 0; m < answermaxdiff.length; m++) {
+        let obj = answermaxdiff[m];
+        selectedmaxdiffOptions.push(obj);
+      }
+    }
+
+    let tableDatamaxd = [];
+    tableDatamaxd = attributesSet && attributesSet.map((item, index) => {
+      return item && item.map((obj, index) => {
+        let ansObj = selectedmaxdiffOptions.find(aObj => (aObj.id == obj.id && aObj.attributeSetID == obj.attributeSetID));
+        let arrTemp = []
+        if (ansObj) {
+          arrTemp[0] = { ...obj, isLeastCheck: true, isChecked: ansObj.isLeastCheck == true ? true : false, name: 'Left' }
+          arrTemp[1] = obj.label
+          arrTemp[2] = { ...obj, isLeastCheck: false, isChecked: ansObj.isLeastCheck == false ? true : false, name: 'Right' }
+        }
+        else {
+          arrTemp[0] = { ...obj, isChecked: false, isLeastCheck: true, name: 'Left' }
+          arrTemp[1] = obj.label
+          arrTemp[2] = { ...obj, isChecked: false, isLeastCheck: false, name: 'Right' }
+        }
+        return arrTemp
+      })
+    })
 
 
+    this.setState({
+      maxdifftableRow: tableDatamaxd,
+      selectedmaxdiffOptions: selectedmaxdiffOptions
+    });
+
+  }
+  onMaxdiffTableScaleClick = (cellDataobj) => {
+    let selectedmaxdiffOptions = this.state.selectedmaxdiffOptions;
+
+    if (selectedmaxdiffOptions.length > 0) {
+      if (selectedmaxdiffOptions.some(e => e.attributeSetID == cellDataobj.attributeSetID && e.id == cellDataobj.id)) {
+        // already added item for same row lest/most item
+      }
+      else {
+        let isMatch = false
+        selectedmaxdiffOptions.map((Ansobj, index) => {
+          if (Ansobj.attributeSetID == cellDataobj.attributeSetID && Ansobj.isLeastCheck == cellDataobj.isLeastCheck) {
+            selectedmaxdiffOptions.splice(index, 1);
+            selectedmaxdiffOptions.push(cellDataobj);
+            isMatch = true
+          }
+        })
+        if (isMatch == false) {
+          selectedmaxdiffOptions.push(cellDataobj);
+        }
+      }
+    }
+    else {
+      this.state.selectedmaxdiffOptions.push(cellDataobj);
+    }
+    this.setState({ selectedmaxdiffOptions })
+  }
+  afterChangeHandler = (currentSlide) => {
+    this.setState({
+      currentSliderPage: currentSlide
+    })
+  }
   render() {
 
     const { selectedQuestion } = this.state;
@@ -925,6 +1023,69 @@ class ModalPopUp extends Component {
                 </Table>
               ) : null}
             </li>
+          ) : (
+            ""
+          )}
+
+          {this.state.selectedQuestion.type === "scale" &&
+            this.state.selectedQuestion.properties.scale_type === "maxdiff" ? (
+            <div className="scaleTableClass maxDiffCss maxDiffModal">
+
+              <div className="slider-arrow">
+                <h6>{(this.state.currentSliderPage + 1) + " Of " + this.state.maxdifftableRow.length}</h6>
+              </div>
+
+              <Slider ref={c => (this.slider = c)} {...settingsSlider} afterChange={this.afterChangeHandler}>
+                {this.state.maxdifftableRow.map((rowData, index) => (
+                  <Table
+                    key={index}
+                    style={tableContainer}
+                    borderstyle={{ borderColor: "#fff" }}
+                  >
+                    <TableBody>
+                      <TableRow>
+                        {this.state.maxdifftableHead.map(
+                          (options, index) => (
+                            <TableCell className="max-diff-table-header" key={index}>{options}</TableCell>
+                          )
+                        )}
+                      </TableRow>
+                      {rowData && rowData.map((cellData, rowIndex) => (
+                        <TableRow
+                          key={rowIndex}
+                          textstyle={tableRowText}
+                          style={{ height: 50, width: 50, alignItems: 'center' }}
+                        >
+                          {cellData && cellData.map((cellDataobj, cellIndex) => (
+                            <TableCell
+                              key={cellIndex}
+                              style={{ height: 50, width: 50, alignItems: 'center' }}
+                            >
+                              {cellIndex !== 1 ? (
+                                <input
+                                  className={(this.state.selectedmaxdiffOptions && this.state.selectedmaxdiffOptions.some(e => e.attributeSetID == cellDataobj.attributeSetID && e.id == cellDataobj.id)) ? "pointer-eventsNone" : null}
+                                  name={(cellDataobj.name + cellDataobj.attributeSetID)}
+                                  type="radio"
+                                  defaultChecked={cellDataobj.isChecked}
+                                  //disabled={this.state.selectedmaxdiffOptions && this.state.selectedmaxdiffOptions.some(e => e.attributeSetID == cellDataobj.attributeSetID && e.id == cellDataobj.id)}
+                                  onChange={event =>
+                                    this.onMaxdiffTableScaleClick(
+                                      cellDataobj
+                                    )
+                                  }
+                                />
+                              ) : (
+                                cellDataobj
+                              )}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                ))}
+              </Slider>
+            </div>
           ) : (
             ""
           )}
