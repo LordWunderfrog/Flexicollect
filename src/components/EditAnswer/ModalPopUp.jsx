@@ -699,7 +699,8 @@ class ModalPopUp extends Component {
   }
   setSelectedScalemaxdiffTable() {
     let question = this.state.selectedQuestion.properties
-    let attributesSet = question.attribute_Set
+    let attributesSet = this.state.selectedAnswer.attribute_Set
+
     let selectedAnswer = this.state.selectedAnswer;
     let selectedmaxdiffOptions = [];
 
@@ -1031,12 +1032,12 @@ class ModalPopUp extends Component {
             this.state.selectedQuestion.properties.scale_type === "maxdiff" ? (
             <div className="scaleTableClass maxDiffCss maxDiffModal">
 
-              <div className="slider-arrow">
+              {(this.state.maxdifftableRow && this.state.maxdifftableRow.length > 0) ? <div className="slider-arrow">
                 <h6>{(this.state.currentSliderPage + 1) + " Of " + this.state.maxdifftableRow.length}</h6>
-              </div>
+              </div> : ""}
 
               <Slider ref={c => (this.slider = c)} {...settingsSlider} afterChange={this.afterChangeHandler}>
-                {this.state.maxdifftableRow.map((rowData, index) => (
+                {this.state.maxdifftableRow && this.state.maxdifftableRow.map((rowData, index) => (
                   <Table
                     key={index}
                     style={tableContainer}
@@ -1044,7 +1045,7 @@ class ModalPopUp extends Component {
                   >
                     <TableBody>
                       <TableRow>
-                        {this.state.maxdifftableHead.map(
+                        {this.state.maxdifftableHead && this.state.maxdifftableHead.map(
                           (options, index) => (
                             <TableCell className="max-diff-table-header" key={index}>{options}</TableCell>
                           )
