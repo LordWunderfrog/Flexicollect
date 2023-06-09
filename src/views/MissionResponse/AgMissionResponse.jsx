@@ -624,8 +624,17 @@ class AgMissionResponse extends React.Component {
             return params.value[0];
           }
           else {
+            // params.value[params.value.length - 1] = params.value[params.value.length - 1].replace('?thumbnail=yes', '');
+            // return params.value;
+
             params.value[params.value.length - 1] = params.value[params.value.length - 1].replace('?thumbnail=yes', '');
-            return params.value;
+            let linkData = params.value[params.value.length - 1]
+            let linkPart = linkData.split("/");
+            if (linkPart && linkPart.length > 0) {
+              let tempPath = linkPart[linkPart.length - 1]
+              let finalPath = `https://reporting.flexicollect.com/flexicollect/Flexiviewer.php?Photo=${tempPath}&src=Flex`
+              return finalPath;
+            }
           }
         }
         else {

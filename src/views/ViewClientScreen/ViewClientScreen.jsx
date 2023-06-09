@@ -2080,8 +2080,16 @@ class ViewClientScreen extends Component {
             return params.value[0];
           }
           else {
+            // params.value[params.value.length - 1] = params.value[params.value.length - 1].replace('?thumbnail=yes', '');
+            // return params.value;
             params.value[params.value.length - 1] = params.value[params.value.length - 1].replace('?thumbnail=yes', '');
-            return params.value;
+            let linkData = params.value[params.value.length - 1]
+            let linkPart = linkData.split("/");
+            if (linkPart && linkPart.length > 0) {
+              let tempPath = linkPart[linkPart.length - 1]
+              let finalPath = `https://reporting.flexicollect.com/flexicollect/Flexiviewer.php?Photo=${tempPath}&src=Flex`
+              return finalPath;
+            }
           }
         }
         else {
@@ -2206,18 +2214,18 @@ class ViewClientScreen extends Component {
         // rowsPerPage: rowsPerPage,
       })
     }
-/*colDef.forEach(c => {
-      if ((getFilterModel[c.field] !== undefined && getFilterModel[c.field].value && getFilterModel[c.field].value.length > 0)
-        || (getFilterModel[c.field].filter && getFilterModel[c.field].filter !== undefined)) {
-        activemenu.push(c.field)
-      }
-      else {
-        if ((getFilterModel[c.field + "_1"] !== undefined && (getFilterModel[c.field + "_1"].value && getFilterModel[c.field + "_1"].value.length > 0))
-          || (getFilterModel[c.field + "_1"].filter && getFilterModel[c.field + "_1"].filter !== undefined)) {
-          activemenu.push(c.field + "_1")
-        }
-      }
-    })*/
+    /*colDef.forEach(c => {
+          if ((getFilterModel[c.field] !== undefined && getFilterModel[c.field].value && getFilterModel[c.field].value.length > 0)
+            || (getFilterModel[c.field].filter && getFilterModel[c.field].filter !== undefined)) {
+            activemenu.push(c.field)
+          }
+          else {
+            if ((getFilterModel[c.field + "_1"] !== undefined && (getFilterModel[c.field + "_1"].value && getFilterModel[c.field + "_1"].value.length > 0))
+              || (getFilterModel[c.field + "_1"].filter && getFilterModel[c.field + "_1"].filter !== undefined)) {
+              activemenu.push(c.field + "_1")
+            }
+          }
+        })*/
 
     //Changing the above to the below to match the format of same code block in the Admin Mission Response screen
     //This is due to an error that occurs when filtering on a client view

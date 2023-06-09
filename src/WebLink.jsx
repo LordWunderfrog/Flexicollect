@@ -968,8 +968,9 @@ class WebLink extends React.Component {
     });
   }
 
-  setSelectedScalemaxdiffTable() {
-    let question = this.state.selectedQuestion.properties
+  async setSelectedScalemaxdiffTable() {
+    let tempQuestion = await this.createMaxdiffSet(this.state.selectedQuestion)
+    let question = tempQuestion.properties
     let attributesSet = question.attribute_Set
     let selectedAnswer = this.state.selectedAnswer;
     let selectedmaxdiffOptions = [];
@@ -1007,6 +1008,63 @@ class WebLink extends React.Component {
       selectedmaxdiffOptions: selectedmaxdiffOptions
     });
   }
+
+  createMaxdiffSet = (question) => {
+    if (this.state.selectedAnswer && this.state.selectedAnswer.attribute_Set) {
+      /** if answer is already given then set will not change and taken from given answer */
+      question["properties"]["attribute_Set"] = this.state.selectedAnswer.attribute_Set
+      return question
+    }
+    /** Case while answer is not given and first time start then create new set */
+    let max_attr = question.properties.Maximum_Attributes ? question.properties.Maximum_Attributes.value : 0
+    let attr_per_task = question.properties.Attribute_PerTask ? question.properties.Attribute_PerTask.value : 0
+    let repeat_attr = question.properties.Repeate_Attribute ? question.properties.Repeate_Attribute.value : 0
+    const num_sets = (max_attr / attr_per_task) * repeat_attr;
+    let tempAtt = question.properties.attribute_data
+
+    let setOfAttribute = [];
+    let occurrences = {}; // Track occurrences of each item
+    const maxAttempts = 10000; // Maximum number of attempts to find suitable combinations
+
+    // Loop through num_sets and generate subarrays
+    for (let i = 0; i < num_sets; i++) {
+      let subarray = [];
+
+      // Loop until subarray is filled with unique attributes or until maximum attempts is reached
+      let attempts = 0;
+      while (subarray.length < attr_per_task && attempts < maxAttempts) {
+        let randomIndex = Math.floor(Math.random() * max_attr);
+        let randomItem = tempAtt[randomIndex];
+
+        // Check if the random item has exceeded the desired count (repeat_attr) in the subarray
+        if (
+          !subarray.includes(randomItem) &&
+          (!occurrences[randomIndex] || occurrences[randomIndex] < repeat_attr)
+        ) {
+          subarray.push(randomItem);
+          // Update the occurrences for the selected random item
+          occurrences[randomIndex] = occurrences[randomIndex] ? occurrences[randomIndex] + 1 : 1;
+        }
+        attempts++;
+      }
+
+      // If subarray is not filled with unique attributes or maximum attempts is reached,
+      // reset setOfAttribute and start over from the beginning
+      if (subarray.length < attr_per_task || attempts === maxAttempts) {
+        setOfAttribute = [];
+        occurrences = {};
+        i = -1;
+      } else {
+        subarray = subarray.map((element) => {
+          return { ...element, attributeSetID: i };
+        });
+        setOfAttribute.push(subarray);
+      }
+    }
+    question["properties"]["attribute_Set"] = setOfAttribute
+    return question
+  }
+
   afterChangeHandler = (currentSlide) => {
     this.setState({
       currentSliderPage: currentSlide
@@ -1594,6 +1652,7 @@ class WebLink extends React.Component {
       let selectedmaxdiffOptions = this.state.selectedmaxdiffOptions
       answer["selected_option"] = selectedmaxdiffOptions;
       answer["scale_type"] = this.state.selectedQuestion.properties.scale_type;
+      answer["attribute_Set"] = this.state.selectedQuestion.properties.attribute_Set
     }
     else if (this.state.selectedQuestion.type === "scale" && this.state.selectedQuestion.properties.scale_type === "scale") {
       let selectedScaleOptions = this.state.selectedScaleOptions
@@ -3882,12 +3941,12 @@ class WebLink extends React.Component {
                       this.state.selectedQuestion.properties.scale_type === "maxdiff" ? (
                       <div className="scaleTableClass maxDiffCss">
 
-                        <div className="slider-arrow">
+                        {(this.state.maxdifftableRow && this.state.maxdifftableRow.length > 0) ? <div className="slider-arrow">
                           <h6>{(this.state.currentSliderPage + 1) + " Of " + this.state.maxdifftableRow.length}</h6>
-                        </div>
+                        </div> : ""}
 
                         <Slider ref={c => (this.slider = c)} {...settingsSlider} afterChange={this.afterChangeHandler}>
-                          {this.state.maxdifftableRow.map((rowData, index) => (
+                          {this.state.maxdifftableRow && this.state.maxdifftableRow.map((rowData, index) => (
                             <Table
                               key={index}
                               style={tableContainer}
@@ -3895,7 +3954,7 @@ class WebLink extends React.Component {
                             >
                               <TableBody>
                                 <TableRow>
-                                  {this.state.maxdifftableHead.map(
+                                  {this.state.maxdifftableHead && this.state.maxdifftableHead.map(
                                     (options, index) => (
                                       <TableCell className="max-diff-table-header" key={index}>{options}</TableCell>
                                     )

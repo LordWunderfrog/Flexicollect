@@ -1610,9 +1610,9 @@ class Card extends React.Component {
             this.setState({
                 fieldprops
             }, () => {
-                if (attributename == "Repeate_Attribute") {
-                    this.createMaxdiffSet()
-                }
+                // if (attributename == "Repeate_Attribute") {
+                //     this.createMaxdiffSet()
+                // }
                 this.props.autosave()
             });
         }
@@ -1757,46 +1757,60 @@ class Card extends React.Component {
         })
     }
 
-    createMaxdiffSet = () => {
-        let fieldprops = this.state.fieldprops
-        let max_attr = fieldprops.properties.Maximum_Attributes ? fieldprops.properties.Maximum_Attributes.value : 0
-        let attr_per_task = fieldprops.properties.Attribute_PerTask ? fieldprops.properties.Attribute_PerTask.value : 0
-        let repeat_attr = fieldprops.properties.Repeate_Attribute ? fieldprops.properties.Repeate_Attribute.value : 0
-        const num_sets = (max_attr / attr_per_task) * repeat_attr;
-        let tempAtt = fieldprops.properties.attribute_data
+    // createMaxdiffSet = () => {
+    //     let fieldprops = this.state.fieldprops
+    //     let max_attr = fieldprops.properties.Maximum_Attributes ? fieldprops.properties.Maximum_Attributes.value : 0
+    //     let attr_per_task = fieldprops.properties.Attribute_PerTask ? fieldprops.properties.Attribute_PerTask.value : 0
+    //     let repeat_attr = fieldprops.properties.Repeate_Attribute ? fieldprops.properties.Repeate_Attribute.value : 0
+    //     const num_sets = (max_attr / attr_per_task) * repeat_attr;
+    //     let tempAtt = fieldprops.properties.attribute_data
 
-        let setOfAttribute = [];
-        // Loop through num_sets and generate subarrays
-        for (let i = 0; i < num_sets; i++) {
-            let subarray = [];
+    //     let setOfAttribute = [];
+    //     let occurrences = {}; // Track occurrences of each item
+    //     const maxAttempts = 10000; // Maximum number of attempts to find suitable combinations
 
-            // Loop until subarray is filled with unique attributes or until maximum attempts is reached
-            let attempts = 0;
-            while (subarray.length < attr_per_task && attempts < max_attr) {
-                let randomItem = tempAtt[Math.floor(Math.random() * max_attr)];
-                if (!subarray.includes(randomItem) && !this.hasOccured(setOfAttribute, randomItem, repeat_attr)) {
-                    subarray.push(randomItem);
-                }
-                attempts++;
-            }
+    //     // Loop through num_sets and generate subarrays
+    //     for (let i = 0; i < num_sets; i++) {
+    //         let subarray = [];
 
-            // If subarray is not filled with unique attributes, reset setOfAttribute and start over from the beginning
-            if (subarray.length < attr_per_task) {
-                setOfAttribute = [];
-                i = -1;
-            } else {
-                subarray = subarray.map(element => {
-                    return { ...element, attributeSetID: i };
-                });
-                setOfAttribute.push(subarray);
-            }
-        }
+    //         // Loop until subarray is filled with unique attributes or until maximum attempts is reached
+    //         let attempts = 0;
+    //         while (subarray.length < attr_per_task && attempts < maxAttempts) {
+    //             let randomIndex = Math.floor(Math.random() * max_attr);
+    //             let randomItem = tempAtt[randomIndex];
 
-        fieldprops.properties['attribute_Set'] = setOfAttribute
-        this.setState({
-            fieldprops
-        })
-    }
+    //             // Check if the random item has exceeded the desired count (repeat_attr) in the subarray
+    //             if (
+    //                 !subarray.includes(randomItem) &&
+    //                 (!occurrences[randomIndex] || occurrences[randomIndex] < repeat_attr)
+    //             ) {
+    //                 subarray.push(randomItem);
+    //                 // Update the occurrences for the selected random item
+    //                 occurrences[randomIndex] = occurrences[randomIndex] ? occurrences[randomIndex] + 1 : 1;
+    //             }
+    //             attempts++;
+    //         }
+
+    //         // If subarray is not filled with unique attributes or maximum attempts is reached,
+    //         // reset setOfAttribute and start over from the beginning
+    //         if (subarray.length < attr_per_task || attempts === maxAttempts) {
+    //             setOfAttribute = [];
+    //             occurrences = {};
+    //             i = -1;
+    //         } else {
+    //             subarray = subarray.map((element) => {
+    //                 return { ...element, attributeSetID: i };
+    //             });
+    //             setOfAttribute.push(subarray);
+    //         }
+    //     }
+
+    //     console.log('final set is', setOfAttribute)
+    //     fieldprops.properties['attribute_Set'] = setOfAttribute
+    //     this.setState({
+    //         fieldprops
+    //     })
+    // }
 
     // Function to check if an attribute has already occurred in setOfAttribute
     hasOccured(setOfAttribute, att, repeat_attr) {
@@ -6273,32 +6287,34 @@ class Card extends React.Component {
 
                                                 <div style={{ height: "20px" }}></div>
                                                 <h3>Maximum Attributes</h3>
-                                                <Select
-                                                    placeholder={'Maximum Attributes'}
-                                                    value={this.state.fieldprops.properties.Maximum_Attributes}
-                                                    options={this.state.maximumAttribute}
-                                                    onChange={e => this.handleAttribute(e, "Maximum_Attributes")}
-                                                    name="Maximum_Attributes"
-                                                    className="language_list"
-                                                />
-                                                <h3>Attributes Per Task</h3>
-                                                <Select
-                                                    placeholder={'Attributes Per Task'}
-                                                    value={this.state.fieldprops.properties.Attribute_PerTask}
-                                                    options={this.state.attributePerTask}
-                                                    onChange={e => this.handleAttribute(e, "Attribute_PerTask")}
-                                                    name="Attribute_PerTask"
-                                                    className="language_list"
-                                                />
-                                                <h3>Repeate Attribute</h3>
-                                                <Select
-                                                    placeholder={'Repeate Attribute'}
-                                                    value={this.state.fieldprops.properties.Repeate_Attribute}
-                                                    options={this.state.repeatAttribute}
-                                                    onChange={e => this.handleAttribute(e, "Repeate_Attribute")}
-                                                    name="Repeate_Attribute"
-                                                    className="language_list"
-                                                />
+                                                <div style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
+                                                    <Select
+                                                        placeholder={'Maximum Attributes'}
+                                                        value={this.state.fieldprops.properties.Maximum_Attributes}
+                                                        options={this.state.maximumAttribute}
+                                                        onChange={e => this.handleAttribute(e, "Maximum_Attributes")}
+                                                        name="Maximum_Attributes"
+                                                        className="language_list"
+                                                    />
+                                                    <h3>Attributes Per Task</h3>
+                                                    <Select
+                                                        placeholder={'Attributes Per Task'}
+                                                        value={this.state.fieldprops.properties.Attribute_PerTask}
+                                                        options={this.state.attributePerTask}
+                                                        onChange={e => this.handleAttribute(e, "Attribute_PerTask")}
+                                                        name="Attribute_PerTask"
+                                                        className="language_list"
+                                                    />
+                                                    <h3>Repeate Attribute</h3>
+                                                    <Select
+                                                        placeholder={'Repeate Attribute'}
+                                                        value={this.state.fieldprops.properties.Repeate_Attribute}
+                                                        options={this.state.repeatAttribute}
+                                                        onChange={e => this.handleAttribute(e, "Repeate_Attribute")}
+                                                        name="Repeate_Attribute"
+                                                        className="language_list"
+                                                    />
+                                                </div>
                                             </div>
                                         ) : (
                                             ""
