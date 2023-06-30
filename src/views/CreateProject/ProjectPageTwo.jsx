@@ -501,7 +501,7 @@ class ProjectPageTwo extends Component {
             <Form noValidate onSubmit={handleSubmit}>
               <Container className="group-container">
                 <Row className="group-header">
-                  <Col md={3} style={{ width: "100%" }}>
+                  <Col md={4}>
                     <Select
                       name="selectedMission"
                       value={this.state.selectedMission}
@@ -509,7 +509,7 @@ class ProjectPageTwo extends Component {
                       options={this.state.missionOptions}
                     />
                   </Col>
-                  <Col md={3} style={{ width: "100%" }}>
+                  <Col md={"auto"}>
                     <Button
                       onClick={() => this.createNewMission('createref')}
                       variant="contained"
@@ -519,7 +519,7 @@ class ProjectPageTwo extends Component {
                       Create New Mission
                     </Button>
                   </Col>
-                  <Col md={2} style={{ width: "100%" }}>
+                  <Col md={"auto"}>
                     <Button
                       onClick={this.deleteItem}
                       variant="contained"
@@ -529,10 +529,10 @@ class ProjectPageTwo extends Component {
                       Delete Mission
                     </Button>
                   </Col>
-                  <Col md={2} style={{ width: "100%" }}>
+                  <Col md={"auto"}>
                     All Missions ({this.state.mission_list.length})
                   </Col>
-                  <Col md={2} style={{ width: "100%", textAlign: "right" }}>
+                  <Col md={"auto"} style={{ textAlign: "right" }}>
                     Active ({this.state.activeMissions})
                   </Col>
                 </Row>
@@ -724,7 +724,7 @@ class ProjectPageTwo extends Component {
                   <Form.Group
                     controlId="validationFormiksurvey"
                     as={Col}
-                    md="4"
+                    md="6"
                   >
                     <Form.Group
                       controlId="validationFormiksurvey"
