@@ -1596,10 +1596,16 @@ class Card extends React.Component {
     /** handle Attribute selection  */
     handleAttribute = (e, attributename) => {
         let fieldprops = this.state.fieldprops;
-
+        let selectedlanguage = this.props.selectedlanguage
+        let languages_drop = this.props.languages_drop;
         /** Validation */
         if (this.validationOfMaxdiffSetting(e, fieldprops, attributename)) {
             fieldprops.properties[attributename] = e
+            selectedlanguage.forEach((a, b) => {
+                if (a.label !== 'English') {
+                    languages_drop[a.label].content[this.props.index].properties[attributename] = e
+                }
+            })
             if (attributename == "Maximum_Attributes") {
                 fieldprops.properties.Attribute_PerTask = ""
                 fieldprops.properties.Repeate_Attribute = ""
@@ -1700,6 +1706,9 @@ class Card extends React.Component {
                     id: manual1,
                     label: "",
                 })
+                languages_drop[a.label].content[this.props.index].properties.Maximum_Attributes = ""
+                languages_drop[a.label].content[this.props.index].properties.Attribute_PerTask = ""
+                languages_drop[a.label].content[this.props.index].properties.Repeate_Attribute = ""
             }
         })
 
