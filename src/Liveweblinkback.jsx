@@ -1281,7 +1281,9 @@ class WebLink extends React.Component {
             }
         })
             .catch(error => {
-                this.showNotification(error.response.data.message, "info");
+                if (error.response && error.response.data && error.response.data.hasOwnProperty("message")) {
+                    this.showNotification(error.response.data.message, "info");
+                }
                 this.setState({ show: false });
             });
 
