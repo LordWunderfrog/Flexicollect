@@ -1070,6 +1070,33 @@ class WebLink extends React.Component {
       currentSliderPage: currentSlide
     })
   }
+  beforeChangeHandler = (oldIndex, newIndex) => {
+    if (newIndex > oldIndex) {
+      if (this.state.selectedQuestion.type === 'scale' && this.state.selectedQuestion.properties.scale_type == 'maxdiff') {
+        let ansObj = this.state.selectedmaxdiffOptions
+        let lengthOfObj = this.countOccurrences(ansObj, oldIndex)
+        if (lengthOfObj == 1) {
+          /**lenth 1 meanse only one set item either least or most is selected.
+           * Must need to select least or most both */
+          this.showNotification('Please select least and most item for every set', "info")
+          return false;
+        }
+      }
+    }
+    else {
+      console.log('left slide')
+    }
+  }
+  countOccurrences(array, value) {
+    let count = 0;
+    for (let i = 0; i < array.length; i++) {
+      if (array[i].attributeSetID === value) {
+        count++;
+      }
+    }
+    return count;
+  }
+
   /* Handles the snackbar message notification. */
   showNotification = (msg, color) => {
     this.setState({
@@ -3947,7 +3974,7 @@ class WebLink extends React.Component {
                           <h6>{(this.state.currentSliderPage + 1) + " Of " + this.state.maxdifftableRow.length}</h6>
                         </div> : ""}
 
-                        <Slider ref={c => (this.slider = c)} {...settingsSlider} afterChange={this.afterChangeHandler}>
+                        <Slider ref={c => (this.slider = c)} {...settingsSlider} afterChange={this.afterChangeHandler} beforeChange={this.beforeChangeHandler}>
                           {this.state.maxdifftableRow && this.state.maxdifftableRow.map((rowData, index) => (
                             <Table
                               key={index}
