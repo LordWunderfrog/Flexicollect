@@ -166,6 +166,7 @@ class WebLink extends React.Component {
       maxdifftableHead: ["Least", "", "Most"],
       maxdifftableRow: [],
       currentSliderPage: 0,
+      isSlidingAllowed: true,
       selectedmaxdiffOptions: []
     };
     this.handleNext = this.handleNext.bind(this);
@@ -229,6 +230,7 @@ class WebLink extends React.Component {
       otheroptiontextbox: false,
       maxdifftableRow: [],
       currentSliderPage: 0,
+      isSlidingAllowed: true,
       selectedmaxdiffOptions: []
     });
   }
@@ -254,6 +256,7 @@ class WebLink extends React.Component {
       updatedText: "",
       maxdifftableRow: [],
       currentSliderPage: 0,
+      isSlidingAllowed: true,
       selectedmaxdiffOptions: []
     })
   }
@@ -813,6 +816,7 @@ class WebLink extends React.Component {
     }
   };
 
+  /** Maxdiff least and most item table click event */
   onMaxdiffTableScaleClick = (cellDataobj) => {
     let selectedmaxdiffOptions = this.state.selectedmaxdiffOptions;
 
@@ -837,11 +841,22 @@ class WebLink extends React.Component {
     else {
       this.state.selectedmaxdiffOptions.push(cellDataobj);
     }
+
+    /** Validation for select least and most item for particular set otherwise restrict slider to slide */
+    let lengthOfObj = this.countOccurrences(this.state.selectedmaxdiffOptions, cellDataobj.attributeSetID);
+    if (lengthOfObj == 1) {
+      /**length 1 means only one set item either least or most is selected */
+      this.setState({ isSlidingAllowed: false }); // Disable sliding
+    }
+    else {
+      this.setState({ isSlidingAllowed: true });
+    }
+
+    /** State update  */
     this.setState({ selectedmaxdiffOptions })
   }
 
   /* Used to format the answer data for scale table image type question and update the scale options. */
-
   setSelectedScaleTableImageOptions() {
     let question = this.state.selectedQuestion.properties.table_content;
     const { table_options, table_value } = question;
@@ -1071,20 +1086,8 @@ class WebLink extends React.Component {
     })
   }
   beforeChangeHandler = (oldIndex, newIndex) => {
-    if (newIndex > oldIndex) {
-      if (this.state.selectedQuestion.type === 'scale' && this.state.selectedQuestion.properties.scale_type == 'maxdiff') {
-        let ansObj = this.state.selectedmaxdiffOptions
-        let lengthOfObj = this.countOccurrences(ansObj, oldIndex)
-        if (lengthOfObj == 1) {
-          /**lenth 1 meanse only one set item either least or most is selected.
-           * Must need to select least or most both */
-          this.showNotification('Please select least and most item for every set', "info")
-          return false;
-        }
-      }
-    }
-    else {
-      console.log('left slide')
+    if (!this.state.isSlidingAllowed) {
+      this.showNotification('Please select least and most item for every set', "info")
     }
   }
   countOccurrences(array, value) {
@@ -3499,6 +3502,15 @@ class WebLink extends React.Component {
       tableCellFirstCol
     } = styles;
 
+    const settingsSlider = {
+      dots: false,
+      arrows: true,
+      infinite: false,
+      speed: 500,
+      swipe: true,
+      slidesToShow: 1,
+      slidesToScroll: this.state.isSlidingAllowed ? 1 : 0
+    };
 
     return (
       <div style={{ backgroundColor: '#605F77', height: 'inherit' }}>
@@ -3968,13 +3980,17 @@ class WebLink extends React.Component {
 
                     {this.state.selectedQuestion.type === "scale" &&
                       this.state.selectedQuestion.properties.scale_type === "maxdiff" ? (
-                      <div className="scaleTableClass maxDiffCss">
-
+                      <div className={`${this.state.isSlidingAllowed == true ? "scaleTableClass maxDiffCss" : "scaleTableClass maxDiffCss sliderArrow"}`}>
                         {(this.state.maxdifftableRow && this.state.maxdifftableRow.length > 0) ? <div className="slider-arrow">
                           <h6>{(this.state.currentSliderPage + 1) + " Of " + this.state.maxdifftableRow.length}</h6>
                         </div> : ""}
+                        <Slider
+                          key={this.state.index}
+                          ref={c => (this.slider = c)}
+                          {...settingsSlider}
+                          afterChange={this.afterChangeHandler}
+                          beforeChange={this.beforeChangeHandler}>
 
-                        <Slider ref={c => (this.slider = c)} {...settingsSlider} afterChange={this.afterChangeHandler} beforeChange={this.beforeChangeHandler}>
                           {this.state.maxdifftableRow && this.state.maxdifftableRow.map((rowData, index) => (
                             <Table
                               key={index}
