@@ -1446,6 +1446,27 @@ class WebLink extends React.Component {
   * ii) If it is an info it validate the question is no return or not and then move to next question
   */
   handleNext = () => {
+    /** check for text input character limit validation */
+    if (this.state.selectedQuestion.type === "input" && this.state.selectedQuestion.properties.hasOwnProperty("limitchar") &&
+      this.state.selectedQuestion.properties.limitchar === 1) {
+      let limit_check = this.limitCharValidation(this.state.selectedQuestion, this.state.updatedText);
+      if (
+        limit_check.limitValid === false
+      ) {
+        this.showNotification(limit_check.limitMessage, "info");
+        return;
+      }
+    }
+
+    /** Check text input content type validation */
+    if (this.state.selectedQuestion.type === "input" && this.state.selectedQuestion.properties.hasOwnProperty("content_type")) {
+      let answerText = this.state.updatedText ? this.state.updatedText : ""
+      if (answerText && answerText.trim()) {
+        if (!this.inputElementValidation(answerText, this.state.selectedQuestion.properties.content_type)) {
+          return;
+        }
+      }
+    }
 
     /** check choice type element set limit */
     if (this.state.selectedQuestion.type === 'choice' && this.state.selectedQuestion.properties.hasOwnProperty('setlimit') && this.state.selectedQuestion.properties.setlimit == 1) {
@@ -1489,6 +1510,93 @@ class WebLink extends React.Component {
     }
 
   };
+
+  /**
+  * Validate limit char on question type input
+  * @param {Array} questionArr Curruent Question Array
+  * @param {Object} questionObj Current Answer
+  */
+  limitCharValidation(questionArr, text) {
+    console.log('Answer text inside limitchar', text)
+    let limit = {
+      limitValid: true,
+      limitMessage: ''
+    };
+    let min = questionArr.properties.hasOwnProperty("minimum")
+      ? questionArr.properties.minimum
+      : null;
+    let max = questionArr.properties.hasOwnProperty("maximum")
+      ? questionArr.properties.maximum
+      : null;
+    let textLength = text ? text.length : 0;
+    if (min !== null && max !== null) {
+      if (textLength < min) {
+        limit.limitValid = false;
+      } else if (textLength > max) {
+        limit.limitValid = false;
+      }
+      limit.limitMessage =
+        limit.limitValid === false
+          ? "Please answer between " + min + " and " + max + " characters"
+          : limit.limitMessage;
+    } else if (min !== null) {
+      if (textLength < min) {
+        limit.limitValid = false;
+        limit.limitMessage =
+          limit.limitValid === false
+            ? "Please answer with " + min + " or more characters"
+            : limit.limitMessage;
+      }
+    } else if (max !== null) {
+      if (textLength > max) {
+        limit.limitValid = false;
+        limit.limitMessage =
+          limit.limitValid === false
+            ? "Please answer within " + max + " characters"
+            : limit.limitMessage;
+      }
+    }
+    return limit;
+  }
+
+  /** As per the content type - restrict the input text validation */
+  inputElementValidation(text, contentType) {
+    console.log('text inside validation', text)
+    if (contentType == "number") {
+      let regNumber = /^[0-9.]+$/
+      if (regNumber.test(text)) {
+        return true
+      }
+      else {
+        this.showNotification("Please enter numeric value only", "info")
+        return false
+      }
+    }
+    else if (contentType == "email") {
+      let regEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+      if (regEmail.test(text)) {
+        return true
+      }
+      else {
+        this.showNotification("Please enter a valid email", "info")
+        return false
+      }
+    }
+    else if (contentType == "alphabets") {
+      let regAlphabets = /^[A-Za-z\s]+$/;
+      if (regAlphabets.test(text)) {
+        return true
+      }
+      else {
+        this.showNotification("Please enter alphabets value only", "info")
+        return false
+      }
+    }
+    else {
+      return true
+    }
+  }
+
 
   /* Used to find the hidden questions from the question array. */
   getHiddenQuestions() {
@@ -1853,6 +1961,51 @@ class WebLink extends React.Component {
 
   /* Handles the api to post the survey answer. */
   handleSubmit = () => {
+    /** check for text input character limit validation */
+    if (this.state.selectedQuestion.type === "input" && this.state.selectedQuestion.properties.hasOwnProperty("limitchar") &&
+      this.state.selectedQuestion.properties.limitchar === 1) {
+      let limit_check = this.limitCharValidation(this.state.selectedQuestion, this.state.updatedText);
+      if (
+        limit_check.limitValid === false
+      ) {
+        this.showNotification(limit_check.limitMessage, "info");
+        return;
+      }
+    }
+
+    /** Check text input content type validation */
+    if (this.state.selectedQuestion.type === "input" && this.state.selectedQuestion.properties.hasOwnProperty("content_type")) {
+      let answerText = this.state.updatedText ? this.state.updatedText : ""
+      if (answerText && answerText.trim()) {
+        if (!this.inputElementValidation(answerText, this.state.selectedQuestion.properties.content_type)) {
+          return;
+        }
+      }
+    }
+
+    /** check choice type element set limit */
+    if (this.state.selectedQuestion.type === 'choice' && this.state.selectedQuestion.properties.hasOwnProperty('setlimit') && this.state.selectedQuestion.properties.setlimit == 1) {
+      let count = this.state.selectedChoiceOptions ? this.state.selectedChoiceOptions.length : 0
+      let objProperty = this.state.selectedQuestion.properties
+      if (count < objProperty.minlimit) {
+        this.showNotification('Please select minimum ' + objProperty.minlimit + ' options', "info")
+        return
+      }
+    }
+
+    /** Check max diff all set item is selected */
+    if (this.state.selectedQuestion.type === 'scale' && this.state.selectedQuestion.properties.scale_type == 'maxdiff') {
+      let ansObj = this.state.selectedmaxdiffOptions
+      if (ansObj && ansObj.length > 0) {
+        let lengthofSet = this.state.selectedQuestion.properties.attribute_Set && this.state.selectedQuestion.properties.attribute_Set.length || 0
+        /** logic is every set has least and most selection so its lenth * 2 */
+        if (ansObj.length < (lengthofSet * 2)) {
+          this.showNotification('Please select least and most item for all set of question', "info")
+          return;
+        }
+      }
+    }
+
     let answer = this.updateAnswerData();
 
     let survey_answer_tag_id = this.state.questions[this.state.index].survey_answer_tag_id;
