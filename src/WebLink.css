@@ -393,6 +393,23 @@ div.infoClass p {
   /* pointer-events: none; */
 }
 
+/**input date picker */
+.inputDate .rdt {
+  width: 400px;
+  margin: 0px;
+  padding: 10px;
+  margin: 0 auto;
+}
+
+.inputDate .rdt input {
+  height: 54px;
+  background-color: #fff;
+}
+
+.inputDate .rdtPicker {
+  position: fixed;
+}
+
 @media only screen and (max-width: 799px) {
   .scaleTable tr {
     display: flex !important;
