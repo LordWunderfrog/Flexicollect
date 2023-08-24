@@ -1541,6 +1541,39 @@ class CreateSurvey extends React.Component {
         return scalecheck;
     }
 
+    /* Handles this function to validate the choice type and properties to be filled. */
+    CheckChoice = () => {
+        let choicecheck = true;
+        let labelname = "";
+        let type = "";
+        let defaultdrops = this.state.drops;
+        for (let i = 0; i < defaultdrops.length; i++) {
+            let q = defaultdrops[i];
+            let emptylable = q.properties.options && q.properties.options.filter((obj) => {
+                return obj.label.trim().length === 0
+            })
+            if (q.type === 'choice') {
+                if (q.properties && !q.properties.hasOwnProperty("options")) {
+                    choicecheck = false;
+                    labelname = q.label;
+                    type = "Choice";
+                    break;
+                } else if (q.properties && q.properties.hasOwnProperty("options") && q.properties.options.length <= 0) {
+                    choicecheck = false;
+                    labelname = q.label;
+                    type = "Choice";
+                    break;
+                } else if (emptylable.length > 0) {
+                    choicecheck = false;
+                    labelname = q.label;
+                    type = "Choice";
+                    break;
+                }
+            }
+        }
+        if (!choicecheck) { this.ShowNotification(" ( " + labelname + " ) " + type + " Elements Are Empty. This will affect the display in mobile app.", "danger", 5000); }
+        return choicecheck;
+    }
     /**
      * Handle next button.
      *
@@ -1571,7 +1604,7 @@ class CreateSurvey extends React.Component {
                 this.OtherLanguagegenerate()
             } else {
                 if (activeStep === 1) {
-                    next = this.CheckScale();
+                    next = this.CheckScale() && this.CheckChoice();
                     if (next) {
                         this.editlanguage(true);
                         this.OtherLancongenerate();

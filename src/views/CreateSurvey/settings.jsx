@@ -15,6 +15,7 @@ import Select from "react-select";
 import Snackbar from "components/Snackbar/Snackbar.jsx";
 import { setTimeout } from "timers";
 import cloneDeep from 'lodash/cloneDeep';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 const styles = theme => ({
     root: {
@@ -77,6 +78,7 @@ class Settings extends React.Component {
         this.deleteSource = this.deleteSource.bind(this);
         this.addNewCondtions = this.addNewCondtions.bind(this);
         this.addMultiSource = this.addMultiSource.bind(this);
+        this.onDragEnd = this.onDragEnd.bind(this);
     }
 
     componentDidMount() {
@@ -1191,6 +1193,33 @@ class Settings extends React.Component {
         }
         return multifields
     }
+    onDragEnd(result) {
+        // dropped outside the list
+        if (!result.destination) {
+            console.log('Outside')
+            return;
+        }
+
+        const items = this.reorder(
+            this.state.conditions,
+            result.source.index,
+            result.destination.index
+        );
+
+        this.setState({
+            conditions: items
+        });
+    }
+    reorder = (list, startIndex, endIndex) => {
+        list[startIndex]["condtion_id"] = endIndex
+        list[endIndex]["condtion_id"] = startIndex
+        list.sort((a, b) => a.condtion_id - b.condtion_id);
+        // const result = Array.from(list);
+        // const [removed] = result.splice(startIndex, 1);
+        // result.splice(endIndex, 0, removed);
+        return list;
+    }
+
     render() {
         const { msgColor, br, message } = this.state;
         return (
@@ -1202,139 +1231,235 @@ class Settings extends React.Component {
                             <p>Change visibility of field(s) depending on `IF` State conditions.</p>
 
                         </div>
-                        {
-                            this.state.conditions.map((drop, index) => (
-                                <div key={index}>
-                                    <div className="dinamic_quest_body">
-                                        {
-                                            drop.error === 1
-                                                ?
-                                                <div className="error errordeletes">
-                                                    <i className="fa fa-times-circle" aria-hidden="true" /> One or more fields have been deleted which are required by this condition.
-                                                </div>
-                                                :
-                                                null
-                                        }
-                                        <div className="dinamic_quest_block">
-                                            <div className="form-group clear clearfix">
-                                                <div className="label-part">Do</div>
-                                                <div className="ans-part">
-                                                    {drop.target.do !== "loop_input" &&
-
-                                                        <select className="form-control" name="do" onChange={e => this.addNewCondtions(e, drop, "target")}>
-                                                            <option value="" disabled selected>
-                                                                Select your option
-                                                            </option>
-                                                            <option selected={drop.target.do === "hide" ? "selected" : ""} value="hide">
-                                                                Hide
-                                                            </option>
-                                                            <option selected={drop.target.do === "show" ? "selected" : ""} value="show">
-                                                                Show
-                                                            </option>
-                                                            <option selected={(drop.target.do === "hide_multiple" && drop.target.uniqueID !== "hide_range") ? "selected" : ""} value="hide_multiple">
-                                                                Hide Multiple
-                                                            </option>
-                                                            <option selected={drop.target.do === "show_multiple" ? "selected" : ""} value="show_multiple">
-                                                                Show Multiple
-                                                            </option>
-                                                            <option selected={(drop.target.do === "hide_multiple" && drop.target.uniqueID === "hide_range") ? "selected" : ""} value="hide_range">
-                                                                Hide Range
-                                                            </option>
-                                                            <option selected={drop.target.do === "loop" ? "selected" : ""}
-                                                                value='loop'>
-                                                                Loop
-                                                            </option>
-                                                            <option selected={drop.target.do === "loop_set" ? "selected" : ""} value="loop_set">
-                                                                Loop Set
-                                                            </option>
-                                                            <option selected={drop.target.do === "release" ? "selected" : ""} value="release">
-                                                                Release
-                                                            </option>
-                                                        </select>
-                                                    }
-                                                    {drop.target.do === "loop_input" &&
-                                                        <select className="form-control" name="do" onChange={e => this.addNewCondtions(e, drop, "target")}>
-                                                            <option selected={drop.target.do === "loop" ? "selected" : ""}
-                                                                value='loop'>
-                                                                Loop
-                                                            </option>
-                                                        </select>
-                                                    }
-                                                </div>
-                                            </div>
-                                            {
-                                                this.state.conditions[index].target.do
-                                                    ?
-                                                    <div className="form-group clear clearfix">
-                                                        {this.state.conditions[index].target.do === "loop_set" ?
-                                                            <div className="label-part">No.of Loops</div> :
-                                                            this.state.conditions[index].target.uniqueID === "hide_range" ?
-                                                                <div className="label-part">From Field</div> :
-                                                                this.state.conditions[index].target.do === "release" ?
-                                                                    <div className="label-part">Project</div> :
-                                                                    <div className="label-part">Field</div>
-                                                        }
-                                                        <div className="ans-part">
-                                                            {
-                                                                this.state.conditions[index].target.do === "hide" || this.state.conditions[index].target.do === "show"
-                                                                    ?
-                                                                    <select className="form-control" name="handler" onChange={e => this.addNewCondtions(e, drop, "target")}>
-                                                                        <option value="" disabled selected>
-                                                                            Select your option
-                                                                        </option>
-                                                                        {this.doList(drop).map((subdrop, index) => (
-                                                                            <option key={index} selected={drop.target.handler === subdrop.handler ? "selected" : ""} value={subdrop.handler}>
-                                                                                {subdrop.label}
-                                                                            </option>
-                                                                        ))}
-                                                                    </select>
-                                                                    :
-                                                                    (this.state.conditions[index].target.do === "hide_multiple" && this.state.conditions[index].target.uniqueID !== "hide_range") || this.state.conditions[index].target.do === "show_multiple"
+                        <DragDropContext onDragEnd={this.onDragEnd}>
+                            <Droppable droppableId="Conditiondroppable">
+                                {(provided, snapshot) => (
+                                    <div
+                                        ref={provided.innerRef}
+                                        draggable
+                                    >
+                                        {this.state.conditions.map((drop, index) => (
+                                            <Draggable
+                                                key={drop.condtion_id}
+                                                draggableId={drop.condtion_id.toString()}
+                                                index={index}
+                                            >
+                                                {(provided, snapshot) => (
+                                                    <div
+                                                        ref={provided.innerRef}
+                                                        {...provided.draggableProps}
+                                                        {...provided.dragHandleProps}>
+                                                        <div key={index}>
+                                                            <div className="dinamic_quest_body">
+                                                                {
+                                                                    drop.error === 1
                                                                         ?
-                                                                        <Select
-                                                                            isMulti
-                                                                            name="multifield"
-                                                                            options={this.multiList(drop)}
-                                                                            closeMenuOnSelect={false}
-                                                                            value={drop.target.multifield}
-                                                                            className="basic-multi-select"
-                                                                            classNamePrefix="select"
-                                                                            onChange={e => this.addNewCondtionsMulti(e, drop, "multifield", "target")}
-                                                                        /> :
-                                                                        (this.state.conditions[index].target.do === "hide_multiple" && this.state.conditions[index].target.uniqueID === "hide_range") ?
-                                                                            <Select
-                                                                                styles={{
-                                                                                    control: (baseStyles, state) => ({
-                                                                                        ...baseStyles,
-                                                                                        fontSize: 14,
-                                                                                    }),
-                                                                                }}
-                                                                                isMulti={false}
-                                                                                name="FromField"
-                                                                                options={this.multiList(drop)}
-                                                                                value={drop.target.multifield && drop.target.multifield[0]}
-                                                                                className="basic-single"
-                                                                                classNamePrefix="select"
-                                                                                onChange={e => this.addNewCondtionsMulti(e, drop, "multifield", "target", "FromField")}
-                                                                            />
+                                                                        <div className="error errordeletes">
+                                                                            <i className="fa fa-times-circle" aria-hidden="true" /> One or more fields have been deleted which are required by this condition.
+                                                                        </div>
+                                                                        :
+                                                                        null
+                                                                }
+                                                                <div className="dinamic_quest_block">
+                                                                    <div className="form-group clear clearfix">
+                                                                        <div className="label-part">Do</div>
+                                                                        <div className="ans-part">
+                                                                            {drop.target.do !== "loop_input" &&
+
+                                                                                <select className="form-control" name="do" onChange={e => this.addNewCondtions(e, drop, "target")}>
+                                                                                    <option value="" disabled selected>
+                                                                                        Select your option
+                                                                                    </option>
+                                                                                    <option selected={drop.target.do === "hide" ? "selected" : ""} value="hide">
+                                                                                        Hide
+                                                                                    </option>
+                                                                                    <option selected={drop.target.do === "show" ? "selected" : ""} value="show">
+                                                                                        Show
+                                                                                    </option>
+                                                                                    <option selected={(drop.target.do === "hide_multiple" && drop.target.uniqueID !== "hide_range") ? "selected" : ""} value="hide_multiple">
+                                                                                        Hide Multiple
+                                                                                    </option>
+                                                                                    <option selected={drop.target.do === "show_multiple" ? "selected" : ""} value="show_multiple">
+                                                                                        Show Multiple
+                                                                                    </option>
+                                                                                    <option selected={(drop.target.do === "hide_multiple" && drop.target.uniqueID === "hide_range") ? "selected" : ""} value="hide_range">
+                                                                                        Hide Range
+                                                                                    </option>
+                                                                                    <option selected={drop.target.do === "loop" ? "selected" : ""}
+                                                                                        value='loop'>
+                                                                                        Loop
+                                                                                    </option>
+                                                                                    <option selected={drop.target.do === "loop_set" ? "selected" : ""} value="loop_set">
+                                                                                        Loop Set
+                                                                                    </option>
+                                                                                    <option selected={drop.target.do === "release" ? "selected" : ""} value="release">
+                                                                                        Release
+                                                                                    </option>
+                                                                                </select>
+                                                                            }
+                                                                            {drop.target.do === "loop_input" &&
+                                                                                <select className="form-control" name="do" onChange={e => this.addNewCondtions(e, drop, "target")}>
+                                                                                    <option selected={drop.target.do === "loop" ? "selected" : ""}
+                                                                                        value='loop'>
+                                                                                        Loop
+                                                                                    </option>
+                                                                                </select>
+                                                                            }
+                                                                        </div>
+                                                                    </div>
+                                                                    {
+                                                                        this.state.conditions[index].target.do
+                                                                            ?
+                                                                            <div className="form-group clear clearfix">
+                                                                                {this.state.conditions[index].target.do === "loop_set" ?
+                                                                                    <div className="label-part">No.of Loops</div> :
+                                                                                    this.state.conditions[index].target.uniqueID === "hide_range" ?
+                                                                                        <div className="label-part">From Field</div> :
+                                                                                        this.state.conditions[index].target.do === "release" ?
+                                                                                            <div className="label-part">Project</div> :
+                                                                                            <div className="label-part">Field</div>
+                                                                                }
+                                                                                <div className="ans-part">
+                                                                                    {
+                                                                                        this.state.conditions[index].target.do === "hide" || this.state.conditions[index].target.do === "show"
+                                                                                            ?
+                                                                                            <select className="form-control" name="handler" onChange={e => this.addNewCondtions(e, drop, "target")}>
+                                                                                                <option value="" disabled selected>
+                                                                                                    Select your option
+                                                                                                </option>
+                                                                                                {this.doList(drop).map((subdrop, index) => (
+                                                                                                    <option key={index} selected={drop.target.handler === subdrop.handler ? "selected" : ""} value={subdrop.handler}>
+                                                                                                        {subdrop.label}
+                                                                                                    </option>
+                                                                                                ))}
+                                                                                            </select>
+                                                                                            :
+                                                                                            (this.state.conditions[index].target.do === "hide_multiple" && this.state.conditions[index].target.uniqueID !== "hide_range") || this.state.conditions[index].target.do === "show_multiple"
+                                                                                                ?
+                                                                                                <Select
+                                                                                                    isMulti
+                                                                                                    name="multifield"
+                                                                                                    options={this.multiList(drop)}
+                                                                                                    closeMenuOnSelect={false}
+                                                                                                    value={drop.target.multifield}
+                                                                                                    className="basic-multi-select"
+                                                                                                    classNamePrefix="select"
+                                                                                                    onChange={e => this.addNewCondtionsMulti(e, drop, "multifield", "target")}
+                                                                                                /> :
+                                                                                                (this.state.conditions[index].target.do === "hide_multiple" && this.state.conditions[index].target.uniqueID === "hide_range") ?
+                                                                                                    <Select
+                                                                                                        styles={{
+                                                                                                            control: (baseStyles, state) => ({
+                                                                                                                ...baseStyles,
+                                                                                                                fontSize: 14,
+                                                                                                            }),
+                                                                                                        }}
+                                                                                                        isMulti={false}
+                                                                                                        name="FromField"
+                                                                                                        options={this.multiList(drop)}
+                                                                                                        value={drop.target.multifield && drop.target.multifield[0]}
+                                                                                                        className="basic-single"
+                                                                                                        classNamePrefix="select"
+                                                                                                        onChange={e => this.addNewCondtionsMulti(e, drop, "multifield", "target", "FromField")}
+                                                                                                    />
+                                                                                                    :
+                                                                                                    this.state.conditions[index].target.do === "loop_set"
+                                                                                                        ?
+                                                                                                        <input
+                                                                                                            className="form-control"
+                                                                                                            name="num_loop"
+                                                                                                            type="number"
+                                                                                                            value={drop.target.num_loop}
+                                                                                                            placeholder="Please type a value here"
+                                                                                                            onChange={e => this.addNewCondtions(e, drop, "num_loop")}
+                                                                                                        />
+                                                                                                        :
+                                                                                                        this.state.conditions[index].target.do && this.state.conditions[index].target.do === "loop"
+                                                                                                            ?
+                                                                                                            <Select
+                                                                                                                isMulti
+                                                                                                                name="multifield"
+                                                                                                                options={this.loopset(index, 'loop')}
+                                                                                                                closeMenuOnSelect={false}
+                                                                                                                value={drop.target.multifield}
+                                                                                                                className="basic-multi-select"
+                                                                                                                classNamePrefix="select"
+                                                                                                                onBlur={e => this.change_field_order(e, drop, index, "multifield", "target")}
+                                                                                                                onChange={e => this.addNewCondtionsMulti(e, drop, "multifield", "target")}
+                                                                                                            />
+                                                                                                            :
+                                                                                                            this.state.conditions[index].target.do === "loop_input"
+                                                                                                                ?
+                                                                                                                <Select
+                                                                                                                    isMulti
+                                                                                                                    name="multifield"
+                                                                                                                    options={this.loopset(index, 'loop_input')}
+                                                                                                                    closeMenuOnSelect={false}
+                                                                                                                    value={drop.target.multifield}
+                                                                                                                    className="basic-multi-select"
+                                                                                                                    classNamePrefix="select"
+                                                                                                                    onBlur={e => this.change_field_order(e, drop, index, "multifield", "target")}
+                                                                                                                    onChange={e => this.addNewCondtionsMulti(e, drop, "multifield", "target")}
+                                                                                                                />
+                                                                                                                :
+                                                                                                                this.state.conditions[index].target.do === "release"
+                                                                                                                    ?
+                                                                                                                    <select
+                                                                                                                        className="form-control"
+                                                                                                                        name="project"
+                                                                                                                        onChange={e => this.addNewCondtions(e, drop, "project")}>
+                                                                                                                        <option value="" disabled selected>
+                                                                                                                            Select your option</option>
+                                                                                                                        {this.state.projects.map((subdrop, index) => (
+                                                                                                                            <option key={index} selected={drop.target.project === subdrop.value ? "selected" : ""} value={subdrop.value}>
+                                                                                                                                {subdrop.label}
+                                                                                                                            </option>
+                                                                                                                        ))}
+                                                                                                                    </select>
+                                                                                                                    :
+                                                                                                                    null
+                                                                                    }
+                                                                                </div>
+                                                                            </div>
                                                                             :
-                                                                            this.state.conditions[index].target.do === "loop_set"
-                                                                                ?
-                                                                                <input
-                                                                                    className="form-control"
-                                                                                    name="num_loop"
-                                                                                    type="number"
-                                                                                    value={drop.target.num_loop}
-                                                                                    placeholder="Please type a value here"
-                                                                                    onChange={e => this.addNewCondtions(e, drop, "num_loop")}
-                                                                                />
-                                                                                :
-                                                                                this.state.conditions[index].target.do && this.state.conditions[index].target.do === "loop"
-                                                                                    ?
+                                                                            null
+                                                                    }
+                                                                    {
+                                                                        this.state.conditions[index].target.do === "release"
+                                                                            ?
+                                                                            <div className="form-group clear clearfix">
+                                                                                <div className="label-part">Mission</div>
+                                                                                <div className="ans-part">
+                                                                                    <select
+                                                                                        className="form-control"
+                                                                                        name="mission"
+                                                                                        onChange={e => this.addNewCondtions(e, drop, "mission")}>
+                                                                                        <option value="" disabled selected>
+                                                                                            Select your option
+                                                                                        </option>
+                                                                                        {this.getMissionList(drop.target.project).map((subdrop, index) => (
+                                                                                            <option key={index} selected={drop.target.mission === subdrop.value ? "selected" : ""} value={subdrop.value}>
+                                                                                                {subdrop.label}
+                                                                                            </option>
+                                                                                        ))}
+                                                                                    </select>
+
+                                                                                </div>
+                                                                            </div>
+                                                                            :
+                                                                            null
+                                                                    }
+                                                                    {
+                                                                        this.state.conditions[index].target.do && this.state.conditions[index].target.do === "loop_set"
+                                                                            ?
+                                                                            <div className="form-group clear clearfix">
+                                                                                <div className="label-part">Field</div>
+                                                                                <div className="ans-part">
+
                                                                                     <Select
                                                                                         isMulti
                                                                                         name="multifield"
-                                                                                        options={this.loopset(index, 'loop')}
+                                                                                        options={this.loopset(index, 'loop_set')}
                                                                                         closeMenuOnSelect={false}
                                                                                         value={drop.target.multifield}
                                                                                         className="basic-multi-select"
@@ -1342,709 +1467,496 @@ class Settings extends React.Component {
                                                                                         onBlur={e => this.change_field_order(e, drop, index, "multifield", "target")}
                                                                                         onChange={e => this.addNewCondtionsMulti(e, drop, "multifield", "target")}
                                                                                     />
-                                                                                    :
-                                                                                    this.state.conditions[index].target.do === "loop_input"
-                                                                                        ?
-                                                                                        <Select
-                                                                                            isMulti
-                                                                                            name="multifield"
-                                                                                            options={this.loopset(index, 'loop_input')}
-                                                                                            closeMenuOnSelect={false}
-                                                                                            value={drop.target.multifield}
-                                                                                            className="basic-multi-select"
-                                                                                            classNamePrefix="select"
-                                                                                            onBlur={e => this.change_field_order(e, drop, index, "multifield", "target")}
-                                                                                            onChange={e => this.addNewCondtionsMulti(e, drop, "multifield", "target")}
-                                                                                        />
-                                                                                        :
-                                                                                        this.state.conditions[index].target.do === "release"
-                                                                                            ?
-                                                                                            <select
-                                                                                                className="form-control"
-                                                                                                name="project"
-                                                                                                onChange={e => this.addNewCondtions(e, drop, "project")}>
-                                                                                                <option value="" disabled selected>
-                                                                                                    Select your option</option>
-                                                                                                {this.state.projects.map((subdrop, index) => (
-                                                                                                    <option key={index} selected={drop.target.project === subdrop.value ? "selected" : ""} value={subdrop.value}>
-                                                                                                        {subdrop.label}
-                                                                                                    </option>
-                                                                                                ))}
-                                                                                            </select>
-                                                                                            :
-                                                                                            null
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                    :
-                                                    null
-                                            }
-                                            {
-                                                this.state.conditions[index].target.do === "release"
-                                                    ?
-                                                    <div className="form-group clear clearfix">
-                                                        <div className="label-part">Mission</div>
-                                                        <div className="ans-part">
-                                                            <select
-                                                                className="form-control"
-                                                                name="mission"
-                                                                onChange={e => this.addNewCondtions(e, drop, "mission")}>
-                                                                <option value="" disabled selected>
-                                                                    Select your option
-                                                                </option>
-                                                                {this.getMissionList(drop.target.project).map((subdrop, index) => (
-                                                                    <option key={index} selected={drop.target.mission === subdrop.value ? "selected" : ""} value={subdrop.value}>
-                                                                        {subdrop.label}
-                                                                    </option>
-                                                                ))}
-                                                            </select>
 
-                                                        </div>
-                                                    </div>
-                                                    :
-                                                    null
-                                            }
-                                            {
-                                                this.state.conditions[index].target.do && this.state.conditions[index].target.do === "loop_set"
-                                                    ?
-                                                    <div className="form-group clear clearfix">
-                                                        <div className="label-part">Field</div>
-                                                        <div className="ans-part">
-
-                                                            <Select
-                                                                isMulti
-                                                                name="multifield"
-                                                                options={this.loopset(index, 'loop_set')}
-                                                                closeMenuOnSelect={false}
-                                                                value={drop.target.multifield}
-                                                                className="basic-multi-select"
-                                                                classNamePrefix="select"
-                                                                onBlur={e => this.change_field_order(e, drop, index, "multifield", "target")}
-                                                                onChange={e => this.addNewCondtionsMulti(e, drop, "multifield", "target")}
-                                                            />
-
-                                                        </div>
-                                                    </div>
-                                                    :
-                                                    null
-                                            }
-                                            {
-                                                this.state.conditions[index].target.uniqueID && this.state.conditions[index].target.uniqueID === "hide_range"
-                                                    ?
-                                                    <div className="form-group clear clearfix">
-                                                        <div className="label-part">To Field</div>
-                                                        <div className="ans-part">
-                                                            <Select
-                                                                styles={{
-                                                                    control: (baseStyles, state) => ({
-                                                                        ...baseStyles,
-                                                                        fontSize: 14,
-                                                                    }),
-                                                                }}
-                                                                name="ToField"
-                                                                options={this.multiList(drop)}
-                                                                value={drop.target.multifield && drop.target.multifield[drop.target.multifield.length - 1] || ""}
-                                                                className="basic-single"
-                                                                classNamePrefix="select"
-                                                                onChange={e => this.addNewCondtionsMulti(e, drop, "multifield", "target", "ToField")}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    :
-                                                    null
-                                            }
-                                        </div>
-                                        {
-                                            drop.source.map((source, idx) => (
-                                                <div key={idx} className="dinamic_quest_block">
-                                                    <div className="form-group clear clearfix">
-                                                        <div className="label-part">If</div>
-                                                        <div className="ans-part">
-                                                            <select className="form-control" style={{ width: '90%', display: 'inline-block' }} name="handler" onChange={e => this.addNewCondtions(e, drop, "source", idx)}>
-                                                                <option value="" disabled selected>
-                                                                    Select your option
-                                                                </option>
-                                                                {this.props.drops.map((subdrop, index) => (
-                                                                    <option
-                                                                        key={index}
-                                                                        disabled={
-                                                                            drop.target.do === 'release' ?
-                                                                                (
-                                                                                    subdrop.type === "info"
-                                                                                        ? "disabled" :
-                                                                                        subdrop.type === "gps"
-                                                                                            ? "disabled"
-                                                                                            : subdrop.properties.marker_enabled === 1 && !subdrop.properties.instruction_enabled && !subdrop.properties.scale_enabled
-                                                                                                ? "disabled"
-                                                                                                : subdrop.properties.marker_enabled === 0 && !subdrop.properties.instruction_enabled && !subdrop.properties.scale_enabled
-                                                                                                    ? "disabled"
-                                                                                                    : subdrop.type === "input"
-                                                                                                        ? "disabled"
-                                                                                                        : subdrop.type === "capture"
-                                                                                                            ? "disabled"
-                                                                                                            : subdrop.type === "upload"
-                                                                                                                ? "disabled"
-                                                                                                                : ""
-                                                                                )
-                                                                                :
-                                                                                this.checkeSelfHideQues(drop, subdrop.handler) === subdrop.handler ?
-                                                                                    "disabled"
-                                                                                    :
-                                                                                    this.checkeSelfHideQues(drop, subdrop.handler) === subdrop.handler ?
-                                                                                        subdrop.type === "info"
-                                                                                            ? "disabled" :
-                                                                                            subdrop.type === "gps"
-                                                                                                ? "disabled"
-                                                                                                : subdrop.properties.marker_enabled === 1 && !subdrop.properties.instruction_enabled && !subdrop.properties.scale_enabled
-                                                                                                    ? "disabled"
-                                                                                                    : subdrop.properties.marker_enabled === 0 && !subdrop.properties.instruction_enabled && !subdrop.properties.scale_enabled
-                                                                                                        ? "disabled"
-                                                                                                        : ""
-                                                                                        :
-                                                                                        subdrop.type === "info"
-                                                                                            ? "disabled" :
-                                                                                            subdrop.type === "gps"
-                                                                                                ? "disabled"
-                                                                                                : subdrop.properties.marker_enabled === 1 && !subdrop.properties.instruction_enabled && !subdrop.properties.scale_enabled
-                                                                                                    ? "disabled"
-                                                                                                    : subdrop.properties.marker_enabled === 0 && !subdrop.properties.instruction_enabled && !subdrop.properties.scale_enabled
-                                                                                                        ? "disabled"
-                                                                                                        : ""
-                                                                        }
-                                                                        selected={drop.target.do === "loop_set" && source.state === "" ? "" :
-                                                                            source.handler === subdrop.handler ? "selected" : ""}
-                                                                        // selected={source.handler === subdrop.handler ? "selected" : ""}
-                                                                        value={subdrop.handler + "." + subdrop.type}
-                                                                    >
-                                                                        {subdrop.label}
-                                                                    </option>
-                                                                ))}
-                                                            </select>
-                                                            <i className="fa fa-trash" onClick={() => this.deleteSource(index, idx)} />
-                                                        </div>
-                                                    </div>
-                                                    {source.source_type === "input" || this.selectedElement(drop, source).properties.instruction_enabled === 1 ? (
-                                                        <div className="form-group clear clearfix"
-
-                                                        >
-                                                            <div className="label-part">State</div>
-                                                            <div className="ans-part">
-                                                                <select
-                                                                    className="form-control"
-                                                                    name="state"
-                                                                    //disabled={source.handler ? "" : "disabled"}
-                                                                    onChange={e => this.addNewCondtions(e, drop, "source", idx)}
-                                                                >
-                                                                    <option value="" disabled selected={!source.state || source.state === "" ? "selected" : ""}>
-                                                                        Select your option
-                                                                    </option>
-                                                                    <option selected={source.state === "equal" ? "selected" : ""} value="equal">
-                                                                        Is Equal to
-                                                                    </option>
-                                                                    <option selected={source.state === "notequal" ? "selected" : ""} value="notequal">
-                                                                        Is Not Equal to
-                                                                    </option>
-                                                                    <option selected={source.state === "contain" ? "selected" : ""} value="contain">
-                                                                        Contains
-                                                                    </option>
-                                                                    <option selected={source.state === "notcontains" ? "selected" : ""} value="notcontains">
-                                                                        Does Not Contains
-                                                                    </option>
-                                                                    <option selected={source.state === "starts" ? "selected" : ""} value="starts">
-                                                                        Starts With
-                                                                    </option>
-                                                                    <option selected={source.state === "notstarts" ? "selected" : ""} value="notstarts">
-                                                                        Does Not Starts with
-                                                                    </option>
-                                                                    <option selected={source.state === "ends" ? "selected" : ""} value="ends">
-                                                                        Ends With
-                                                                    </option>
-                                                                    <option selected={source.state === "notends" ? "selected" : ""} value="notends">
-                                                                        Does Not Ends with
-                                                                    </option>
-                                                                    <option selected={source.state === "empty" ? "selected" : ""} value="empty">
-                                                                        Is Empty
-                                                                    </option>
-                                                                    <option selected={source.state === "filled" ? "selected" : ""} value="filled">
-                                                                        Is Filled
-                                                                    </option>
-                                                                    <option selected={source.state === "loop_input" ? "selected" : ""} value="loop_input">
-                                                                        Loop
-                                                                    </option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    ) : source.source_type === "choice" || this.selectedElement(drop, source).properties.scale_enabled === 1 ? (
-
-                                                        <div className="form-group clear clearfix"
-
-                                                        >
-                                                            <div className="label-part">State</div>
-                                                            <div className="ans-part">
-
-                                                                <select
-                                                                    className="form-control"
-                                                                    name="state"
-                                                                    //disabled={source.handler ? "" : "disabled"}
-                                                                    onChange={e => this.addNewCondtions(e, drop, "source", idx)}
-                                                                >
-                                                                    <option value="" disabled selected={!source.state || source.state === "" ? "selected" : ""}>
-                                                                        Select your option
-                                                                    </option>
-                                                                    <option selected={source.state === "equal" ? "selected" : ""} value="equal">
-                                                                        Is Equal to
-                                                                    </option>
-                                                                    <option selected={source.state === "notequal" ? "selected" : ""} value="notequal">
-                                                                        Is Not Equal to
-                                                                    </option>
-                                                                    <option selected={source.state === "empty" ? "selected" : ""} value="empty">
-                                                                        Is Empty
-                                                                    </option>
-                                                                    <option selected={source.state === "filled" ? "selected" : ""} value="filled">
-                                                                        Is Filled
-                                                                    </option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    ) : this.selectedElement(drop, source).properties.scale_enabled === 1 ? (
-                                                        <div className="form-group clear clearfix"
-
-                                                        >
-                                                            <div className="label-part">State</div>
-                                                            <div className="ans-part">
-                                                                <select
-                                                                    className="form-control"
-                                                                    name="state"
-                                                                    //disabled={source.handler ? "" : "disabled"}
-                                                                    onChange={e => this.addNewCondtions(e, drop, "source", idx)}
-                                                                >
-                                                                    <option value="" disabled selected={!source.state || source.state === "" ? "selected" : ""}>
-                                                                        Select your option
-                                                                    </option>
-                                                                    <option selected={source.state === "equal" ? "selected" : ""} value="equal">
-                                                                        Is Equal to
-                                                                    </option>
-                                                                    <option selected={source.state === "notequal" ? "selected" : ""} value="notequal">
-                                                                        Is Not Equal to
-                                                                    </option>
-                                                                    <option selected={source.state === "empty" ? "selected" : ""} value="empty">
-                                                                        Is Empty
-                                                                    </option>
-                                                                    <option selected={source.state === "filled" ? "selected" : ""} value="filled">
-                                                                        Is Filled
-                                                                    </option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    ) : source.source_type === "upload" ? (
-                                                        <div className="form-group clear clearfix"
-
-                                                        >
-                                                            <div className="label-part">State</div>
-                                                            <div className="ans-part">
-                                                                <select
-                                                                    className="form-control"
-                                                                    name="state"
-                                                                    //disabled={source.handler ? "" : "disabled"}
-                                                                    onChange={e => this.addNewCondtions(e, drop, "source", idx)}
-                                                                >
-                                                                    <option value="" disabled selected={!source.state || source.state === "" ? "selected" : ""}>
-                                                                        Select your option
-                                                                    </option>
-                                                                    <option selected={source.state === "empty" ? "selected" : ""} value="empty">
-                                                                        Is Empty
-                                                                    </option>
-                                                                    <option selected={source.state === "filled" ? "selected" : ""} value="filled">
-                                                                        Is Filled
-                                                                    </option>
-                                                                </select>
-                                                            </div>
-
-                                                        </div>
-                                                    )
-
-                                                        : source.source_type === "barcode" && this.selectedElement(drop, source).properties.barcode_enabled === 1 ? (
-                                                            <div className="form-group clear clearfix"
-
-                                                            >
-                                                                <div className="label-part">State</div>
-                                                                <div className="ans-part">
-                                                                    <select
-                                                                        className="form-control"
-                                                                        name="state"
-                                                                        //disabled={source.handler ? "" : "disabled"}
-                                                                        onChange={e => this.addNewCondtions(e, drop, "source", idx)}
-                                                                    >
-                                                                        <option value="" disabled selected={!source.state || source.state === "" ? "selected" : ""}>
-                                                                            Select your option
-                                                                        </option>
-                                                                        <option selected={source.state === "equal" ? "selected" : ""} value="equal">
-                                                                            Is Equal to
-                                                                        </option>
-                                                                        <option selected={source.state === "notequal" ? "selected" : ""} value="notequal">
-                                                                            Is Not Equal to
-                                                                        </option>
-                                                                        <option selected={source.state === "empty" ? "selected" : ""} value="empty">
-                                                                            Is Empty
-                                                                        </option>
-                                                                        <option selected={source.state === "filled" ? "selected" : ""} value="filled">
-                                                                            Is Filled
-                                                                        </option>
-                                                                    </select>
-                                                                </div>
-
-                                                            </div>
-                                                        )
-
-                                                            : source.source_type === "barcode" && !this.selectedElement(drop, source).properties.barcode_enabled ? (
-                                                                <div className="form-group clear clearfix"
-
-                                                                >
-                                                                    <div className="label-part">State</div>
-                                                                    <div className="ans-part">
-                                                                        <select
-                                                                            className="form-control"
-                                                                            name="state"
-                                                                            //disabled={source.handler ? "" : "disabled"}
-                                                                            onChange={e => this.addNewCondtions(e, drop, "source", idx)}
-                                                                        >
-                                                                            <option value="" disabled selected={!source.state || source.state === "" ? "selected" : ""}>
-                                                                                Select your option
-                                                                            </option>
-                                                                            <option selected={source.state === "equal" ? "selected" : ""} value="equal">
-                                                                                Is Equal to
-                                                                            </option>
-                                                                            <option selected={source.state === "notequal" ? "selected" : ""} value="notequal">
-                                                                                Is Not Equal to
-                                                                            </option>
-                                                                            <option selected={source.state === "contain" ? "selected" : ""} value="contain">
-                                                                                Contains
-                                                                            </option>
-                                                                            <option selected={source.state === "notcontains" ? "selected" : ""} value="notcontains">
-                                                                                Does Not Contains
-                                                                            </option>
-                                                                            <option selected={source.state === "starts" ? "selected" : ""} value="starts">
-                                                                                Starts With
-                                                                            </option>
-                                                                            <option selected={source.state === "notstarts" ? "selected" : ""} value="notstarts">
-                                                                                Does Not Starts with
-                                                                            </option>
-                                                                            <option selected={source.state === "ends" ? "selected" : ""} value="ends">
-                                                                                Ends With
-                                                                            </option>
-                                                                            <option selected={source.state === "notends" ? "selected" : ""} value="notends">
-                                                                                Does Not Ends with
-                                                                            </option>
-                                                                            <option selected={source.state === "empty" ? "selected" : ""} value="empty">
-                                                                                Is Empty
-                                                                            </option>
-                                                                            <option selected={source.state === "filled" ? "selected" : ""} value="filled">
-                                                                                Is Filled
-                                                                            </option>
-
-                                                                        </select>
-                                                                    </div>
-                                                                </div>
-                                                            )
-
-                                                                : source.source_type === "scale" ? (
-
-                                                                    <div
-
-                                                                    >
-
-                                                                        {this.tableList(drop, source) === "table" ?
-                                                                            <div className="form-group clear clearfix">
-                                                                                <div className="label-part">State</div>
-                                                                                <div className="ans-part">
-                                                                                    <select
-                                                                                        className="form-control"
-                                                                                        name="state"
-                                                                                        //disabled={source.handler ? "" : "disabled"}
-                                                                                        onChange={e => this.addNewCondtions(e, drop, "source", idx, "table")}
-                                                                                    >
-                                                                                        <option value="" disabled selected={!source.state || source.state === "" ? "selected" : ""}>
-                                                                                            Select your option
-                                                                                        </option>
-                                                                                        <option selected={source.state === "equal" ? "selected" : ""} value="equal">
-                                                                                            Is Equal to
-                                                                                        </option>
-                                                                                        <option selected={source.state === "notequal" ? "selected" : ""} value="notequal">
-                                                                                            Is Not Equal to
-                                                                                        </option>
-                                                                                        <option selected={source.state === "empty" ? "selected" : ""} value="empty">
-                                                                                            Is Empty
-                                                                                        </option>
-                                                                                        <option selected={source.state === "filled" ? "selected" : ""} value="filled">
-                                                                                            Is Filled
-                                                                                        </option>
-                                                                                    </select>
                                                                                 </div>
                                                                             </div>
                                                                             :
+                                                                            null
+                                                                    }
+                                                                    {
+                                                                        this.state.conditions[index].target.uniqueID && this.state.conditions[index].target.uniqueID === "hide_range"
+                                                                            ?
                                                                             <div className="form-group clear clearfix">
-                                                                                <div className="label-part">State</div>
+                                                                                <div className="label-part">To Field</div>
                                                                                 <div className="ans-part">
-                                                                                    <select
-                                                                                        className="form-control"
-                                                                                        name="state"
-                                                                                        //disabled={source.handler ? "" : "disabled"}
-                                                                                        onChange={e => this.addNewCondtions(e, drop, "source", idx)}
-                                                                                    >
-                                                                                        <option value="" disabled selected={!source.state || source.state === "" ? "selected" : ""}>
-                                                                                            Select your option
-                                                                                        </option>
-                                                                                        <option selected={source.state === "equal" ? "selected" : ""} value="equal">
-                                                                                            Is Equal to
-                                                                                        </option>
-                                                                                        <option selected={source.state === "notequal" ? "selected" : ""} value="notequal">
-                                                                                            Is Not Equal to
-                                                                                        </option>
-                                                                                        <option selected={source.state === "empty" ? "selected" : ""} value="empty">
-                                                                                            Is Empty
-                                                                                        </option>
-                                                                                        <option selected={source.state === "filled" ? "selected" : ""} value="filled">
-                                                                                            Is Filled
-                                                                                        </option>
-                                                                                    </select>
+                                                                                    <Select
+                                                                                        styles={{
+                                                                                            control: (baseStyles, state) => ({
+                                                                                                ...baseStyles,
+                                                                                                fontSize: 14,
+                                                                                            }),
+                                                                                        }}
+                                                                                        name="ToField"
+                                                                                        options={this.multiList(drop)}
+                                                                                        value={drop.target.multifield && drop.target.multifield[drop.target.multifield.length - 1] || ""}
+                                                                                        className="basic-single"
+                                                                                        classNamePrefix="select"
+                                                                                        onChange={e => this.addNewCondtionsMulti(e, drop, "multifield", "target", "ToField")}
+                                                                                    />
                                                                                 </div>
                                                                             </div>
-                                                                        }
-                                                                    </div>
-                                                                )
-
-                                                                    : (
-                                                                        ""
-                                                                    )}
-                                                    {this.tableList(drop, source) === "table" && source.state !== "empty" && source.state !== "filled" ? (
-                                                        <div
-
-                                                        >
-                                                            <div className="form-group clear clearfix">
-                                                                <div className="label-part">Value</div>
-                                                                <div className="ans-part">
-                                                                    <select className="form-control" name="match_value" onChange={e => this.addNewCondtions(e, drop, "source", idx)}>
-                                                                        <option value="" disabled selected>
-                                                                            Select your option
-                                                                        </option>
-                                                                        {this.valueList(drop, source)}
-                                                                    </select>
-                                                                </div>
-                                                            </div>
-                                                            <div className="form-group clear clearfix">
-                                                                <div className="label-part">Options</div>
-                                                                <div className="ans-part">
-                                                                    <select className="form-control" name="match_option" onChange={e => this.addNewCondtions(e, drop, "source", idx)}>
-                                                                        <option value="" disabled selected>
-                                                                            Select your option
-                                                                        </option>
-                                                                        {this.optionsList(drop, source)}
-                                                                    </select>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    ) : (
-                                                        ""
-                                                    )}
-
-                                                    {source.state === "empty" || source.state === "loop_input" || !source.state || this.tableList(drop, source) === "table" || source.state === "filled" ? (
-                                                        ""
-                                                    ) : (
-                                                        <div>
-                                                            <div className="form-group clear clearfix"
-
-                                                            >
-                                                                <div className="label-part">Target</div>
-                                                                <div className="ans-part">
-                                                                    <select className="form-control" name="target" onChange={e => this.addNewCondtions(e, drop, "source", idx)}>
-                                                                        <option value="" disabled selected>
-                                                                            Select your option
-                                                                        </option>
-                                                                        {source.state === "equal" && this.selectedElement(drop, source).properties.scale_enabled === 1 && !this.selectedElement(drop, source).properties.instruction_enabled ?
-                                                                            "" : source.state === "notequal" && this.selectedElement(drop, source).properties.scale_enabled === 1 && !this.selectedElement(drop, source).properties.instruction_enabled ?
-                                                                                "" : <option selected={source.target === "value" ? "selected" : ""} value="value">
-                                                                                    Value
-                                                                                </option>}
-                                                                        <option selected={source.target === "field" ? "selected" : ""} value="field">
-                                                                            Another Fields
-                                                                        </option>
-                                                                        {source.state === "equal" && this.selectedElement(drop, source).properties.scale_enabled === 1 ?
-                                                                            <option selected={source.target === "scale_value" ? "selected" : ""} value="scale_value">
-                                                                                Scale Value
-                                                                            </option>
                                                                             :
-                                                                            source.state === "notequal" && this.selectedElement(drop, source).properties.scale_enabled === 1 ?
-                                                                                <option selected={source.target === "scale_value" ? "selected" : ""} value="scale_value">
-                                                                                    Scale Value
-                                                                                </option>
-                                                                                : ""}
-                                                                        {
-
-                                                                            <option selected={source.target === "Value_Multiple_Any" ? "selected" : ""} value="Value_Multiple_Any">
-                                                                                Value Multiple Any
-                                                                            </option>
-                                                                        }
-                                                                        {
-
-                                                                            <option selected={source.target === "Value_Multiple_All" ? "selected" : ""} value="Value_Multiple_All">
-                                                                                Value Multiple All
-                                                                            </option>
-                                                                        }
-                                                                    </select>
+                                                                            null
+                                                                    }
                                                                 </div>
-                                                            </div>
-                                                            {source.target === "value" && source.source_type !== "scale" && source.source_type !== "choice" && source.source_type !== "barcode" && this.selectedElement(drop, source).properties.scale_enabled !== 1 ? (
-                                                                <div className="form-group clear clearfix"
-                                                                >
-                                                                    <div className="label-part">Value</div>
-                                                                    <div className="ans-part">
-                                                                        <input
-                                                                            className="form-control"
-                                                                            name="match_value"
-                                                                            value={source.match_value}
-                                                                            onFocus={() => { this.setState({ value: true }) }}
-                                                                            onBlur={() => { this.setState({ value: false }) }}
-                                                                            placeholder="Please type a value here"
-                                                                            onChange={e => this.addNewCondtions(e, drop, "source", idx)}
-                                                                        />
-                                                                    </div>
-                                                                </div>
-                                                            ) :
-
-                                                                (source.target === "value" && source.source_type === "barcode" && this.selectedElement(drop, source).properties.barcode_enabled === 1) ? (
-                                                                    <div className="form-group clear clearfix"
-
-                                                                    >
-                                                                        <div className="label-part">Value</div>
-                                                                        <div className="ans-part">
-                                                                            <select className="form-control" name="match_value" onChange={e => this.addNewCondtions(e, drop, "source", idx)}>
-                                                                                <option value="" disabled selected>
-                                                                                    Select your option
-                                                                                </option>
-                                                                                {this.barcodeList(drop, source)}
-                                                                            </select>
-                                                                        </div>
-                                                                    </div>
-                                                                ) : ((source.target === "Value_Multiple_Any" || source.target === "Value_Multiple_All") && source.source_type === "barcode" && this.selectedElement(drop, source).properties.barcode_enabled === 1) ?
-                                                                    (
-                                                                        <div className="form-group clear clearfix"
-
-                                                                        >
-
-                                                                            <div className="label-part">Value</div>
-                                                                            <div className="ans-part">
-                                                                                <Select
-                                                                                    name="match_value"
-                                                                                    options={this.barcodeList_valueMultiple(drop, source)}
-                                                                                    isMulti
-                                                                                    isClearable
-                                                                                    formatGroupLabel={this.formatGroupLabel}
-                                                                                    closeMenuOnSelect={false}
-                                                                                    value={source.match_value && source.match_value}
-                                                                                    onChange={e => this.addNewCondtions_release(e, drop, "source", idx)}
-                                                                                />
-                                                                            </div>
-                                                                        </div>
-                                                                    )
-                                                                    :
-
-                                                                    (source.target === "value" && source.source_type === "barcode" && !this.selectedElement(drop, source).properties.barcode_enabled) ? (
-                                                                        <div className="form-group clear clearfix"
-                                                                        >
-                                                                            <div className="label-part">Value</div>
-                                                                            <div className="ans-part">
-                                                                                <input
-                                                                                    className="form-control"
-                                                                                    name="match_value"
-                                                                                    value={source.match_value}
-                                                                                    onFocus={() => { this.setState({ value: true }) }}
-                                                                                    onBlur={() => { this.setState({ value: false }) }}
-                                                                                    placeholder="Please type a value here"
-                                                                                    onChange={e => this.addNewCondtions(e, drop, "source", idx)}
-                                                                                />
-                                                                            </div>
-                                                                        </div>
-                                                                    ) :
-
-                                                                        (source.target === "value" && this.selectedElement(drop, source).properties.scale_enabled === 1) && !this.selectedElement(drop, source).properties.instruction_enabled ? (
-                                                                            <div className="form-group clear clearfix"
-
-                                                                            >
-                                                                                <div className="label-part">Value</div>
+                                                                {
+                                                                    drop.source.map((source, idx) => (
+                                                                        <div key={idx} className="dinamic_quest_block">
+                                                                            <div className="form-group clear clearfix">
+                                                                                <div className="label-part">If</div>
                                                                                 <div className="ans-part">
-                                                                                    <select className="form-control" name="match_value" onChange={e => this.addNewCondtions(e, drop, "source", idx)}>
+                                                                                    <select className="form-control" style={{ width: '90%', display: 'inline-block' }} name="handler" onChange={e => this.addNewCondtions(e, drop, "source", idx)}>
                                                                                         <option value="" disabled selected>
                                                                                             Select your option
                                                                                         </option>
-                                                                                        {this.selectedElement(drop, source).properties.scale_images.map((subval, subind) => (
-                                                                                            <option key={subind} selected={source.match_value === subind + 1 ? "selected" : ""} value={subind + 1}>
-                                                                                                {subind + 1}
+                                                                                        {this.props.drops.map((subdrop, index) => (
+                                                                                            <option
+                                                                                                key={index}
+                                                                                                disabled={
+                                                                                                    drop.target.do === 'release' ?
+                                                                                                        (
+                                                                                                            subdrop.type === "info"
+                                                                                                                ? "disabled" :
+                                                                                                                subdrop.type === "gps"
+                                                                                                                    ? "disabled"
+                                                                                                                    : subdrop.properties.marker_enabled === 1 && !subdrop.properties.instruction_enabled && !subdrop.properties.scale_enabled
+                                                                                                                        ? "disabled"
+                                                                                                                        : subdrop.properties.marker_enabled === 0 && !subdrop.properties.instruction_enabled && !subdrop.properties.scale_enabled
+                                                                                                                            ? "disabled"
+                                                                                                                            : subdrop.type === "input"
+                                                                                                                                ? "disabled"
+                                                                                                                                : subdrop.type === "capture"
+                                                                                                                                    ? "disabled"
+                                                                                                                                    : subdrop.type === "upload"
+                                                                                                                                        ? "disabled"
+                                                                                                                                        : ""
+                                                                                                        )
+                                                                                                        :
+                                                                                                        this.checkeSelfHideQues(drop, subdrop.handler) === subdrop.handler ?
+                                                                                                            "disabled"
+                                                                                                            :
+                                                                                                            this.checkeSelfHideQues(drop, subdrop.handler) === subdrop.handler ?
+                                                                                                                subdrop.type === "info"
+                                                                                                                    ? "disabled" :
+                                                                                                                    subdrop.type === "gps"
+                                                                                                                        ? "disabled"
+                                                                                                                        : subdrop.properties.marker_enabled === 1 && !subdrop.properties.instruction_enabled && !subdrop.properties.scale_enabled
+                                                                                                                            ? "disabled"
+                                                                                                                            : subdrop.properties.marker_enabled === 0 && !subdrop.properties.instruction_enabled && !subdrop.properties.scale_enabled
+                                                                                                                                ? "disabled"
+                                                                                                                                : ""
+                                                                                                                :
+                                                                                                                subdrop.type === "info"
+                                                                                                                    ? "disabled" :
+                                                                                                                    subdrop.type === "gps"
+                                                                                                                        ? "disabled"
+                                                                                                                        : subdrop.properties.marker_enabled === 1 && !subdrop.properties.instruction_enabled && !subdrop.properties.scale_enabled
+                                                                                                                            ? "disabled"
+                                                                                                                            : subdrop.properties.marker_enabled === 0 && !subdrop.properties.instruction_enabled && !subdrop.properties.scale_enabled
+                                                                                                                                ? "disabled"
+                                                                                                                                : ""
+                                                                                                }
+                                                                                                selected={drop.target.do === "loop_set" && source.state === "" ? "" :
+                                                                                                    source.handler === subdrop.handler ? "selected" : ""}
+                                                                                                // selected={source.handler === subdrop.handler ? "selected" : ""}
+                                                                                                value={subdrop.handler + "." + subdrop.type}
+                                                                                            >
+                                                                                                {subdrop.label}
                                                                                             </option>
                                                                                         ))}
                                                                                     </select>
+                                                                                    <i className="fa fa-trash" onClick={() => this.deleteSource(index, idx)} />
                                                                                 </div>
                                                                             </div>
-                                                                        ) :
+                                                                            {source.source_type === "input" || this.selectedElement(drop, source).properties.instruction_enabled === 1 ? (
+                                                                                <div className="form-group clear clearfix"
 
-                                                                            source.target === "value" && this.selectedElement(drop, source).properties.instruction_enabled === 1 ? (
-                                                                                <div className="form-group clear clearfix">
-                                                                                    <div className="label-part">Value</div>
+                                                                                >
+                                                                                    <div className="label-part">State</div>
                                                                                     <div className="ans-part">
-                                                                                        <input
+                                                                                        <select
                                                                                             className="form-control"
-                                                                                            name="match_value"
-                                                                                            value={source.match_value}
-                                                                                            onFocus={() => { this.setState({ value: true }) }}
-                                                                                            onBlur={() => { this.setState({ value: false }) }}
-                                                                                            placeholder="Please type a value here"
+                                                                                            name="state"
+                                                                                            //disabled={source.handler ? "" : "disabled"}
                                                                                             onChange={e => this.addNewCondtions(e, drop, "source", idx)}
-                                                                                        />
+                                                                                        >
+                                                                                            <option value="" disabled selected={!source.state || source.state === "" ? "selected" : ""}>
+                                                                                                Select your option
+                                                                                            </option>
+                                                                                            <option selected={source.state === "equal" ? "selected" : ""} value="equal">
+                                                                                                Is Equal to
+                                                                                            </option>
+                                                                                            <option selected={source.state === "notequal" ? "selected" : ""} value="notequal">
+                                                                                                Is Not Equal to
+                                                                                            </option>
+                                                                                            <option selected={source.state === "contain" ? "selected" : ""} value="contain">
+                                                                                                Contains
+                                                                                            </option>
+                                                                                            <option selected={source.state === "notcontains" ? "selected" : ""} value="notcontains">
+                                                                                                Does Not Contains
+                                                                                            </option>
+                                                                                            <option selected={source.state === "starts" ? "selected" : ""} value="starts">
+                                                                                                Starts With
+                                                                                            </option>
+                                                                                            <option selected={source.state === "notstarts" ? "selected" : ""} value="notstarts">
+                                                                                                Does Not Starts with
+                                                                                            </option>
+                                                                                            <option selected={source.state === "ends" ? "selected" : ""} value="ends">
+                                                                                                Ends With
+                                                                                            </option>
+                                                                                            <option selected={source.state === "notends" ? "selected" : ""} value="notends">
+                                                                                                Does Not Ends with
+                                                                                            </option>
+                                                                                            <option selected={source.state === "empty" ? "selected" : ""} value="empty">
+                                                                                                Is Empty
+                                                                                            </option>
+                                                                                            <option selected={source.state === "filled" ? "selected" : ""} value="filled">
+                                                                                                Is Filled
+                                                                                            </option>
+                                                                                            <option selected={source.state === "loop_input" ? "selected" : ""} value="loop_input">
+                                                                                                Loop
+                                                                                            </option>
+                                                                                        </select>
                                                                                     </div>
                                                                                 </div>
-                                                                            ) :
+                                                                            ) : source.source_type === "choice" || this.selectedElement(drop, source).properties.scale_enabled === 1 ? (
 
-                                                                                source.target === "value" && source.source_type === "choice" ? (
+                                                                                <div className="form-group clear clearfix"
+
+                                                                                >
+                                                                                    <div className="label-part">State</div>
+                                                                                    <div className="ans-part">
+
+                                                                                        <select
+                                                                                            className="form-control"
+                                                                                            name="state"
+                                                                                            //disabled={source.handler ? "" : "disabled"}
+                                                                                            onChange={e => this.addNewCondtions(e, drop, "source", idx)}
+                                                                                        >
+                                                                                            <option value="" disabled selected={!source.state || source.state === "" ? "selected" : ""}>
+                                                                                                Select your option
+                                                                                            </option>
+                                                                                            <option selected={source.state === "equal" ? "selected" : ""} value="equal">
+                                                                                                Is Equal to
+                                                                                            </option>
+                                                                                            <option selected={source.state === "notequal" ? "selected" : ""} value="notequal">
+                                                                                                Is Not Equal to
+                                                                                            </option>
+                                                                                            <option selected={source.state === "empty" ? "selected" : ""} value="empty">
+                                                                                                Is Empty
+                                                                                            </option>
+                                                                                            <option selected={source.state === "filled" ? "selected" : ""} value="filled">
+                                                                                                Is Filled
+                                                                                            </option>
+                                                                                        </select>
+                                                                                    </div>
+                                                                                </div>
+                                                                            ) : this.selectedElement(drop, source).properties.scale_enabled === 1 ? (
+                                                                                <div className="form-group clear clearfix"
+
+                                                                                >
+                                                                                    <div className="label-part">State</div>
+                                                                                    <div className="ans-part">
+                                                                                        <select
+                                                                                            className="form-control"
+                                                                                            name="state"
+                                                                                            //disabled={source.handler ? "" : "disabled"}
+                                                                                            onChange={e => this.addNewCondtions(e, drop, "source", idx)}
+                                                                                        >
+                                                                                            <option value="" disabled selected={!source.state || source.state === "" ? "selected" : ""}>
+                                                                                                Select your option
+                                                                                            </option>
+                                                                                            <option selected={source.state === "equal" ? "selected" : ""} value="equal">
+                                                                                                Is Equal to
+                                                                                            </option>
+                                                                                            <option selected={source.state === "notequal" ? "selected" : ""} value="notequal">
+                                                                                                Is Not Equal to
+                                                                                            </option>
+                                                                                            <option selected={source.state === "empty" ? "selected" : ""} value="empty">
+                                                                                                Is Empty
+                                                                                            </option>
+                                                                                            <option selected={source.state === "filled" ? "selected" : ""} value="filled">
+                                                                                                Is Filled
+                                                                                            </option>
+                                                                                        </select>
+                                                                                    </div>
+                                                                                </div>
+                                                                            ) : source.source_type === "upload" ? (
+                                                                                <div className="form-group clear clearfix"
+
+                                                                                >
+                                                                                    <div className="label-part">State</div>
+                                                                                    <div className="ans-part">
+                                                                                        <select
+                                                                                            className="form-control"
+                                                                                            name="state"
+                                                                                            //disabled={source.handler ? "" : "disabled"}
+                                                                                            onChange={e => this.addNewCondtions(e, drop, "source", idx)}
+                                                                                        >
+                                                                                            <option value="" disabled selected={!source.state || source.state === "" ? "selected" : ""}>
+                                                                                                Select your option
+                                                                                            </option>
+                                                                                            <option selected={source.state === "empty" ? "selected" : ""} value="empty">
+                                                                                                Is Empty
+                                                                                            </option>
+                                                                                            <option selected={source.state === "filled" ? "selected" : ""} value="filled">
+                                                                                                Is Filled
+                                                                                            </option>
+                                                                                        </select>
+                                                                                    </div>
+
+                                                                                </div>
+                                                                            )
+
+                                                                                : source.source_type === "barcode" && this.selectedElement(drop, source).properties.barcode_enabled === 1 ? (
                                                                                     <div className="form-group clear clearfix"
 
                                                                                     >
+                                                                                        <div className="label-part">State</div>
+                                                                                        <div className="ans-part">
+                                                                                            <select
+                                                                                                className="form-control"
+                                                                                                name="state"
+                                                                                                //disabled={source.handler ? "" : "disabled"}
+                                                                                                onChange={e => this.addNewCondtions(e, drop, "source", idx)}
+                                                                                            >
+                                                                                                <option value="" disabled selected={!source.state || source.state === "" ? "selected" : ""}>
+                                                                                                    Select your option
+                                                                                                </option>
+                                                                                                <option selected={source.state === "equal" ? "selected" : ""} value="equal">
+                                                                                                    Is Equal to
+                                                                                                </option>
+                                                                                                <option selected={source.state === "notequal" ? "selected" : ""} value="notequal">
+                                                                                                    Is Not Equal to
+                                                                                                </option>
+                                                                                                <option selected={source.state === "empty" ? "selected" : ""} value="empty">
+                                                                                                    Is Empty
+                                                                                                </option>
+                                                                                                <option selected={source.state === "filled" ? "selected" : ""} value="filled">
+                                                                                                    Is Filled
+                                                                                                </option>
+                                                                                            </select>
+                                                                                        </div>
+
+                                                                                    </div>
+                                                                                )
+
+                                                                                    : source.source_type === "barcode" && !this.selectedElement(drop, source).properties.barcode_enabled ? (
+                                                                                        <div className="form-group clear clearfix"
+
+                                                                                        >
+                                                                                            <div className="label-part">State</div>
+                                                                                            <div className="ans-part">
+                                                                                                <select
+                                                                                                    className="form-control"
+                                                                                                    name="state"
+                                                                                                    //disabled={source.handler ? "" : "disabled"}
+                                                                                                    onChange={e => this.addNewCondtions(e, drop, "source", idx)}
+                                                                                                >
+                                                                                                    <option value="" disabled selected={!source.state || source.state === "" ? "selected" : ""}>
+                                                                                                        Select your option
+                                                                                                    </option>
+                                                                                                    <option selected={source.state === "equal" ? "selected" : ""} value="equal">
+                                                                                                        Is Equal to
+                                                                                                    </option>
+                                                                                                    <option selected={source.state === "notequal" ? "selected" : ""} value="notequal">
+                                                                                                        Is Not Equal to
+                                                                                                    </option>
+                                                                                                    <option selected={source.state === "contain" ? "selected" : ""} value="contain">
+                                                                                                        Contains
+                                                                                                    </option>
+                                                                                                    <option selected={source.state === "notcontains" ? "selected" : ""} value="notcontains">
+                                                                                                        Does Not Contains
+                                                                                                    </option>
+                                                                                                    <option selected={source.state === "starts" ? "selected" : ""} value="starts">
+                                                                                                        Starts With
+                                                                                                    </option>
+                                                                                                    <option selected={source.state === "notstarts" ? "selected" : ""} value="notstarts">
+                                                                                                        Does Not Starts with
+                                                                                                    </option>
+                                                                                                    <option selected={source.state === "ends" ? "selected" : ""} value="ends">
+                                                                                                        Ends With
+                                                                                                    </option>
+                                                                                                    <option selected={source.state === "notends" ? "selected" : ""} value="notends">
+                                                                                                        Does Not Ends with
+                                                                                                    </option>
+                                                                                                    <option selected={source.state === "empty" ? "selected" : ""} value="empty">
+                                                                                                        Is Empty
+                                                                                                    </option>
+                                                                                                    <option selected={source.state === "filled" ? "selected" : ""} value="filled">
+                                                                                                        Is Filled
+                                                                                                    </option>
+
+                                                                                                </select>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    )
+
+                                                                                        : source.source_type === "scale" ? (
+
+                                                                                            <div
+
+                                                                                            >
+
+                                                                                                {this.tableList(drop, source) === "table" ?
+                                                                                                    <div className="form-group clear clearfix">
+                                                                                                        <div className="label-part">State</div>
+                                                                                                        <div className="ans-part">
+                                                                                                            <select
+                                                                                                                className="form-control"
+                                                                                                                name="state"
+                                                                                                                //disabled={source.handler ? "" : "disabled"}
+                                                                                                                onChange={e => this.addNewCondtions(e, drop, "source", idx, "table")}
+                                                                                                            >
+                                                                                                                <option value="" disabled selected={!source.state || source.state === "" ? "selected" : ""}>
+                                                                                                                    Select your option
+                                                                                                                </option>
+                                                                                                                <option selected={source.state === "equal" ? "selected" : ""} value="equal">
+                                                                                                                    Is Equal to
+                                                                                                                </option>
+                                                                                                                <option selected={source.state === "notequal" ? "selected" : ""} value="notequal">
+                                                                                                                    Is Not Equal to
+                                                                                                                </option>
+                                                                                                                <option selected={source.state === "empty" ? "selected" : ""} value="empty">
+                                                                                                                    Is Empty
+                                                                                                                </option>
+                                                                                                                <option selected={source.state === "filled" ? "selected" : ""} value="filled">
+                                                                                                                    Is Filled
+                                                                                                                </option>
+                                                                                                            </select>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                    :
+                                                                                                    <div className="form-group clear clearfix">
+                                                                                                        <div className="label-part">State</div>
+                                                                                                        <div className="ans-part">
+                                                                                                            <select
+                                                                                                                className="form-control"
+                                                                                                                name="state"
+                                                                                                                //disabled={source.handler ? "" : "disabled"}
+                                                                                                                onChange={e => this.addNewCondtions(e, drop, "source", idx)}
+                                                                                                            >
+                                                                                                                <option value="" disabled selected={!source.state || source.state === "" ? "selected" : ""}>
+                                                                                                                    Select your option
+                                                                                                                </option>
+                                                                                                                <option selected={source.state === "equal" ? "selected" : ""} value="equal">
+                                                                                                                    Is Equal to
+                                                                                                                </option>
+                                                                                                                <option selected={source.state === "notequal" ? "selected" : ""} value="notequal">
+                                                                                                                    Is Not Equal to
+                                                                                                                </option>
+                                                                                                                <option selected={source.state === "empty" ? "selected" : ""} value="empty">
+                                                                                                                    Is Empty
+                                                                                                                </option>
+                                                                                                                <option selected={source.state === "filled" ? "selected" : ""} value="filled">
+                                                                                                                    Is Filled
+                                                                                                                </option>
+                                                                                                            </select>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                }
+                                                                                            </div>
+                                                                                        )
+
+                                                                                            : (
+                                                                                                ""
+                                                                                            )}
+                                                                            {this.tableList(drop, source) === "table" && source.state !== "empty" && source.state !== "filled" ? (
+                                                                                <div
+
+                                                                                >
+                                                                                    <div className="form-group clear clearfix">
                                                                                         <div className="label-part">Value</div>
                                                                                         <div className="ans-part">
                                                                                             <select className="form-control" name="match_value" onChange={e => this.addNewCondtions(e, drop, "source", idx)}>
                                                                                                 <option value="" disabled selected>
                                                                                                     Select your option
                                                                                                 </option>
-                                                                                                {this.choiceList(drop, source)}
+                                                                                                {this.valueList(drop, source)}
                                                                                             </select>
                                                                                         </div>
                                                                                     </div>
-                                                                                ) :
+                                                                                    <div className="form-group clear clearfix">
+                                                                                        <div className="label-part">Options</div>
+                                                                                        <div className="ans-part">
+                                                                                            <select className="form-control" name="match_option" onChange={e => this.addNewCondtions(e, drop, "source", idx)}>
+                                                                                                <option value="" disabled selected>
+                                                                                                    Select your option
+                                                                                                </option>
+                                                                                                {this.optionsList(drop, source)}
+                                                                                            </select>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            ) : (
+                                                                                ""
+                                                                            )}
 
-                                                                                    source.target === "scale_value" ? (
+                                                                            {source.state === "empty" || source.state === "loop_input" || !source.state || this.tableList(drop, source) === "table" || source.state === "filled" ? (
+                                                                                ""
+                                                                            ) : (
+                                                                                <div>
+                                                                                    <div className="form-group clear clearfix"
+
+                                                                                    >
+                                                                                        <div className="label-part">Target</div>
+                                                                                        <div className="ans-part">
+                                                                                            <select className="form-control" name="target" onChange={e => this.addNewCondtions(e, drop, "source", idx)}>
+                                                                                                <option value="" disabled selected>
+                                                                                                    Select your option
+                                                                                                </option>
+                                                                                                {source.state === "equal" && this.selectedElement(drop, source).properties.scale_enabled === 1 && !this.selectedElement(drop, source).properties.instruction_enabled ?
+                                                                                                    "" : source.state === "notequal" && this.selectedElement(drop, source).properties.scale_enabled === 1 && !this.selectedElement(drop, source).properties.instruction_enabled ?
+                                                                                                        "" : <option selected={source.target === "value" ? "selected" : ""} value="value">
+                                                                                                            Value
+                                                                                                        </option>}
+                                                                                                <option selected={source.target === "field" ? "selected" : ""} value="field">
+                                                                                                    Another Fields
+                                                                                                </option>
+                                                                                                {source.state === "equal" && this.selectedElement(drop, source).properties.scale_enabled === 1 ?
+                                                                                                    <option selected={source.target === "scale_value" ? "selected" : ""} value="scale_value">
+                                                                                                        Scale Value
+                                                                                                    </option>
+                                                                                                    :
+                                                                                                    source.state === "notequal" && this.selectedElement(drop, source).properties.scale_enabled === 1 ?
+                                                                                                        <option selected={source.target === "scale_value" ? "selected" : ""} value="scale_value">
+                                                                                                            Scale Value
+                                                                                                        </option>
+                                                                                                        : ""}
+                                                                                                {
+
+                                                                                                    <option selected={source.target === "Value_Multiple_Any" ? "selected" : ""} value="Value_Multiple_Any">
+                                                                                                        Value Multiple Any
+                                                                                                    </option>
+                                                                                                }
+                                                                                                {
+
+                                                                                                    <option selected={source.target === "Value_Multiple_All" ? "selected" : ""} value="Value_Multiple_All">
+                                                                                                        Value Multiple All
+                                                                                                    </option>
+                                                                                                }
+                                                                                            </select>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    {source.target === "value" && source.source_type !== "scale" && source.source_type !== "choice" && source.source_type !== "barcode" && this.selectedElement(drop, source).properties.scale_enabled !== 1 ? (
                                                                                         <div className="form-group clear clearfix"
-
                                                                                         >
                                                                                             <div className="label-part">Value</div>
-
                                                                                             <div className="ans-part">
-                                                                                                <select className="form-control" name="match_value" onChange={e => this.addNewCondtions(e, drop, "source", idx)}>
-                                                                                                    <option value="" disabled selected>
-                                                                                                        Select your option
-                                                                                                    </option>
-                                                                                                    {this.selectedElement(drop).properties.scale_images.map((subval, subind) => (
-                                                                                                        <option key={subind} selected={source.match_value === subind + 1 ? "selected" : ""} value={subind + 1}>
-                                                                                                            {subind + 1}
-                                                                                                        </option>
-                                                                                                    ))}
-                                                                                                </select>
+                                                                                                <input
+                                                                                                    className="form-control"
+                                                                                                    name="match_value"
+                                                                                                    value={source.match_value}
+                                                                                                    onFocus={() => { this.setState({ value: true }) }}
+                                                                                                    onBlur={() => { this.setState({ value: false }) }}
+                                                                                                    placeholder="Please type a value here"
+                                                                                                    onChange={e => this.addNewCondtions(e, drop, "source", idx)}
+                                                                                                />
                                                                                             </div>
                                                                                         </div>
                                                                                     ) :
 
-
-
-
-
-                                                                                        (source.target === "value" && source.source_type === "scale") ? (
+                                                                                        (source.target === "value" && source.source_type === "barcode" && this.selectedElement(drop, source).properties.barcode_enabled === 1) ? (
                                                                                             <div className="form-group clear clearfix"
 
                                                                                             >
@@ -2054,23 +1966,21 @@ class Settings extends React.Component {
                                                                                                         <option value="" disabled selected>
                                                                                                             Select your option
                                                                                                         </option>
-                                                                                                        {this.scaleList(drop, source)}
+                                                                                                        {this.barcodeList(drop, source)}
                                                                                                     </select>
                                                                                                 </div>
                                                                                             </div>
-                                                                                        ) :
-
-                                                                                            (((source.target === "Value_Multiple_Any" ||
-                                                                                                source.target === "Value_Multiple_All") && source.source_type === "choice") ? (
+                                                                                        ) : ((source.target === "Value_Multiple_Any" || source.target === "Value_Multiple_All") && source.source_type === "barcode" && this.selectedElement(drop, source).properties.barcode_enabled === 1) ?
+                                                                                            (
                                                                                                 <div className="form-group clear clearfix"
 
                                                                                                 >
-                                                                                                    <div className="label-part">Value</div>
 
+                                                                                                    <div className="label-part">Value</div>
                                                                                                     <div className="ans-part">
                                                                                                         <Select
                                                                                                             name="match_value"
-                                                                                                            options={this.choiceList_release(drop, source)}
+                                                                                                            options={this.barcodeList_valueMultiple(drop, source)}
                                                                                                             isMulti
                                                                                                             isClearable
                                                                                                             formatGroupLabel={this.formatGroupLabel}
@@ -2080,101 +1990,242 @@ class Settings extends React.Component {
                                                                                                         />
                                                                                                     </div>
                                                                                                 </div>
-                                                                                            ) : (
-                                                                                                ((source.target === "Value_Multiple_Any" ||
-                                                                                                    source.target === "Value_Multiple_All") && source.source_type === "scale") ? (
+                                                                                            )
+                                                                                            :
+
+                                                                                            (source.target === "value" && source.source_type === "barcode" && !this.selectedElement(drop, source).properties.barcode_enabled) ? (
+                                                                                                <div className="form-group clear clearfix"
+                                                                                                >
+                                                                                                    <div className="label-part">Value</div>
+                                                                                                    <div className="ans-part">
+                                                                                                        <input
+                                                                                                            className="form-control"
+                                                                                                            name="match_value"
+                                                                                                            value={source.match_value}
+                                                                                                            onFocus={() => { this.setState({ value: true }) }}
+                                                                                                            onBlur={() => { this.setState({ value: false }) }}
+                                                                                                            placeholder="Please type a value here"
+                                                                                                            onChange={e => this.addNewCondtions(e, drop, "source", idx)}
+                                                                                                        />
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            ) :
+
+                                                                                                (source.target === "value" && this.selectedElement(drop, source).properties.scale_enabled === 1) && !this.selectedElement(drop, source).properties.instruction_enabled ? (
                                                                                                     <div className="form-group clear clearfix"
 
                                                                                                     >
                                                                                                         <div className="label-part">Value</div>
-
                                                                                                         <div className="ans-part">
-                                                                                                            <Select
-                                                                                                                isMulti
-                                                                                                                name="match_value"
-                                                                                                                options={this.scaleList_valueMultiple(drop, source)}
-                                                                                                                closeMenuOnSelect={false}
-                                                                                                                className="basic-multi-select"
-                                                                                                                classNamePrefix="select"
-                                                                                                                value={source.match_value && source.match_value}
-                                                                                                                onChange={e => this.addNewCondtions_release(e, drop, "source", idx)}
-                                                                                                            />
+                                                                                                            <select className="form-control" name="match_value" onChange={e => this.addNewCondtions(e, drop, "source", idx)}>
+                                                                                                                <option value="" disabled selected>
+                                                                                                                    Select your option
+                                                                                                                </option>
+                                                                                                                {this.selectedElement(drop, source).properties.scale_images.map((subval, subind) => (
+                                                                                                                    <option key={subind} selected={source.match_value === subind + 1 ? "selected" : ""} value={subind + 1}>
+                                                                                                                        {subind + 1}
+                                                                                                                    </option>
+                                                                                                                ))}
+                                                                                                            </select>
                                                                                                         </div>
                                                                                                     </div>
-                                                                                                ) : ("")
-                                                                                            ))
-                                                            }
-                                                            {source.target === "field" ? (
-                                                                <div className="form-group clear clearfix"
+                                                                                                ) :
 
-                                                                >
-                                                                    <div className="label-part">Field</div>
-                                                                    <div className="ans-part">
-                                                                        <select className="form-control" name="matchid" onChange={e => this.addNewCondtions(e, drop, "source", idx)}>
-                                                                            <option value="" disabled selected>
-                                                                                Select your option
-                                                                            </option>
-                                                                            {this.props.drops.map((subdrop, index) => (
-                                                                                <option key={index} selected={source.matchid === subdrop.handler ? "selected" : ""} value={subdrop.handler}>
-                                                                                    {subdrop.label}
+                                                                                                    source.target === "value" && this.selectedElement(drop, source).properties.instruction_enabled === 1 ? (
+                                                                                                        <div className="form-group clear clearfix">
+                                                                                                            <div className="label-part">Value</div>
+                                                                                                            <div className="ans-part">
+                                                                                                                <input
+                                                                                                                    className="form-control"
+                                                                                                                    name="match_value"
+                                                                                                                    value={source.match_value}
+                                                                                                                    onFocus={() => { this.setState({ value: true }) }}
+                                                                                                                    onBlur={() => { this.setState({ value: false }) }}
+                                                                                                                    placeholder="Please type a value here"
+                                                                                                                    onChange={e => this.addNewCondtions(e, drop, "source", idx)}
+                                                                                                                />
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                    ) :
+
+                                                                                                        source.target === "value" && source.source_type === "choice" ? (
+                                                                                                            <div className="form-group clear clearfix"
+
+                                                                                                            >
+                                                                                                                <div className="label-part">Value</div>
+                                                                                                                <div className="ans-part">
+                                                                                                                    <select className="form-control" name="match_value" onChange={e => this.addNewCondtions(e, drop, "source", idx)}>
+                                                                                                                        <option value="" disabled selected>
+                                                                                                                            Select your option
+                                                                                                                        </option>
+                                                                                                                        {this.choiceList(drop, source)}
+                                                                                                                    </select>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        ) :
+
+                                                                                                            source.target === "scale_value" ? (
+                                                                                                                <div className="form-group clear clearfix"
+
+                                                                                                                >
+                                                                                                                    <div className="label-part">Value</div>
+
+                                                                                                                    <div className="ans-part">
+                                                                                                                        <select className="form-control" name="match_value" onChange={e => this.addNewCondtions(e, drop, "source", idx)}>
+                                                                                                                            <option value="" disabled selected>
+                                                                                                                                Select your option
+                                                                                                                            </option>
+                                                                                                                            {this.selectedElement(drop).properties.scale_images.map((subval, subind) => (
+                                                                                                                                <option key={subind} selected={source.match_value === subind + 1 ? "selected" : ""} value={subind + 1}>
+                                                                                                                                    {subind + 1}
+                                                                                                                                </option>
+                                                                                                                            ))}
+                                                                                                                        </select>
+                                                                                                                    </div>
+                                                                                                                </div>
+                                                                                                            ) :
+
+
+
+
+
+                                                                                                                (source.target === "value" && source.source_type === "scale") ? (
+                                                                                                                    <div className="form-group clear clearfix"
+
+                                                                                                                    >
+                                                                                                                        <div className="label-part">Value</div>
+                                                                                                                        <div className="ans-part">
+                                                                                                                            <select className="form-control" name="match_value" onChange={e => this.addNewCondtions(e, drop, "source", idx)}>
+                                                                                                                                <option value="" disabled selected>
+                                                                                                                                    Select your option
+                                                                                                                                </option>
+                                                                                                                                {this.scaleList(drop, source)}
+                                                                                                                            </select>
+                                                                                                                        </div>
+                                                                                                                    </div>
+                                                                                                                ) :
+
+                                                                                                                    (((source.target === "Value_Multiple_Any" ||
+                                                                                                                        source.target === "Value_Multiple_All") && source.source_type === "choice") ? (
+                                                                                                                        <div className="form-group clear clearfix"
+
+                                                                                                                        >
+                                                                                                                            <div className="label-part">Value</div>
+
+                                                                                                                            <div className="ans-part">
+                                                                                                                                <Select
+                                                                                                                                    name="match_value"
+                                                                                                                                    options={this.choiceList_release(drop, source)}
+                                                                                                                                    isMulti
+                                                                                                                                    isClearable
+                                                                                                                                    formatGroupLabel={this.formatGroupLabel}
+                                                                                                                                    closeMenuOnSelect={false}
+                                                                                                                                    value={source.match_value && source.match_value}
+                                                                                                                                    onChange={e => this.addNewCondtions_release(e, drop, "source", idx)}
+                                                                                                                                />
+                                                                                                                            </div>
+                                                                                                                        </div>
+                                                                                                                    ) : (
+                                                                                                                        ((source.target === "Value_Multiple_Any" ||
+                                                                                                                            source.target === "Value_Multiple_All") && source.source_type === "scale") ? (
+                                                                                                                            <div className="form-group clear clearfix"
+
+                                                                                                                            >
+                                                                                                                                <div className="label-part">Value</div>
+
+                                                                                                                                <div className="ans-part">
+                                                                                                                                    <Select
+                                                                                                                                        isMulti
+                                                                                                                                        name="match_value"
+                                                                                                                                        options={this.scaleList_valueMultiple(drop, source)}
+                                                                                                                                        closeMenuOnSelect={false}
+                                                                                                                                        className="basic-multi-select"
+                                                                                                                                        classNamePrefix="select"
+                                                                                                                                        value={source.match_value && source.match_value}
+                                                                                                                                        onChange={e => this.addNewCondtions_release(e, drop, "source", idx)}
+                                                                                                                                    />
+                                                                                                                                </div>
+                                                                                                                            </div>
+                                                                                                                        ) : ("")
+                                                                                                                    ))
+                                                                                    }
+                                                                                    {source.target === "field" ? (
+                                                                                        <div className="form-group clear clearfix"
+
+                                                                                        >
+                                                                                            <div className="label-part">Field</div>
+                                                                                            <div className="ans-part">
+                                                                                                <select className="form-control" name="matchid" onChange={e => this.addNewCondtions(e, drop, "source", idx)}>
+                                                                                                    <option value="" disabled selected>
+                                                                                                        Select your option
+                                                                                                    </option>
+                                                                                                    {this.props.drops.map((subdrop, index) => (
+                                                                                                        <option key={index} selected={source.matchid === subdrop.handler ? "selected" : ""} value={subdrop.handler}>
+                                                                                                            {subdrop.label}
+                                                                                                        </option>
+                                                                                                    ))}
+                                                                                                </select>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    ) : (
+                                                                                        ""
+                                                                                    )}
+                                                                                </div>
+                                                                            )}
+
+                                                                        </div>
+                                                                    ))
+                                                                }
+                                                                <div className="dinamic_quest_block">
+                                                                    <div className="form-group clear clearfix">
+                                                                        <div className="label-part">Rule</div>
+                                                                        <div className="ans-part">
+                                                                            <select
+                                                                                className="form-control"
+                                                                                name="rule"
+                                                                                onChange={e =>
+                                                                                    this.addNewCondtions(e, drop, "rule")
+                                                                                }
+                                                                            >
+                                                                                <option value="" disabled selected>
+                                                                                    Select your option
                                                                                 </option>
-                                                                            ))}
-                                                                        </select>
+                                                                                <option
+                                                                                    selected={
+                                                                                        drop.rule === "and" ? "selected" : ""
+                                                                                    }
+                                                                                    value="and"
+                                                                                >
+                                                                                    AND
+                                                                                </option>
+                                                                                <option
+                                                                                    selected={
+                                                                                        drop.rule === "any" ? "selected" : ""
+                                                                                    }
+                                                                                    value="any"
+                                                                                >
+                                                                                    ANY
+                                                                                </option>
+                                                                            </select>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-                                                            ) : (
-                                                                ""
-                                                            )}
+                                                                <div className="addbtn" onClick={() => this.addMultiSource(index)}>
+                                                                    <i className="fa fa-plus" />
+                                                                </div>
+                                                                <div className="deletbtn" onClick={() => this.deleteCondtion(index)}>
+                                                                    <i className="fa fa-trash" />
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                    )}
-
-                                                </div>
-                                            ))
-                                        }
-                                        <div className="dinamic_quest_block">
-                                            <div className="form-group clear clearfix">
-                                                <div className="label-part">Rule</div>
-                                                <div className="ans-part">
-                                                    <select
-                                                        className="form-control"
-                                                        name="rule"
-                                                        onChange={e =>
-                                                            this.addNewCondtions(e, drop, "rule")
-                                                        }
-                                                    >
-                                                        <option value="" disabled selected>
-                                                            Select your option
-                                                        </option>
-                                                        <option
-                                                            selected={
-                                                                drop.rule === "and" ? "selected" : ""
-                                                            }
-                                                            value="and"
-                                                        >
-                                                            AND
-                                                        </option>
-                                                        <option
-                                                            selected={
-                                                                drop.rule === "any" ? "selected" : ""
-                                                            }
-                                                            value="any"
-                                                        >
-                                                            ANY
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="addbtn" onClick={() => this.addMultiSource(index)}>
-                                            <i className="fa fa-plus" />
-                                        </div>
-                                        <div className="deletbtn" onClick={() => this.deleteCondtion(index)}>
-                                            <i className="fa fa-trash" />
-                                        </div>
+                                                    </div>
+                                                )}
+                                            </Draggable>
+                                        ))}
                                     </div>
-                                </div>
-                            ))
-                        }
+                                )}
+                            </Droppable>
+                        </DragDropContext>
                         {(this.state.validate === 1) ? <p className="conditionerror"> <i className="fa fa-exclamation-triangle" aria-hidden="true"></i>  Kindly Fill all the Fields to add more Conditions</p> : ""}
                         <div className="plus plus-btns" onClick={this.addCondtion}>
                             <i className="fa fa-plus-circle" />{" "}
