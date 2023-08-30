@@ -280,8 +280,8 @@ class ProjectList extends React.Component {
             </GridItem>
 
             <GridItem id="filler" xs={4} sm={4} md={4} />
-
-            <GridItem
+            {/** Hide Swipe between greed and list */}
+            {/* <GridItem
               gridCss={{ padding: "0px !important" }}
               xs={6}
               sm={4}
@@ -301,7 +301,7 @@ class ProjectList extends React.Component {
               >
                 <i className="fa fa-list" aria-hidden="true" />
               </Button>
-            </GridItem>
+            </GridItem> */}
 
             <GridItem xs={6} sm={4} md={2}>
               <Link to="/home/create-project">

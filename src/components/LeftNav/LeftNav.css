@@ -155,10 +155,10 @@ a:hover {
 }
 
 .menu-logo {
-    width: 60%;
+    width: 70%;
     height: 20%;
     cursor: pointer;
-    margin: 10% 20%;
+    margin: 10%;
 
 }
 
@@ -173,7 +173,7 @@ a:hover {
 }
 
 @media only screen and (min-width: 1277px) {
-  .body-left {
-    width: 18%;
-  }
+    .body-left {
+        width: 18%;
+    }
 }

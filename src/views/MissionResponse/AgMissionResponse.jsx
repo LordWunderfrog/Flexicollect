@@ -694,7 +694,7 @@ class AgMissionResponse extends React.Component {
     api2.get("v1/survey_report/metric_filter?mission_id=" + missionId)
       .then(resp => {
         this.setState({
-          filteredMetricList: resp.data.result
+          filteredMetricList: resp && resp.data && resp.data.result ? resp.data.result : []
         }, () => {
           this.onFilterChanged(field)
         })
@@ -1707,8 +1707,8 @@ class AgMissionResponse extends React.Component {
 
                 this.setState({ openModal: false });
                 this.closeLightbox();
-                //this.setSelectedAnswer();
-                this.getMissionResponse(this.state.selectedlanguage.value, defaultApirecordId, defaultApiPage);
+                this.setSelectedAnswer();
+                // this.getMissionResponse(this.state.selectedlanguage.value, defaultApirecordId, defaultApiPage);
                 this.setState({
                   selectedAnswer: {},
                   answer_id: "",
@@ -1883,7 +1883,6 @@ class AgMissionResponse extends React.Component {
             filteredconsumertype: resp.data.result
           })
         }
-
       })
   }
   /* 
@@ -2515,11 +2514,17 @@ class AgMissionResponse extends React.Component {
         missResp.responses.forEach(x => {
           answs.push(x);
           address = x.answers.address && x.answers.address !== "" ? x.answers.address : address;
-          device = x.answers.deviceId ? x.answers.deviceName ? x.answers.systemName ? x.answers.systemVersion
-            ? (x.answers.deviceId + "\n" + x.answers.deviceName + "\n" + x.answers.systemName + "\n" + x.answers.systemVersion) :
+          device = x.answers.deviceId ? x.answers.deviceName ? x.answers.systemName ? x.answers.systemVersion ? x.answers.appVersion
+            ? (x.answers.deviceId + "\n" + x.answers.deviceName + "\n" + x.answers.systemName + "\n" + x.answers.systemVersion + "\n AppVersion-" + x.answers.appVersion) :
+            (x.answers.deviceId + "\n" + x.answers.deviceName + "\n" + x.answers.systemName + "\n" + x.answers.systemVersion) :
             (x.answers.deviceId + "\n" + x.answers.deviceName + "\n" + x.answers.systemName) :
             (x.answers.deviceId + "\n" + x.answers.deviceName) :
             (x.answers.deviceId) : device;
+          // device = x.answers.deviceId ? x.answers.deviceName ? x.answers.systemName ? x.answers.systemVersion
+          //   ? (x.answers.deviceId + "\n" + x.answers.deviceName + "\n" + x.answers.systemName + "\n" + x.answers.systemVersion) :
+          //   (x.answers.deviceId + "\n" + x.answers.deviceName + "\n" + x.answers.systemName) :
+          //   (x.answers.deviceId + "\n" + x.answers.deviceName) :
+          //   (x.answers.deviceId) : device;
           if (surveyTagUpdated.length === 0) {
             surveyTagUpdated = x.updated_on;
           }
@@ -2601,11 +2606,17 @@ class AgMissionResponse extends React.Component {
           //answs.loop_number = x.loop_number ? x.loop_number : null;
           // answs.loop_set = x.loop_set ? x.loop_set : null;
           address = x.answers.address && x.answers.address !== "" ? x.answers.address : address;
-          device = x.answers.deviceId ? x.answers.deviceName ? x.answers.systemName ? x.answers.systemVersion
-            ? (x.answers.deviceId + "\n" + x.answers.deviceName + "\n" + x.answers.systemName + "\n" + x.answers.systemVersion) :
+          device = x.answers.deviceId ? x.answers.deviceName ? x.answers.systemName ? x.answers.systemVersion ? x.answers.appVersion
+            ? (x.answers.deviceId + "\n" + x.answers.deviceName + "\n" + x.answers.systemName + "\n" + x.answers.systemVersion + "\n AppVersion-" + x.answers.appVersion) :
+            (x.answers.deviceId + "\n" + x.answers.deviceName + "\n" + x.answers.systemName + "\n" + x.answers.systemVersion) :
             (x.answers.deviceId + "\n" + x.answers.deviceName + "\n" + x.answers.systemName) :
             (x.answers.deviceId + "\n" + x.answers.deviceName) :
             (x.answers.deviceId) : device;
+          // device = x.answers.deviceId ? x.answers.deviceName ? x.answers.systemName ? x.answers.systemVersion
+          //   ? (x.answers.deviceId + "\n" + x.answers.deviceName + "\n" + x.answers.systemName + "\n" + x.answers.systemVersion) :
+          //   (x.answers.deviceId + "\n" + x.answers.deviceName + "\n" + x.answers.systemName) :
+          //   (x.answers.deviceId + "\n" + x.answers.deviceName) :
+          //   (x.answers.deviceId) : device;
           if (surveyTagUpdated.length === 0) {
             surveyTagUpdated = x.updated_on;
           }
@@ -3188,7 +3199,6 @@ class AgMissionResponse extends React.Component {
   metricFilter = (missionId) => {
     api2.get("v1/survey_report/metric_filter?mission_id=" + missionId)
       .then(resp => {
-
         this.setState({
           filteredMetricList: resp && resp.data && resp.data.result ? resp.data.result : []
         })

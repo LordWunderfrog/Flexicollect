@@ -308,7 +308,7 @@ div.infoClass p {
 
 .maxDiffCss {
   min-width: inherit;
-  width: 50%;
+  width: 85%;
   margin: 0 auto;
   display: block;
   overflow: inherit;
@@ -325,9 +325,13 @@ div.infoClass p {
 }
 
 .maxDiffCss td {
-  padding: 4px 24px;
+  padding: 4px 4px;
   text-align: center;
   border: 1px solid #e8e8e8 !important;
+}
+
+.maxDiffCss td:last-child {
+  padding-right: 4px !important;
 }
 
 .slider-arrow {
@@ -364,19 +368,29 @@ div.infoClass p {
 .slick-slider .slick-arrow.slick-next {
   background: url(../src/assets/img/arrow-right.svg) no-repeat;
   background-size: cover;
-  right: -40px;
+  /*right: -40px;*/
 }
 
 .slick-slider .slick-arrow.slick-prev {
   background: url(../src/assets/img/arrow-left.svg) no-repeat;
   background-size: cover;
-  left: -40px;
+  /*left: -40px;*/
 }
 
 .maxDiffCss .slick-list {
   max-height: 60vh;
   overflow: hidden;
   overflow-y: auto;
+}
+
+.sliderArrow .slick-next {
+  opacity: 0.2;
+  /* pointer-events: none; */
+}
+
+.sliderArrow .slick-prev {
+  opacity: 0.2;
+  /* pointer-events: none; */
 }
 
 @media only screen and (max-width: 799px) {

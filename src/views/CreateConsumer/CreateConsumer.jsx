@@ -493,7 +493,7 @@ class CreateConsumer extends Component {
       })
       .catch(error => {
         this.stopLoading();
-        if (error.response.data.hasOwnProperty("message")) {
+        if (error.response && error.response.data && error.response.data.hasOwnProperty("message")) {
           this.showNotification(error.response.data.message, "danger");
         }
       });

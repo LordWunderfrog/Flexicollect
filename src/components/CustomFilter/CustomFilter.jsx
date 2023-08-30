@@ -531,7 +531,8 @@ export default class CustomFilter extends Component {
     this.state.selectAll = false
     // this.setState({ selectAll: false })
     if (this.state.text.length === this.state.scaleFilterValue.length) {
-      this.setState({ selectAll: true })
+      //this.setState({ selectAll: true })
+      this.state.selectAll = true
     }
 
     return (
@@ -558,7 +559,7 @@ export default class CustomFilter extends Component {
 
         <div className="fixed" style={{ height: "auto", maxHeight: "350px", overflowY: "auto" }}>
           {this.state.scaleFilterValue.map((scaleValue, index) => (
-            <div className="list-cbox" >
+            <div className="list-cbox" key={index}>
               <div className="checkbox-render" style={{ display: "inline-flex" }}>
 
                 <Checkbox

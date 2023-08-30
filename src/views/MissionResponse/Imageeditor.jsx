@@ -525,6 +525,9 @@ class PhotoEditor extends React.Component {
   */
   handleUpload = (file) => {
     let uploadedfile = file.target.files[0]
+    if (!uploadedfile) {
+      return
+    }
     this.getBase64(uploadedfile).then(data => {
       let imageData = this.state.imageData;
       imageData.image = data;

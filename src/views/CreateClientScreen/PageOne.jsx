@@ -224,7 +224,7 @@ class PageOne extends Component {
   metricFilter = (missionId) => {
     api2.get("v1/survey_report/metric_filter?mission_id=" + missionId)
       .then(resp => {
-        this.setState({ filteredMetricList: resp.data.result })
+        this.setState({ filteredMetricList: resp && resp.data && resp.data.result ? resp.data.result : [] })
       })
   }
 
@@ -232,7 +232,7 @@ class PageOne extends Component {
   ConsumerTypeFilter = (missionId) => {
     api2.get("v1/survey_report/consumertype_filter?mission_id=" + missionId)
       .then(resp => {
-        this.setState({ filteredconsumertype: resp.data.result })
+        this.setState({ filteredconsumertype: resp && resp.data && resp.data.result ? resp.data.result : [] })
       })
   }
 
