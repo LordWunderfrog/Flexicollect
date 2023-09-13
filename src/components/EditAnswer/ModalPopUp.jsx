@@ -213,6 +213,32 @@ class ModalPopUp extends Component {
     }
   }
 
+  onDeleteModelPopupValue() {
+    if (this.state.selectedQuestion.type === "scale" && this.state.selectedQuestion.properties.scale_type && this.state.selectedQuestion.properties.scale_type === 'scale') {
+      this.setState({ updatedScaleOptions: [], selectedScaleOptions: [] })
+    }
+    else if (this.state.selectedQuestion.type === "scale" && this.state.selectedQuestion.properties.scale_type && this.state.selectedQuestion.properties.scale_type === 'table'
+      && this.state.selectedQuestion.properties.grid_type === "image") {
+      this.setState({ selectedTableOptions: [] })
+    }
+    else if (this.state.selectedQuestion.type === "scale" && this.state.selectedQuestion.properties.scale_type && this.state.selectedQuestion.properties.scale_type === 'table'
+      && this.state.selectedQuestion.properties.grid_type === "radio") {
+      this.setState({ selectedTableOptions: [] })
+    } else if (
+      this.state.selectedQuestion.type === "scale" &&
+      this.state.selectedQuestion.properties.scale_type &&
+      this.state.selectedQuestion.properties.scale_type === "maxdiff"
+    ) {
+      this.setState({ selectedmaxdiffOptions: [] })
+    }
+    else if (this.state.selectedQuestion.type === "input") {
+      this.setState({ updatedText: "" })
+    }
+    else if (this.state.selectedQuestion.type === "choice") {
+      this.setState({ selectedChoiceOptions: [], updatedChoiceOptions: [], otheroptionvalue: "" })
+    }
+  }
+
   /* Used to format the question data for scale question and update the scale options. */
   setSelectedScaleOptions() {
     let updatedScaleOptions = [];

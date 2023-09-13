@@ -5,9 +5,11 @@
   width: 300px;
   overflow: auto;
 }
+
 #modal-title {
   margin-bottom: 5px;
 }
+
 #simple-modal-description button {
   color: #fff;
   background-color: #074e9e;
@@ -15,6 +17,7 @@
   margin-bottom: 10px;
   padding: 5px 16px;
 }
+
 #simple-modal-description button:hover {
   background-color: rgb(4, 54, 110);
 }
@@ -48,9 +51,10 @@
 .MuiTypography-root-107 ul li img {
   object-fit: contain;
 }*/
-#modal-title ul li img{
+#modal-title ul li img {
   opacity: 1;
 }
+
 /*.MuiTypography-root-107 ul h6 {
   font-size: 12px;
   letter-spacing: 0px;
@@ -84,29 +88,36 @@
   margin-left: 0;
 }
 
-.ag-theme-balham .status-New{
-  
+.ag-theme-balham .status-New {
+
   background: #C0D4F0 !important
 }
-.ag-theme-balham .status-Hold{
-  background:  #F0E9FF !important
+
+.ag-theme-balham .status-Hold {
+  background: #F0E9FF !important
 }
-.ag-theme-balham .status-Inprogress{
-  background:#B4B4B4 !important
+
+.ag-theme-balham .status-Inprogress {
+  background: #B4B4B4 !important
 }
-.ag-theme-balham .status-Accepted{
+
+.ag-theme-balham .status-Accepted {
   background: #FFFFFF !important
 }
-.ag-theme-balham .status-Invalid{
+
+.ag-theme-balham .status-Invalid {
   background: #F8DAC0 !important
 }
-.ag-theme-balham .status-Fraudulent{
-  background:#EDBCBC !important
+
+.ag-theme-balham .status-Fraudulent {
+  background: #EDBCBC !important
 }
-.ag-theme-balham .capture-Text{
+
+.ag-theme-balham .capture-Text {
   background: saddlebrown !important
 }
-.__react_modal_image__header{
+
+.__react_modal_image__header {
   background: transparent !important;
 }
 
@@ -126,20 +137,29 @@
 input[type="checkbox"]:checked {
   color: #4f4f4f;
 }
-.css-1492t68, .css-15k3avv{
-  font-size:12px;
+
+.css-1492t68,
+.css-15k3avv {
+  font-size: 12px;
 }
-.css-15k3avv{
-  font-size:12px;
+
+.css-15k3avv {
+  font-size: 12px;
   position: absolute;
   /*z-index: 10000;*/
-  
+
 }
 
 .ag-header-cell .ag-react-container {
-	width: 100%
+  width: 100%
 }
 
 #textarea {
   resize: none;
+}
+
+.delete-Icon {
+  position: absolute;
+  right: 2px;
+  top: 2px;
 }

@@ -1461,7 +1461,7 @@ class WebLink extends React.Component {
     /** Check text input content type validation */
     if (this.state.selectedQuestion.type === "input" && this.state.selectedQuestion.properties.hasOwnProperty("content_type")) {
       let answerText = this.state.updatedText ? this.state.updatedText : ""
-      if (answerText && answerText.trim()) {
+      if (answerText && this.safeTrim(answerText)) {
         if (!this.inputElementValidation(answerText, this.state.selectedQuestion.properties.content_type)) {
           return;
         }
@@ -1510,6 +1510,13 @@ class WebLink extends React.Component {
     }
 
   };
+
+  safeTrim(value) {
+    if (typeof value === 'string') {
+      return value.trim();
+    }
+    return value;
+  }
 
   /**
   * Validate limit char on question type input
@@ -1976,7 +1983,7 @@ class WebLink extends React.Component {
     /** Check text input content type validation */
     if (this.state.selectedQuestion.type === "input" && this.state.selectedQuestion.properties.hasOwnProperty("content_type")) {
       let answerText = this.state.updatedText ? this.state.updatedText : ""
-      if (answerText && answerText.trim()) {
+      if (answerText && this.safeTrim(answerText)) {
         if (!this.inputElementValidation(answerText, this.state.selectedQuestion.properties.content_type)) {
           return;
         }
