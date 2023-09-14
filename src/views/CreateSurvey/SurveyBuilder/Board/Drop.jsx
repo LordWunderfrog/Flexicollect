@@ -2677,6 +2677,42 @@ class Card extends React.Component {
                     }
                 })
             }
+            if (fieldprops.properties.attribute_data) {
+
+                delete fieldprops.properties.attribute_data;
+                selectedlanguage.forEach((a, b) => {
+                    if (a.label !== 'English') {
+                        delete languages_drop[a.label].content[this.props.index].properties.attribute_data
+                    }
+                })
+            }
+            if (fieldprops.properties.Maximum_Attributes) {
+
+                delete fieldprops.properties.Maximum_Attributes;
+                selectedlanguage.forEach((a, b) => {
+                    if (a.label !== 'English') {
+                        delete languages_drop[a.label].content[this.props.index].properties.Maximum_Attributes
+                    }
+                })
+            }
+            if (fieldprops.properties.Attribute_PerTask) {
+
+                delete fieldprops.properties.Attribute_PerTask;
+                selectedlanguage.forEach((a, b) => {
+                    if (a.label !== 'English') {
+                        delete languages_drop[a.label].content[this.props.index].properties.Attribute_PerTask
+                    }
+                })
+            }
+            if (fieldprops.properties.Repeate_Attribute) {
+
+                delete fieldprops.properties.Repeate_Attribute;
+                selectedlanguage.forEach((a, b) => {
+                    if (a.label !== 'English') {
+                        delete languages_drop[a.label].content[this.props.index].properties.Repeate_Attribute
+                    }
+                })
+            }
             fieldprops.properties.scale_type = evalue;
             fieldprops.properties.icon_type = "image";
             selectedlanguage.forEach((a, b) => {
@@ -2711,6 +2747,42 @@ class Card extends React.Component {
                     }
                 })
             }
+            if (fieldprops.properties.attribute_data) {
+
+                delete fieldprops.properties.attribute_data;
+                selectedlanguage.forEach((a, b) => {
+                    if (a.label !== 'English') {
+                        delete languages_drop[a.label].content[this.props.index].properties.attribute_data
+                    }
+                })
+            }
+            if (fieldprops.properties.Maximum_Attributes) {
+
+                delete fieldprops.properties.Maximum_Attributes;
+                selectedlanguage.forEach((a, b) => {
+                    if (a.label !== 'English') {
+                        delete languages_drop[a.label].content[this.props.index].properties.Maximum_Attributes
+                    }
+                })
+            }
+            if (fieldprops.properties.Attribute_PerTask) {
+
+                delete fieldprops.properties.Attribute_PerTask;
+                selectedlanguage.forEach((a, b) => {
+                    if (a.label !== 'English') {
+                        delete languages_drop[a.label].content[this.props.index].properties.Attribute_PerTask
+                    }
+                })
+            }
+            if (fieldprops.properties.Repeate_Attribute) {
+
+                delete fieldprops.properties.Repeate_Attribute;
+                selectedlanguage.forEach((a, b) => {
+                    if (a.label !== 'English') {
+                        delete languages_drop[a.label].content[this.props.index].properties.Repeate_Attribute
+                    }
+                })
+            }
             fieldprops.properties.scale_type = evalue;
             fieldprops.properties.grid_type = "radio";
             fieldprops.properties.table_content = {};
@@ -2723,6 +2795,47 @@ class Card extends React.Component {
                 }
             })
         } else if (evalue === "maxdiff") {
+            if (fieldprops.properties.grid_type) {
+
+                delete fieldprops.properties.grid_type;
+                selectedlanguage.forEach((a, b) => {
+                    if (a.label !== 'English') {
+                        delete languages_drop[a.label].content[this.props.index].properties.grid_type
+                    }
+                })
+            }
+            if (fieldprops.properties.table_content) {
+                delete fieldprops.properties.table_content;
+                selectedlanguage.forEach((a, b) => {
+                    if (a.label !== 'English') {
+                        delete languages_drop[a.label].content[this.props.index].properties.table_content
+                    }
+                })
+            }
+            if (fieldprops.properties.start_text) {
+                delete fieldprops.properties.start_text;
+                selectedlanguage.forEach((a, b) => {
+                    if (a.label !== 'English') {
+                        delete languages_drop[a.label].content[this.props.index].properties.start_text
+                    }
+                })
+            }
+            if (fieldprops.properties.end_text) {
+                delete fieldprops.properties.end_text;
+                selectedlanguage.forEach((a, b) => {
+                    if (a.label !== 'English') {
+                        delete languages_drop[a.label].content[this.props.index].properties.end_text
+                    }
+                })
+            }
+            if (fieldprops.properties.scale_content) {
+                delete fieldprops.properties.scale_content;
+                selectedlanguage.forEach((a, b) => {
+                    if (a.label !== 'English') {
+                        delete languages_drop[a.label].content[this.props.index].properties.scale_content
+                    }
+                })
+            }
             fieldprops.properties.scale_type = evalue;
             fieldprops.properties.attribute_data = [];
             selectedlanguage.forEach((a, b) => {
