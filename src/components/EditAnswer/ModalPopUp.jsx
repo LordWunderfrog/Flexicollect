@@ -19,6 +19,8 @@ import TableRow from "@material-ui/core/TableRow";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import Datetime from 'react-datetime';
+import moment from "moment";
 
 const styleMedia = {
   opacity: "0.5",
@@ -210,6 +212,32 @@ class ModalPopUp extends Component {
     }
     else if (this.state.selectedQuestion.type === "choice") {
       this.setSelectedChoiceOptions();
+    }
+  }
+
+  onDeleteModelPopupValue() {
+    if (this.state.selectedQuestion.type === "scale" && this.state.selectedQuestion.properties.scale_type && this.state.selectedQuestion.properties.scale_type === 'scale') {
+      this.setState({ updatedScaleOptions: [], selectedScaleOptions: [] })
+    }
+    else if (this.state.selectedQuestion.type === "scale" && this.state.selectedQuestion.properties.scale_type && this.state.selectedQuestion.properties.scale_type === 'table'
+      && this.state.selectedQuestion.properties.grid_type === "image") {
+      this.setState({ selectedTableOptions: [] })
+    }
+    else if (this.state.selectedQuestion.type === "scale" && this.state.selectedQuestion.properties.scale_type && this.state.selectedQuestion.properties.scale_type === 'table'
+      && this.state.selectedQuestion.properties.grid_type === "radio") {
+      this.setState({ selectedTableOptions: [] })
+    } else if (
+      this.state.selectedQuestion.type === "scale" &&
+      this.state.selectedQuestion.properties.scale_type &&
+      this.state.selectedQuestion.properties.scale_type === "maxdiff"
+    ) {
+      this.setState({ selectedmaxdiffOptions: [] })
+    }
+    else if (this.state.selectedQuestion.type === "input") {
+      this.setState({ updatedText: "" })
+    }
+    else if (this.state.selectedQuestion.type === "choice") {
+      this.setState({ selectedChoiceOptions: [], updatedChoiceOptions: [], otheroptionvalue: "" })
     }
   }
 
@@ -1092,14 +1120,30 @@ class ModalPopUp extends Component {
           )}
 
           {this.state.selectedQuestion.type === "input" ? (
-            <TextField style={{
-              display: "flex"
-            }}
-              //inputStyle={styles.resize}
-              multiline={true}
-              value={this.state.updatedText}
-              onChange={value => this.onTextClick(value)}
-            />
+            <>
+              {this.state.selectedQuestion.properties.hasOwnProperty('datePickerOn') && this.state.selectedQuestion.properties.datePickerOn == 1 ?
+                <Datetime
+                  inputProps={{ readOnly: true }}
+                  name="inputDate"
+                  dateFormat="DD/MM/YYYY"
+                  value={this.state.updatedText}
+                  selected={this.state.updatedText}
+                  timeFormat={false}
+                  onChange={e => {
+                    const newDate = moment(e).format('DD-MM-YYYY');
+                    this.setState({ updatedText: newDate ? newDate : "" });
+                  }}
+                  closeOnSelect
+                /> :
+                <TextField style={{
+                  display: "flex"
+                }}
+                  //inputStyle={styles.resize}
+                  multiline={true}
+                  value={this.state.updatedText}
+                  onChange={value => this.onTextClick(value)}
+                />}
+            </>
           ) : (
             ""
           )}

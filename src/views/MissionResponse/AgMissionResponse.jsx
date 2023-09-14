@@ -21,8 +21,9 @@ import List from "@material-ui/core/List";
 import Divider from "@material-ui/core/Divider";
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import Modal from "@material-ui/core/Modal";
-
-
+import IconButton from "@material-ui/core/IconButton";
+import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
+import AlertDialog from "components/AlertDialog/AlertDialog";
 /* Bootstrap 1.0 */
 import { Form } from "react-bootstrap";
 
@@ -307,7 +308,8 @@ class AgMissionResponse extends React.Component {
       isAddColumnPopupOpen: false,
       backupphotos: null,
       backupphotosupdate: false,
-      apikey: 1
+      apikey: 1,
+      deleteAlertOpen: false
     };
     this.ShowNotification = this.ShowNotification.bind(this);
     this.updateRowData = this.updateRowData.bind(this);
@@ -1707,8 +1709,8 @@ class AgMissionResponse extends React.Component {
 
                 this.setState({ openModal: false });
                 this.closeLightbox();
-                this.setSelectedAnswer();
-                // this.getMissionResponse(this.state.selectedlanguage.value, defaultApirecordId, defaultApiPage);
+                //this.setSelectedAnswer();
+                this.getMissionResponse(this.state.selectedlanguage.value, defaultApirecordId, defaultApiPage);
                 this.setState({
                   selectedAnswer: {},
                   answer_id: "",
@@ -1762,6 +1764,23 @@ class AgMissionResponse extends React.Component {
       }
     }
   };
+
+  /** Delete survey Answer
+   *  TO delete answer edited survey answer and called edit survey 
+   *  answer api to remove cell answer with passing blank/not selected
+   */
+  deleteSurveyAnswer = () => {
+    this.setState({ deleteAlertOpen: true })
+  }
+  handleDialogClose = deleteAnswer => event => {
+    if (deleteAnswer) {
+      this.refs.modalPopUp.onDeleteModelPopupValue()
+      setTimeout(() => {
+        this.editSurveyAnswer()
+      }, 10);
+    }
+    this.setState({ deleteAlertOpen: false });
+  }
   /* 
   * Get the column state from the event.
   * pass the mission id and updated columns to the save column oder function.
@@ -4002,6 +4021,14 @@ class AgMissionResponse extends React.Component {
                   id="modal-title"
                   style={{ textAlign: "center" }}
                 >
+                  <div className="delete-Icon">
+                    <IconButton
+                      aria-label="Delete"
+                      onClick={this.deleteSurveyAnswer}
+                    >
+                      <DeleteForeverIcon />
+                    </IconButton>
+                  </div>
                   <div>
                     <ModalPopUp ref="modalPopUp"
                       selectedQuestion={this.state.selectedQuestion}
@@ -4235,6 +4262,12 @@ class AgMissionResponse extends React.Component {
               </DialogActions>
             </DialogContent>
           </Dialog>
+          <AlertDialog
+            title={"Delete"}
+            description="Are you sure you want to delete this answer? Once deleted it cannot be retrieved"
+            open={this.state.deleteAlertOpen}
+            handleDialogClose={this.handleDialogClose}
+          />
         </MuiThemeProvider>
       </div >
     );

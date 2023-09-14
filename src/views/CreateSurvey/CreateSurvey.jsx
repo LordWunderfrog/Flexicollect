@@ -548,7 +548,7 @@ class CreateSurvey extends React.Component {
     get_completed = (x, y) => {
         let defaultdrops = x;
         let fieldprops = this.state.defaultdrops[y];
-        if (fieldprops.type === 'info') {
+        if (fieldprops && fieldprops.type === 'info') {
             if (defaultdrops.label === "" && fieldprops.label !== "") {
 
                 return false;
@@ -562,7 +562,7 @@ class CreateSurvey extends React.Component {
                 return true;
             }
         }
-        else if (fieldprops.type === 'input') {
+        else if (fieldprops && fieldprops.type === 'input') {
             if ((fieldprops.label !== "" && defaultdrops.label === "")) {
 
                 return false;
@@ -575,7 +575,7 @@ class CreateSurvey extends React.Component {
                 return true;
             }
         }
-        else if (fieldprops.type === 'capture') {
+        else if (fieldprops && fieldprops.type === 'capture') {
             if ((defaultdrops.label === "" && fieldprops.label !== "")) {
 
                 return false;
@@ -601,7 +601,7 @@ class CreateSurvey extends React.Component {
 
             }
         }
-        else if (fieldprops.type === 'upload') {
+        else if (fieldprops && fieldprops.type === 'upload') {
             if ((fieldprops.label !== "" && defaultdrops.label === "")) {
 
                 return false;
@@ -614,7 +614,7 @@ class CreateSurvey extends React.Component {
                 return true;
             }
         }
-        else if (fieldprops.type === 'choice') {
+        else if (fieldprops && fieldprops.type === 'choice') {
             if ((fieldprops.label !== "" && defaultdrops.label === "")) {
 
                 return false;
@@ -650,7 +650,7 @@ class CreateSurvey extends React.Component {
                 }
             }
         }
-        else if (fieldprops.type === 'gps') {
+        else if (fieldprops && fieldprops.type === 'gps') {
             if (fieldprops.label !== "" && defaultdrops.label === "") {
 
                 return false;
@@ -663,7 +663,7 @@ class CreateSurvey extends React.Component {
                 return true;
             }
         }
-        else if (fieldprops.type === 'scale') {
+        else if (fieldprops && fieldprops.type === 'scale') {
             if ((fieldprops.label === "" && defaultdrops.label !== "")) {
 
                 return false;
@@ -682,7 +682,7 @@ class CreateSurvey extends React.Component {
                 return true;
             }
         }
-        else if (fieldprops.type === 'barcode') {
+        else if (fieldprops && fieldprops.type === 'barcode') {
             if (fieldprops.label !== "" && defaultdrops.label === "") {
 
                 return false;
@@ -1490,7 +1490,7 @@ class CreateSurvey extends React.Component {
                     }
                     else if (q.properties.scale_type === "maxdiff" && q.properties.attribute_data) {
                         let emptyAttribute = q.properties.attribute_data && q.properties.attribute_data.filter((obj) => {
-                            return obj.label.trim().length === 0
+                            return this.safeTrim(obj.label).length === 0
                         })
                         if (q.properties.attribute_data.length <= 0) {
                             scalecheck = false;
@@ -1541,6 +1541,46 @@ class CreateSurvey extends React.Component {
         return scalecheck;
     }
 
+    /* Handles this function to validate the choice type and properties to be filled. */
+    CheckChoice = () => {
+        let choicecheck = true;
+        let labelname = "";
+        let type = "";
+        let defaultdrops = this.state.drops;
+        for (let i = 0; i < defaultdrops.length; i++) {
+            let q = defaultdrops[i];
+            let emptylable = q.properties.options && q.properties.options.filter((obj) => {
+                return this.safeTrim(obj.label).length === 0
+            })
+            if (q.type === 'choice') {
+                if (q.properties && !q.properties.hasOwnProperty("options")) {
+                    choicecheck = false;
+                    labelname = q.label;
+                    type = "Choice";
+                    break;
+                } else if (q.properties && q.properties.hasOwnProperty("options") && q.properties.options.length <= 0) {
+                    choicecheck = false;
+                    labelname = q.label;
+                    type = "Choice";
+                    break;
+                } else if (emptylable.length > 0) {
+                    choicecheck = false;
+                    labelname = q.label;
+                    type = "Choice";
+                    break;
+                }
+            }
+        }
+        if (!choicecheck) { this.ShowNotification(" ( " + labelname + " ) " + type + " Elements Are Empty. This will affect the display in mobile app.", "danger", 5000); }
+        return choicecheck;
+    }
+
+    safeTrim(value) {
+        if (typeof value === 'string') {
+            return value.trim();
+        }
+        return value;
+    }
     /**
      * Handle next button.
      *
@@ -1571,7 +1611,7 @@ class CreateSurvey extends React.Component {
                 this.OtherLanguagegenerate()
             } else {
                 if (activeStep === 1) {
-                    next = this.CheckScale();
+                    next = this.CheckScale() && this.CheckChoice();
                     if (next) {
                         this.editlanguage(true);
                         this.OtherLancongenerate();

@@ -1525,12 +1525,12 @@ class Board extends Component {
         let defaultdrops = languages_drop[a.label].content[index]
         if (defaultdrops) {
           if (fieldprops && fieldprops.type === 'info') {
-            if (defaultdrops.label.trim() === "" && fieldprops.label.trim() !== "") {
+            if (this.safeTrim(defaultdrops.label) === "" && this.safeTrim(fieldprops.label) !== "") {
 
               defaultdrops.completed = 0;
             }
             else if (((defaultdrops.properties.info_text || '').trim() === "" && (fieldprops.properties.info_text || '').trim() !== "") ||
-              (defaultdrops.properties.question.trim() === "" && fieldprops.properties.question.trim() !== "")) {
+              (this.safeTrim(defaultdrops.properties.question) === "" && this.safeTrim(fieldprops.properties.question) !== "")) {
 
               defaultdrops.completed = 0;
             }
@@ -1538,12 +1538,12 @@ class Board extends Component {
               defaultdrops.completed = 1;
             }
           }
-          else if (fieldprops && fieldprops.type.trim() === 'input') {
-            if ((fieldprops.label.trim() !== "" && defaultdrops.label.trim() === "")) {
+          else if (this.safeTrim(fieldprops && fieldprops.type) === 'input') {
+            if ((this.safeTrim(fieldprops.label) !== "" && this.safeTrim(defaultdrops.label) === "")) {
 
               defaultdrops.completed = 0;
             }
-            else if ((defaultdrops.properties.question.trim() === "" && fieldprops.properties.question.trim() !== "")) {
+            else if ((this.safeTrim(defaultdrops.properties.question) === "" && this.safeTrim(fieldprops.properties.question) !== "")) {
 
               defaultdrops.completed = 0;
             }
@@ -1552,24 +1552,24 @@ class Board extends Component {
             }
           }
           else if (fieldprops && fieldprops.type === 'capture') {
-            if ((defaultdrops.label.trim() === "" && fieldprops.label.trim() !== "")) {
+            if ((this.safeTrim(defaultdrops.label) === "" && this.safeTrim(fieldprops.label) !== "")) {
 
               defaultdrops.completed = 0;
             }
-            else if ((fieldprops.properties.question.trim() !== "" && defaultdrops.properties.question.trim() === "")) {
+            else if ((this.safeTrim(fieldprops.properties.question) !== "" && this.safeTrim(defaultdrops.properties.question) === "")) {
 
               defaultdrops.completed = 0;
             }
-            else if ((fieldprops.properties.instruction_text && fieldprops.properties.instruction_text.trim() !== "") &&
-              defaultdrops.properties.instruction_text && defaultdrops.properties.instruction_text.trim() === "") {
+            else if ((fieldprops.properties.instruction_text && this.safeTrim(fieldprops.properties.instruction_text) !== "") &&
+              defaultdrops.properties.instruction_text && this.safeTrim(defaultdrops.properties.instruction_text) === "") {
               defaultdrops.completed = 0;
             }
-            else if ((fieldprops.properties.marker_instruction_text && fieldprops.properties.marker_instruction_text.trim() !== "") &&
-              defaultdrops.properties.marker_instruction_text && defaultdrops.properties.marker_instruction_text.trim() === "") {
+            else if ((fieldprops.properties.marker_instruction_text && this.safeTrim(fieldprops.properties.marker_instruction_text) !== "") &&
+              defaultdrops.properties.marker_instruction_text && this.safeTrim(defaultdrops.properties.marker_instruction_text) === "") {
               defaultdrops.completed = 0;
             }
-            else if ((fieldprops.properties.scale_text && fieldprops.properties.scale_text.trim() !== "") &&
-              defaultdrops.properties.scale_text && defaultdrops.properties.scale_text.trim() === "") {
+            else if ((fieldprops.properties.scale_text && this.safeTrim(fieldprops.properties.scale_text) !== "") &&
+              defaultdrops.properties.scale_text && this.safeTrim(defaultdrops.properties.scale_text) === "") {
               defaultdrops.completed = 0;
             }
             else {
@@ -1578,11 +1578,11 @@ class Board extends Component {
             }
           }
           else if (fieldprops && fieldprops.type === 'upload') {
-            if ((fieldprops.label.trim() !== "" && defaultdrops.label.trim() === "")) {
+            if ((this.safeTrim(fieldprops.label) !== "" && this.safeTrim(defaultdrops.label) === "")) {
 
               defaultdrops.completed = 0;
             }
-            else if ((defaultdrops.properties.question.trim() === "" && fieldprops.properties.question.trim() !== "")) {
+            else if ((this.safeTrim(defaultdrops.properties.question) === "" && this.safeTrim(fieldprops.properties.question) !== "")) {
 
               defaultdrops.completed = 0;
             }
@@ -1591,11 +1591,11 @@ class Board extends Component {
             }
           }
           else if (fieldprops && fieldprops.type === 'choice') {
-            if ((fieldprops.label.trim() !== "" && defaultdrops.label.trim() === "")) {
+            if ((this.safeTrim(fieldprops.label) !== "" && this.safeTrim(defaultdrops.label) === "")) {
 
               defaultdrops.completed = 0;
             }
-            else if ((defaultdrops.properties.question.trim() === "" && fieldprops.properties.question.trim() !== "")) {
+            else if ((this.safeTrim(defaultdrops.properties.question) === "" && this.safeTrim(fieldprops.properties.question) !== "")) {
 
               defaultdrops.completed = 0;
             }
@@ -1606,13 +1606,13 @@ class Board extends Component {
               let completed = 1;
               if (fieldprops.properties.options) {
                 fieldprops.properties.options.map((x, y) => {
-                  if (x.label.trim() !== "" && (defaultdrops.properties.options && defaultdrops.properties.options[y] && defaultdrops.properties.options[y].label.trim() === "")) {
+                  if (this.safeTrim(x.label) !== "" && (defaultdrops.properties.options && defaultdrops.properties.options[y] && this.safeTrim(defaultdrops.properties.options[y].label) === "")) {
                     completed = 0;
                   }
                   if (x.sublabel) {
                     x.sublabel.map((a, b) => {
-                      if (a.sublabel.trim() !== "" && defaultdrops.properties.options && defaultdrops.properties.options[y] &&
-                        defaultdrops.properties.options[y].sublabel && defaultdrops.properties.options[y].sublabel[b] && defaultdrops.properties.options[y].sublabel[b].sublabel.trim() === "") {
+                      if (this.safeTrim(a.sublabel) !== "" && defaultdrops.properties.options && defaultdrops.properties.options[y] &&
+                        defaultdrops.properties.options[y].sublabel && defaultdrops.properties.options[y].sublabel[b] && this.safeTrim(defaultdrops.properties.options[y].sublabel[b].sublabel) === "") {
                         completed = 0;
                       }
                     })
@@ -1624,7 +1624,7 @@ class Board extends Component {
             else if (fieldprops.properties.multilevel === 0 || fieldprops.properties) {
               if (fieldprops.properties.options) {
                 fieldprops.properties.options.map((x, y) => {
-                  if (x.label.trim() !== "" && (defaultdrops.properties.options[y].label.trim() === "")) {
+                  if (this.safeTrim(x.label) !== "" && (this.safeTrim(defaultdrops.properties.options[y].label) === "")) {
                     defaultdrops.completed = 0;
                   }
                   else {
@@ -1639,7 +1639,7 @@ class Board extends Component {
 
               defaultdrops.completed = 0;
             }
-            else if ((defaultdrops.properties.question.trim() === "" && fieldprops.properties.question.trim() !== "")) {
+            else if ((this.safeTrim(defaultdrops.properties.question) === "" && this.safeTrim(fieldprops.properties.question) !== "")) {
 
               defaultdrops.completed = 0;
             }
@@ -1649,18 +1649,18 @@ class Board extends Component {
           }
           else if (fieldprops && fieldprops.type === 'scale') {
             if (defaultdrops.properties.question) {
-              if ((fieldprops.label.trim() === "" && defaultdrops.label.trim() !== "")) {
+              if ((this.safeTrim(fieldprops.label) === "" && this.safeTrim(defaultdrops.label) !== "")) {
 
                 defaultdrops.completed = 0;
               }
-              else if ((defaultdrops.properties.question.trim() !== "" && fieldprops.properties.question.trim() === "")) {
+              else if ((this.safeTrim(defaultdrops.properties.question) !== "" && this.safeTrim(fieldprops.properties.question) === "")) {
 
                 defaultdrops.completed = 0;
               }
-              else if (fieldprops.properties.scale_type == "scale" && fieldprops.properties.end_text.trim() !== "" && defaultdrops.properties.end_text.trim() === "") {
+              else if (fieldprops.properties.scale_type == "scale" && this.safeTrim(fieldprops.properties.end_text) !== "" && this.safeTrim(defaultdrops.properties.end_text) === "") {
                 defaultdrops.completed = 0;
               }
-              else if (fieldprops.properties.scale_type == "scale" && fieldprops.properties.start_text.trim() !== "" && defaultdrops.properties.start_text.trim() === "") {
+              else if (fieldprops.properties.scale_type == "scale" && this.safeTrim(fieldprops.properties.start_text) !== "" && this.safeTrim(defaultdrops.properties.start_text) === "") {
                 defaultdrops.completed = 0;
               }
               else {
@@ -1669,11 +1669,11 @@ class Board extends Component {
             }
           }
           else if (fieldprops && fieldprops.type === 'barcode') {
-            if (fieldprops.label.trim() !== "" && defaultdrops.label.trim() === "") {
+            if (this.safeTrim(fieldprops.label) !== "" && this.safeTrim(defaultdrops.label) === "") {
 
               defaultdrops.completed = 0;
             }
-            if ((defaultdrops.properties.question.trim() === "" && fieldprops.properties.question.trim() !== "")) {
+            if ((this.safeTrim(defaultdrops.properties.question) === "" && this.safeTrim(fieldprops.properties.question) !== "")) {
 
               defaultdrops.completed = 0;
             } else {
@@ -2242,6 +2242,12 @@ class Board extends Component {
     this.setState({ drops: this.state.drops })
   }
 
+  safeTrim(value) {
+    if (typeof value === 'string') {
+      return value.trim();
+    }
+    return value;
+  }
 
   render() {
 

@@ -2677,6 +2677,42 @@ class Card extends React.Component {
                     }
                 })
             }
+            if (fieldprops.properties.attribute_data) {
+
+                delete fieldprops.properties.attribute_data;
+                selectedlanguage.forEach((a, b) => {
+                    if (a.label !== 'English') {
+                        delete languages_drop[a.label].content[this.props.index].properties.attribute_data
+                    }
+                })
+            }
+            if (fieldprops.properties.Maximum_Attributes) {
+
+                delete fieldprops.properties.Maximum_Attributes;
+                selectedlanguage.forEach((a, b) => {
+                    if (a.label !== 'English') {
+                        delete languages_drop[a.label].content[this.props.index].properties.Maximum_Attributes
+                    }
+                })
+            }
+            if (fieldprops.properties.Attribute_PerTask) {
+
+                delete fieldprops.properties.Attribute_PerTask;
+                selectedlanguage.forEach((a, b) => {
+                    if (a.label !== 'English') {
+                        delete languages_drop[a.label].content[this.props.index].properties.Attribute_PerTask
+                    }
+                })
+            }
+            if (fieldprops.properties.Repeate_Attribute) {
+
+                delete fieldprops.properties.Repeate_Attribute;
+                selectedlanguage.forEach((a, b) => {
+                    if (a.label !== 'English') {
+                        delete languages_drop[a.label].content[this.props.index].properties.Repeate_Attribute
+                    }
+                })
+            }
             fieldprops.properties.scale_type = evalue;
             fieldprops.properties.icon_type = "image";
             selectedlanguage.forEach((a, b) => {
@@ -2711,6 +2747,42 @@ class Card extends React.Component {
                     }
                 })
             }
+            if (fieldprops.properties.attribute_data) {
+
+                delete fieldprops.properties.attribute_data;
+                selectedlanguage.forEach((a, b) => {
+                    if (a.label !== 'English') {
+                        delete languages_drop[a.label].content[this.props.index].properties.attribute_data
+                    }
+                })
+            }
+            if (fieldprops.properties.Maximum_Attributes) {
+
+                delete fieldprops.properties.Maximum_Attributes;
+                selectedlanguage.forEach((a, b) => {
+                    if (a.label !== 'English') {
+                        delete languages_drop[a.label].content[this.props.index].properties.Maximum_Attributes
+                    }
+                })
+            }
+            if (fieldprops.properties.Attribute_PerTask) {
+
+                delete fieldprops.properties.Attribute_PerTask;
+                selectedlanguage.forEach((a, b) => {
+                    if (a.label !== 'English') {
+                        delete languages_drop[a.label].content[this.props.index].properties.Attribute_PerTask
+                    }
+                })
+            }
+            if (fieldprops.properties.Repeate_Attribute) {
+
+                delete fieldprops.properties.Repeate_Attribute;
+                selectedlanguage.forEach((a, b) => {
+                    if (a.label !== 'English') {
+                        delete languages_drop[a.label].content[this.props.index].properties.Repeate_Attribute
+                    }
+                })
+            }
             fieldprops.properties.scale_type = evalue;
             fieldprops.properties.grid_type = "radio";
             fieldprops.properties.table_content = {};
@@ -2723,6 +2795,47 @@ class Card extends React.Component {
                 }
             })
         } else if (evalue === "maxdiff") {
+            if (fieldprops.properties.grid_type) {
+
+                delete fieldprops.properties.grid_type;
+                selectedlanguage.forEach((a, b) => {
+                    if (a.label !== 'English') {
+                        delete languages_drop[a.label].content[this.props.index].properties.grid_type
+                    }
+                })
+            }
+            if (fieldprops.properties.table_content) {
+                delete fieldprops.properties.table_content;
+                selectedlanguage.forEach((a, b) => {
+                    if (a.label !== 'English') {
+                        delete languages_drop[a.label].content[this.props.index].properties.table_content
+                    }
+                })
+            }
+            if (fieldprops.properties.start_text) {
+                delete fieldprops.properties.start_text;
+                selectedlanguage.forEach((a, b) => {
+                    if (a.label !== 'English') {
+                        delete languages_drop[a.label].content[this.props.index].properties.start_text
+                    }
+                })
+            }
+            if (fieldprops.properties.end_text) {
+                delete fieldprops.properties.end_text;
+                selectedlanguage.forEach((a, b) => {
+                    if (a.label !== 'English') {
+                        delete languages_drop[a.label].content[this.props.index].properties.end_text
+                    }
+                })
+            }
+            if (fieldprops.properties.scale_content) {
+                delete fieldprops.properties.scale_content;
+                selectedlanguage.forEach((a, b) => {
+                    if (a.label !== 'English') {
+                        delete languages_drop[a.label].content[this.props.index].properties.scale_content
+                    }
+                })
+            }
             fieldprops.properties.scale_type = evalue;
             fieldprops.properties.attribute_data = [];
             selectedlanguage.forEach((a, b) => {
@@ -3565,6 +3678,37 @@ class Card extends React.Component {
                 }
             );
         }
+    }
+
+    setDatepickerOn = name => event => {
+        updateProperties = true;
+        let checkval;
+        event.target.checked === true ? (checkval = 1) : (checkval = 0);
+        if (name === "datePickerOn" && checkval === 1) {
+            let fieldprops = this.state.fieldprops;
+            let selectedlanguage = this.props.selectedlanguage
+            let languages_drop = this.props.languages_drop
+            fieldprops["properties"]["minimum"] = "";
+            fieldprops["properties"]["maximum"] = "";
+            fieldprops["properties"]["limitchar"] = 0;
+            fieldprops["properties"]["content_type"] = "text";
+            selectedlanguage.forEach((a, b) => {
+                if (a.label !== 'English') {
+                    languages_drop[a.label].content[this.props.index]["properties"]["minimum"] = "";
+                    languages_drop[a.label].content[this.props.index]["properties"]["maximum"] = "";
+                    languages_drop[a.label].content[this.props.index]["properties"]["limitchar"] = 0;
+                    languages_drop[a.label].content[this.props.index]["properties"]["content_type"] = "text"
+                }
+            })
+        }
+        this.setState(
+            {
+                [name]: checkval
+            },
+            () => {
+                this.updatepropschecked(checkval, name);
+            }
+        );
     }
 
     multilevel = name => event => {
@@ -4908,9 +5052,20 @@ class Card extends React.Component {
                             </div>
                         </li>
 
-                        <li
-                            style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
-                        >
+                        <li>
+                            <div className="below-lanbel-body"
+                                style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
+                            >
+                                <div className="switch-text-boxes switch-text-boxes-mandatory clear">
+                                    <div className="switch-textboxes xtboxestext">Open DatePicker</div>
+                                    <div className="switches-boxes">
+                                        <Switch checked={Boolean(this.state.fieldprops.properties.datePickerOn)} onChange={this.setDatepickerOn("datePickerOn")} value="datePickerOn" color="primary" />
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li style={this.state.currentlanguage.value !== "English" || this.state.fieldprops.properties.datePickerOn == 1 ? disabledive : {}}>
                             <h3>Validation</h3>
                             <div className="below-lanbel-body">
                                 <select onChange={e => this.updateprops(e, "content_type")} value={this.state.fieldprops.properties.content_type}>
@@ -4922,7 +5077,7 @@ class Card extends React.Component {
                                 </select>
                             </div>
                         </li>
-                        <li style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
+                        <li style={this.state.currentlanguage.value !== "English" || this.state.fieldprops.properties.datePickerOn == 1 ? disabledive : {}}>
                             <div className="below-lanbel-body">
                                 <div className="switch-text-boxes switch-text-boxes-mandatory clear">
                                     <div className="switch-textboxes xtboxestext">
