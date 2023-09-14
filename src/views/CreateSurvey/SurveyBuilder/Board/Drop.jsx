@@ -3680,6 +3680,37 @@ class Card extends React.Component {
         }
     }
 
+    setDatepickerOn = name => event => {
+        updateProperties = true;
+        let checkval;
+        event.target.checked === true ? (checkval = 1) : (checkval = 0);
+        if (name === "datePickerOn" && checkval === 1) {
+            let fieldprops = this.state.fieldprops;
+            let selectedlanguage = this.props.selectedlanguage
+            let languages_drop = this.props.languages_drop
+            fieldprops["properties"]["minimum"] = "";
+            fieldprops["properties"]["maximum"] = "";
+            fieldprops["properties"]["limitchar"] = 0;
+            fieldprops["properties"]["content_type"] = "text";
+            selectedlanguage.forEach((a, b) => {
+                if (a.label !== 'English') {
+                    languages_drop[a.label].content[this.props.index]["properties"]["minimum"] = "";
+                    languages_drop[a.label].content[this.props.index]["properties"]["maximum"] = "";
+                    languages_drop[a.label].content[this.props.index]["properties"]["limitchar"] = 0;
+                    languages_drop[a.label].content[this.props.index]["properties"]["content_type"] = "text"
+                }
+            })
+        }
+        this.setState(
+            {
+                [name]: checkval
+            },
+            () => {
+                this.updatepropschecked(checkval, name);
+            }
+        );
+    }
+
     multilevel = name => event => {
         updateProperties = true;
         let checkval;
@@ -5021,9 +5052,20 @@ class Card extends React.Component {
                             </div>
                         </li>
 
-                        <li
-                            style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
-                        >
+                        <li>
+                            <div className="below-lanbel-body"
+                                style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
+                            >
+                                <div className="switch-text-boxes switch-text-boxes-mandatory clear">
+                                    <div className="switch-textboxes xtboxestext">Open DatePicker</div>
+                                    <div className="switches-boxes">
+                                        <Switch checked={Boolean(this.state.fieldprops.properties.datePickerOn)} onChange={this.setDatepickerOn("datePickerOn")} value="datePickerOn" color="primary" />
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li style={this.state.currentlanguage.value !== "English" || this.state.fieldprops.properties.datePickerOn == 1 ? disabledive : {}}>
                             <h3>Validation</h3>
                             <div className="below-lanbel-body">
                                 <select onChange={e => this.updateprops(e, "content_type")} value={this.state.fieldprops.properties.content_type}>
@@ -5035,7 +5077,7 @@ class Card extends React.Component {
                                 </select>
                             </div>
                         </li>
-                        <li style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
+                        <li style={this.state.currentlanguage.value !== "English" || this.state.fieldprops.properties.datePickerOn == 1 ? disabledive : {}}>
                             <div className="below-lanbel-body">
                                 <div className="switch-text-boxes switch-text-boxes-mandatory clear">
                                     <div className="switch-textboxes xtboxestext">

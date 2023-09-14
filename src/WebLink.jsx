@@ -39,6 +39,8 @@ import imageCompression from 'browser-image-compression';
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import Datetime from 'react-datetime';
+import moment from "moment";
 
 const styles = {
   //style for font size
@@ -1459,7 +1461,8 @@ class WebLink extends React.Component {
     }
 
     /** Check text input content type validation */
-    if (this.state.selectedQuestion.type === "input" && this.state.selectedQuestion.properties.hasOwnProperty("content_type")) {
+    if (this.state.selectedQuestion.type === "input" && this.state.selectedQuestion.properties.hasOwnProperty("content_type") &&
+      (this.state.selectedQuestion.properties.hasOwnProperty("datePickerOn") && this.state.selectedQuestion.properties.datePickerOn != 1)) {
       let answerText = this.state.updatedText ? this.state.updatedText : ""
       if (answerText && this.safeTrim(answerText)) {
         if (!this.inputElementValidation(answerText, this.state.selectedQuestion.properties.content_type)) {
@@ -1469,7 +1472,8 @@ class WebLink extends React.Component {
     }
 
     /** check choice type element set limit */
-    if (this.state.selectedQuestion.type === 'choice' && this.state.selectedQuestion.properties.hasOwnProperty('setlimit') && this.state.selectedQuestion.properties.setlimit == 1) {
+    if (this.state.selectedQuestion.type === 'choice' && this.state.selectedQuestion.properties.hasOwnProperty('setlimit') && this.state.selectedQuestion.properties.setlimit == 1
+      && (this.state.selectedQuestion.properties.hasOwnProperty("datePickerOn") && this.state.selectedQuestion.properties.datePickerOn != 1)) {
       let count = this.state.selectedChoiceOptions ? this.state.selectedChoiceOptions.length : 0
       let objProperty = this.state.selectedQuestion.properties
       if (count < objProperty.minlimit) {
@@ -1492,7 +1496,8 @@ class WebLink extends React.Component {
     }
 
     this.setState(() => ({ show: true }));
-    if (this.state.selectedQuestion.type == "input") {
+    if (this.state.selectedQuestion.type == "input" && this.state.selectedQuestion.properties.hasOwnProperty("datePickerOn")
+      && this.state.selectedQuestion.properties.datePickerOn != 1) {
       document.getElementById("inputTypeQuestion").focus()
     }
 
@@ -1970,7 +1975,8 @@ class WebLink extends React.Component {
   handleSubmit = () => {
     /** check for text input character limit validation */
     if (this.state.selectedQuestion.type === "input" && this.state.selectedQuestion.properties.hasOwnProperty("limitchar") &&
-      this.state.selectedQuestion.properties.limitchar === 1) {
+      this.state.selectedQuestion.properties.limitchar === 1
+      && (this.state.selectedQuestion.properties.hasOwnProperty("datePickerOn") && this.state.selectedQuestion.properties.datePickerOn != 1)) {
       let limit_check = this.limitCharValidation(this.state.selectedQuestion, this.state.updatedText);
       if (
         limit_check.limitValid === false
@@ -1981,7 +1987,8 @@ class WebLink extends React.Component {
     }
 
     /** Check text input content type validation */
-    if (this.state.selectedQuestion.type === "input" && this.state.selectedQuestion.properties.hasOwnProperty("content_type")) {
+    if (this.state.selectedQuestion.type === "input" && this.state.selectedQuestion.properties.hasOwnProperty("content_type") &&
+      (this.state.selectedQuestion.properties.hasOwnProperty("datePickerOn") && this.state.selectedQuestion.properties.datePickerOn != 1)) {
       let answerText = this.state.updatedText ? this.state.updatedText : ""
       if (answerText && this.safeTrim(answerText)) {
         if (!this.inputElementValidation(answerText, this.state.selectedQuestion.properties.content_type)) {
@@ -4206,28 +4213,43 @@ class WebLink extends React.Component {
                     )}
 
                     {selectedQuestion.type === "input" ? (
-                      <div className="inputClass">
-                        <TextField
-                          id={"inputTypeQuestion"}
-                          style={{
-                            width: 400,
-                            margin: 0,
-                            padding: 10,
-                            border: "1px solid rgba(0, 0, 0, 0.25)",
-                            maxHeight: "500px",
-                            //overflow: "auto",
-                            fontStyle: "Roboto"
-                          }}
-                          autoFocus={true}
-                          className="scrollVisible"
-                          //inputStyle={styles.resize}
-                          multiline={true}
-                          value={this.state.updatedText}
-                          InputProps={{ disableUnderline: true }}
-                          onChange={event => {
-                            this.setState({ updatedText: event.target.value });
-                          }}
-                        />
+                      <div className="inputClass inputDate">
+                        {selectedQuestion.properties.hasOwnProperty('datePickerOn') && selectedQuestion.properties.datePickerOn == 1 ?
+                          <Datetime
+                            inputProps={{ readOnly: true }}
+                            name="inputDate"
+                            dateFormat="DD-MM-YYYY"
+                            value={this.state.updatedText}
+                            selected={this.state.updatedText}
+                            timeFormat={false}
+                            onChange={e => {
+                              const newDate = moment(e).format('DD-MM-YYYY');
+                              this.setState({ updatedText: newDate ? newDate : "" });
+                            }}
+                            closeOnSelect
+                          />
+                          :
+                          <TextField
+                            id={"inputTypeQuestion"}
+                            style={{
+                              width: 400,
+                              margin: 0,
+                              padding: 10,
+                              border: "1px solid rgba(0, 0, 0, 0.25)",
+                              maxHeight: "500px",
+                              //overflow: "auto",
+                              fontStyle: "Roboto"
+                            }}
+                            autoFocus={true}
+                            className="scrollVisible"
+                            //inputStyle={styles.resize}
+                            multiline={true}
+                            value={this.state.updatedText}
+                            InputProps={{ disableUnderline: true }}
+                            onChange={event => {
+                              this.setState({ updatedText: event.target.value });
+                            }}
+                          />}
                         <h6
                           style={{
                             marginTop: "5px",
