@@ -658,14 +658,18 @@ class CreateProject extends React.Component {
 
       mission_survey_type: "",
       submission: submitData.submission ? submitData.submission : 0,
-      mission_end_date: submitData.endDate
-        // ? submitData.endDate.format("YYYY-MM-DD h:mm A")
-        ? moment.utc(submitData.endDate)
-        : "",
-      mission_start_date: submitData.startDate
-        // ? submitData.endDate.format("YYYY-MM-DD h:mm A")
-        ? moment.utc(submitData.startDate)
-        : "",
+      // mission_end_date: submitData.endDate
+      //   // ? submitData.endDate.format("YYYY-MM-DD h:mm A")
+      //   ? moment.utc(submitData.endDate)
+      //   : "",
+      // mission_start_date: submitData.startDate
+      //   // ? submitData.endDate.format("YYYY-MM-DD h:mm A")
+      //   ? moment.utc(submitData.startDate)
+      //   : "",
+      mission_start_date: submitData.startDate ? moment(submitData.startDate) : "",
+      mission_end_date: submitData.endDate ? moment(submitData.endDate) : "",
+
+
       // mission image
       mission_image: submitData.missionImage ? submitData.missionImage : "",
       mission_image_type:

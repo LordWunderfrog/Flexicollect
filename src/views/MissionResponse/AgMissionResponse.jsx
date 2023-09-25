@@ -323,6 +323,8 @@ class AgMissionResponse extends React.Component {
     this.getDepartmentList();
     this.getClientList();
     this.getlanguagelist();
+
+    localStorage.removeItem("defaultfilterState")
   }
 
   /* Handle the close event of payment popup. */
@@ -506,6 +508,7 @@ class AgMissionResponse extends React.Component {
           paymentEnableDetails: e.value,
           paymentProjName: e.label
         });
+        localStorage.removeItem("defaultfilterState")
       })
       .catch(error => {
         console.error(error);
@@ -572,6 +575,8 @@ class AgMissionResponse extends React.Component {
         loadedlistItems = [];
         this.getMissionResponse('', defaultApirecordId, defaultApiPage);
         this.getClientresponseconfig()
+
+        localStorage.removeItem("defaultfilterState")
       }
     );
   };
@@ -679,6 +684,7 @@ class AgMissionResponse extends React.Component {
       {
         quickFilterText: ""
       });
+    localStorage.removeItem("defaultfilterState")
   }
 
   /*  Handles the event to apply the filter in the mission response table. */
@@ -2602,6 +2608,13 @@ class AgMissionResponse extends React.Component {
       let id = sepMission[0].survey_tag_id
       this.getMissionResponsepage(this.state.selectedlanguage.value, id, defaultApiPage, page)
     }
+
+    /** set stored filter state again to be persistence */
+    const storedFilterModel = this.loadFilterModelFromLocalStorage();
+    if (storedFilterModel) {
+      this.api.setFilterModel(storedFilterModel);
+    }
+
   };
   /*  Handles the function to design the column header and column definition.*/
   doTheThingpage = (page, exportCsv) => {
@@ -3473,12 +3486,21 @@ class AgMissionResponse extends React.Component {
       }
       return 0;
     })
+
+    /** Storing default filter state in local for persistence custom filter is already persistence*/
+    let filterModel = params.api.getFilterModel();
+    localStorage.setItem('defaultfilterState', JSON.stringify(filterModel));
+
     this.setState({
       activefiltermenu: activemenu
     }, () => { this.api.refreshHeader(); })
 
   }
-
+  /** get filter state from local storage */
+  loadFilterModelFromLocalStorage = () => {
+    const filterModel = localStorage.getItem('defaultfilterState');
+    return filterModel ? JSON.parse(filterModel) : null;
+  };
 
   /* Handles the navigation of page. */
   handleChangePage = (event, page) => {
