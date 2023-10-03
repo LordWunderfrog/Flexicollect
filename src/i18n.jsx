@@ -40,7 +40,6 @@ i18n
           AnswerValidation: "Beantwoord asseblief hierdie vraag",
           ServerError: "Bedienerfout het voorgekom met die indiening van die vraelys",
           SurveySubmitted: "Vraelys suksesvol ingedien",
-          SelectDate: "Kies asseblief datum",
           Cancel: "kanselleer",
           Ok: "OK",
         }
@@ -77,7 +76,6 @@ i18n
           AnswerValidation: "الرجاء الإجابة على هذا السؤال",
           ServerError: "حدث خطأ في الخادم أثناء إرسال الاستبيان",
           SurveySubmitted: "تم إرسال الاستبيان بنجاح",
-          SelectDate: "الرجاء تحديد التاريخ",
           Cancel: "إلغاء",
           Ok: "موافق",
         }
@@ -114,7 +112,6 @@ i18n
           AnswerValidation: "请回答这个问题",
           ServerError: "提交调查问卷时服务器发生错误",
           SurveySubmitted: "调查问卷提交成功",
-          SelectDate: "请选择日期",
           Cancel: "取消",
           Ok: "确定",
         }
@@ -151,7 +148,6 @@ i18n
           AnswerValidation: "Beantwoord deze vraag alsjeblieft",
           ServerError: "Er trad een serverfout op tijdens het verzenden van de vragenlijst",
           SurveySubmitted: "Vragenlijst succesvol verzonden",
-          SelectDate: "Selecteer alsjeblieft de datum",
           Cancel: "Annuleren",
           Ok: "OK",
         }
@@ -188,7 +184,6 @@ i18n
           AnswerValidation: "Please answer this question",
           ServerError: "Server error occurred in submitting the survey",
           SurveySubmitted: "Survey Submitted Successfully",
-          SelectDate: "Please Select Date",
           Cancel: "Cancel",
           Ok: "OK",
         }
@@ -225,7 +220,6 @@ i18n
           AnswerValidation: "Veuillez répondre à cette question",
           ServerError: "Une erreur de serveur s'est produite lors de la soumission de l'enquête",
           SurveySubmitted: "L'enquête a été soumise avec succès",
-          SelectDate: "Veuillez sélectionner une date",
           Cancel: "Annuler",
           Ok: "OK",
         }
@@ -262,7 +256,6 @@ i18n
           AnswerValidation: "Bitte beantworten Sie diese Frage",
           ServerError: "Bei der Übermittlung der Umfrage ist ein Serverfehler aufgetreten",
           SurveySubmitted: "Umfrage erfolgreich abgeschickt",
-          SelectDate: "Bitte Datum auswählen",
           Cancel: "Abbrechen",
           Ok: "OK",
         }
@@ -299,7 +292,6 @@ i18n
           AnswerValidation: "कृपया इस प्रश्न का उत्तर दें",
           ServerError: "सर्वेक्षण सबमिट करने में सर्वर त्रुटि हुई",
           SurveySubmitted: "प्रश्नावली सफलतापूर्वक प्रस्तुत की गई",
-          SelectDate: "कृपया दिनांक चुनें",
           Cancel: "रद्द करें",
           Ok: "ठीक है",
         }
@@ -336,7 +328,6 @@ i18n
           AnswerValidation: "Tolong jawab pertanyaan ini",
           ServerError: "Terjadi kesalahan server saat mengirimkan survei",
           SurveySubmitted: "Survei Berhasil Dikirim",
-          SelectDate: "Silakan Pilih Tanggal",
           Cancel: "Batal",
           Ok: "OK",
         }
@@ -373,7 +364,6 @@ i18n
           AnswerValidation: "Per favore rispondi a questa domanda",
           ServerError: "Si è verificato un errore del server durante l'invio del questionario",
           SurveySubmitted: "Questionario inviato con successo",
-          SelectDate: "Seleziona la data",
           Cancel: "Annulla",
           Ok: "OK",
         }
@@ -410,7 +400,6 @@ i18n
           AnswerValidation: "この質問に答えてください",
           ServerError: "アンケート送信時にサーバーエラーが発生しました",
           SurveySubmitted: "アンケートは正常に送信されました",
-          SelectDate: "日付を選択してください",
           Cancel: "キャンセル",
           Ok: "わかった",
         }
@@ -447,7 +436,6 @@ i18n
           AnswerValidation: "Sila jawab soalan ini",
           ServerError: "Ralat pelayan berlaku semasa menyerahkan soal selidik",
           SurveySubmitted: "Soal selidik berjaya dihantar",
-          SelectDate: "Sila pilih tarikh",
           Cancel: "Batal",
           Ok: "Baik",
         }
@@ -484,7 +472,6 @@ i18n
           AnswerValidation: "Proszę odpowiedzieć na to pytanie",
           ServerError: "Podczas przesyłania kwestionariusza wystąpił błąd serwera",
           SurveySubmitted: "Kwestionariusz przesłany pomyślnie",
-          SelectDate: "Proszę wybrać datę",
           Cancel: "Anuluj",
           Ok: "Dobra",
         }
@@ -521,7 +508,6 @@ i18n
           AnswerValidation: "Por favor responda a esta pergunta",
           ServerError: "Ocorreu um erro no servidor ao enviar o questionário",
           SurveySubmitted: "Questionário enviado com sucesso",
-          SelectDate: "Selecione a data",
           Cancel: "Cancelar",
           Ok: "OK",
         }
@@ -558,7 +544,6 @@ i18n
           AnswerValidation: "Пожалуйста, ответьте на этот вопрос",
           ServerError: "Произошла ошибка сервера при отправке опроса",
           SurveySubmitted: "Анкета успешно отправлена",
-          SelectDate: "Пожалуйста, выберите дату",
           Cancel: "Отмена",
           Ok: "хорошо",
         }
@@ -595,7 +580,6 @@ i18n
           AnswerValidation: "Por favor responde esta pregunta",
           ServerError: "Se produjo un error del servidor al enviar el cuestionario",
           SurveySubmitted: "Cuestionario enviado exitosamente",
-          SelectDate: "Por favor seleccione fecha",
           Cancel: "Cancelar",
           Ok: "Bueno",
         }
@@ -632,7 +616,6 @@ i18n
           AnswerValidation: "Pakisagot ang tanong na ito",
           ServerError: "Nagkaroon ng error sa server sa pagsusumite ng survey",
           SurveySubmitted: "Matagumpay na naisumite ang survey",
-          SelectDate: "Mangyaring pumili ng petsa",
           Cancel: "Kanselahin",
           Ok: "Sige",
         }
@@ -669,7 +652,6 @@ i18n
           AnswerValidation: "กรุณาตอบคำถามนี้",
           ServerError: "เกิดข้อผิดพลาดของเซิร์ฟเวอร์ในการส่งแบบสำรวจ",
           SurveySubmitted: "ส่งแบบสำรวจเรียบร้อยแล้ว",
-          SelectDate: "กรุณาเลือกวันที่",
           Cancel: "ยกเลิก",
           Ok: "ตกลง",
         }
@@ -706,7 +688,6 @@ i18n
           AnswerValidation: "Hãy trả lời câu hỏi này",
           ServerError: "Đã xảy ra lỗi máy chủ khi gửi khảo sát",
           SurveySubmitted: "Đã gửi khảo sát thành công",
-          SelectDate: "Vui lòng chọn ngày",
           Cancel: "Hủy bỏ",
           Ok: "Đồng ý",
         }
@@ -743,7 +724,6 @@ i18n
           AnswerValidation: "براہ کرم اس سوال کا جواب دیں۔",
           ServerError: "سروے جمع کرانے میں سرور کی خرابی پیش آگئی",
           SurveySubmitted: "سروے کامیابی کے ساتھ جمع کرایا گیا۔",
-          SelectDate: "براہ کرم تاریخ منتخب کریں۔",
           Cancel: "منسوخ کریں",
           Ok: "تصدیق کریں",
         }
