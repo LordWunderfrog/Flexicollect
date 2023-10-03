@@ -9,7 +9,7 @@ import {
 import "react-metismenu/dist/react-metismenu-standart.min.css";
 import "./css/font-awesome.min.css";
 import 'react-table/react-table.css';
-
+import "../src/i18n"
 
 ReactDOM.render(<BrowserRouter>
   <App />
