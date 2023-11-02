@@ -3034,7 +3034,7 @@ class AgMissionResponse extends React.Component {
         if (Number.isInteger(text)) {
           text = text.toString();
         }
-        if (prop[prop.length - 1] && prop[prop.length - 1] !== undefined) {
+        if (prop[prop.length - 1] && prop[prop.length - 1] !== undefined && (prop && prop.length > 1)) {
           prop[prop.length - 1].split(",").forEach(img => {
             if (img) {
               textImages.push({
@@ -3336,19 +3336,21 @@ class AgMissionResponse extends React.Component {
     this.state.columnDefs.forEach(c => {
       previewMissionkeys.forEach((k, index) => {
         if (c.headerName !== 'Action' && c.headerName !== 'Payment' && c.field === k) {
-          list.push(
-            <Fragment key={index}>
-              <Grid container alignItems="center">
-                <Typography gutterBottom variant="h6" style={{ marginLeft: 20, fontSize: 12, fontWeight: 600 }}>
-                  &bull; {c.id ? c.id + '_' + c.headerName : c.headerName}
-                </Typography>
-              </Grid>
-              <Grid container alignItems="center" style={{ marginLeft: 40, fontSize: 12 }}>
-                {this.renderText(previewMissionvalues[index])}
-              </Grid>
-              <Divider variant="middle" />
-            </Fragment>
-          );
+          if (previewMissionvalues[index]) {
+            list.push(
+              <Fragment key={index}>
+                <Grid container alignItems="center">
+                  <Typography gutterBottom variant="h6" style={{ marginLeft: 20, fontSize: 12, fontWeight: 600 }}>
+                    &bull; {c.id ? c.id + '_' + c.headerName : c.headerName}
+                  </Typography>
+                </Grid>
+                <Grid container alignItems="center" style={{ marginLeft: 40, fontSize: 12 }}>
+                  {this.renderText(previewMissionvalues[index])}
+                </Grid>
+                <Divider variant="middle" />
+              </Fragment>
+            );
+          }
         }
       })
     })
@@ -3810,7 +3812,7 @@ class AgMissionResponse extends React.Component {
                             onModelUpdated={this.calculateRowCount}
                             onColumnMoved={this.columnMoved}
                             onColumnResized={this.onColumnResized}
-                            // rowData={this.state.listItems}
+                            rowData={this.state.listItems}
                             //onCellValueChanged={this.onCellValueChanged}
                             onRowDataChanged={this.updateColumns}
                             getRowNodeId={function (data) { return data.survey_tag_id; }}

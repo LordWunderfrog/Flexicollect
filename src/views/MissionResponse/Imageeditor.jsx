@@ -691,17 +691,15 @@ class PhotoEditor extends React.Component {
                       <label style={{ color: "white", fontSize: '18px' }}>Hide</label>
                       <MuiThemeProvider theme={theme}>
                         <Switchlimit color='primary' value="hide"
-                          checked={(this.state.imageData.length > 0 && this.state.imageData.answers.hide) ?
-                            this.state.imageData.answers.hide === 1 ? true : false : false}
+                          // checked={(this.state.imageData.length > 0 && this.state.imageData.answers.hide) ?
+                          //   this.state.imageData.answers.hide === 1 ? true : false : false}
+                          checked={(this.state.imageData && this.state.imageData.answers.hasOwnProperty("hide") && this.state.imageData.answers.hide === 1) ? true : false}
                           onChange={this.handleChange()} />
                       </MuiThemeProvider>
                     </div>
-
                   }
 
                   <h3 style={{ color: "white" }}>{this.state.imageData.title}</h3>
-
-
                 </div>
                 <div className='imagesize' style={{ position: "relative" }}>
 
