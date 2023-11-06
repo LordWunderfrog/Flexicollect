@@ -41,6 +41,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Datetime from 'react-datetime';
 import moment from "moment";
+import { withTranslation } from 'react-i18next';
 
 const styles = {
   //style for font size
@@ -165,7 +166,7 @@ class WebLink extends React.Component {
       enableTermsCond: false,
       otheroptionvalue: "",
       otheroptiontextbox: false,
-      maxdifftableHead: ["Least", "", "Most"],
+      maxdifftableHead: [this.props.t("Least"), "", this.props.t("Most")],
       maxdifftableRow: [],
       currentSliderPage: 0,
       isSlidingAllowed: true,
@@ -194,6 +195,8 @@ class WebLink extends React.Component {
 
     }
 
+    const { i18n } = this.props;
+    i18n.changeLanguage("English");
   }
 
   componentWillUnmount() {
@@ -591,7 +594,7 @@ class WebLink extends React.Component {
               break;
             }
           }
-          this.showNotification('Please select maximum ' + queProperty.maxlimit + ' options only', "info")
+          this.showNotification(this.props.t("Maximum_Validation_Msg") + " " + queProperty.maxlimit + " " + this.props.t('Option'), "info")
         }
       }
       else {
@@ -1089,7 +1092,7 @@ class WebLink extends React.Component {
   }
   beforeChangeHandler = (oldIndex, newIndex) => {
     if (!this.state.isSlidingAllowed) {
-      this.showNotification('Please select least and most item for every set', "info")
+      this.showNotification(this.props.t("MaxDiffSelectMsg"), "info")
     }
   }
   countOccurrences(array, value) {
@@ -1170,16 +1173,18 @@ class WebLink extends React.Component {
       .post("/weblink_consumer?id=" + mission_id, data)
       .then(resp => {
         if (resp.data.status === 200 && resp.data.id > 0) {
+          const { i18n } = this.props;
+          i18n.changeLanguage("English");
           localStorage.setItem("api_key", resp.data.api_key);
           this.setState({ cust_id: resp.data.id }, () => { this.getSurveyResponse() });
         }
         else {
-          this.showNotification("There seems to be an issue with your email or phone number - Please contact support at flexicollect-support@eolasinternational.com", "info");
+          this.showNotification(this.props.t("WrongCredantialMsg") + " " + "flexicollect-support@eolasinternational.com", "info");
         }
       })
       .catch(error => {
         console.error(error);
-        this.showNotification("There seems to be an issue with your email or phone number - Please contact support at flexicollect-support@eolasinternational.com", "info");
+        this.showNotification(this.props.t("WrongCredantialMsg") + " " + "flexicollect-support@eolasinternational.com", "info");
       });
 
   };
@@ -1216,13 +1221,13 @@ class WebLink extends React.Component {
         this.setSurveyQuestions(resp.data);
         this.onWeblinkNext();
       } else {
-        this.showNotification(resp.data.error ? resp.data.error : "Sorry this mission is no longer available", "info");
+        this.showNotification(resp.data.error ? resp.data.error : this.props.t("MissionNotAvailalble"), "info");
       }
 
     })
       .catch(error => {
         console.error(error);
-        this.showNotification("Sorry this mission is no longer available", "info");
+        this.showNotification(this.props.t("MissionNotAvailalble"), "info");
       });
   };
 
@@ -1450,7 +1455,7 @@ class WebLink extends React.Component {
   handleNext = () => {
     /** check for text input character limit validation */
     if (this.state.selectedQuestion.type === "input" && this.state.selectedQuestion.properties.hasOwnProperty("limitchar") &&
-      this.state.selectedQuestion.properties.limitchar === 1) {
+      this.state.selectedQuestion.properties.limitchar === 1 && (this.state.selectedQuestion.properties.datePickerOn != 1)) {
       let limit_check = this.limitCharValidation(this.state.selectedQuestion, this.state.updatedText);
       if (
         limit_check.limitValid === false
@@ -1462,7 +1467,7 @@ class WebLink extends React.Component {
 
     /** Check text input content type validation */
     if (this.state.selectedQuestion.type === "input" && this.state.selectedQuestion.properties.hasOwnProperty("content_type") &&
-      (this.state.selectedQuestion.properties.hasOwnProperty("datePickerOn") && this.state.selectedQuestion.properties.datePickerOn != 1)) {
+      (this.state.selectedQuestion.properties.datePickerOn != 1)) {
       let answerText = this.state.updatedText ? this.state.updatedText : ""
       if (answerText && this.safeTrim(answerText)) {
         if (!this.inputElementValidation(answerText, this.state.selectedQuestion.properties.content_type)) {
@@ -1472,12 +1477,11 @@ class WebLink extends React.Component {
     }
 
     /** check choice type element set limit */
-    if (this.state.selectedQuestion.type === 'choice' && this.state.selectedQuestion.properties.hasOwnProperty('setlimit') && this.state.selectedQuestion.properties.setlimit == 1
-      && (this.state.selectedQuestion.properties.hasOwnProperty("datePickerOn") && this.state.selectedQuestion.properties.datePickerOn != 1)) {
+    if (this.state.selectedQuestion.type === 'choice' && this.state.selectedQuestion.properties.hasOwnProperty('setlimit') && this.state.selectedQuestion.properties.setlimit == 1) {
       let count = this.state.selectedChoiceOptions ? this.state.selectedChoiceOptions.length : 0
       let objProperty = this.state.selectedQuestion.properties
       if (count < objProperty.minlimit) {
-        this.showNotification('Please select minimum ' + objProperty.minlimit + ' options', "info")
+        this.showNotification(this.props.t("Minimum_Validation_Msg") + " " + objProperty.minlimit + " " + this.props.t("Option"), "info")
         return
       }
     }
@@ -1489,7 +1493,7 @@ class WebLink extends React.Component {
         let lengthofSet = this.state.selectedQuestion.properties.attribute_Set && this.state.selectedQuestion.properties.attribute_Set.length || 0
         /** logic is every set has least and most selection so its lenth * 2 */
         if (ansObj.length < (lengthofSet * 2)) {
-          this.showNotification('Please select least and most item for all set of question', "info")
+          this.showNotification(this.props.t("MaxDiffSelectMsg"), "info")
           return;
         }
       }
@@ -1529,7 +1533,6 @@ class WebLink extends React.Component {
   * @param {Object} questionObj Current Answer
   */
   limitCharValidation(questionArr, text) {
-    console.log('Answer text inside limitchar', text)
     let limit = {
       limitValid: true,
       limitMessage: ''
@@ -1549,14 +1552,14 @@ class WebLink extends React.Component {
       }
       limit.limitMessage =
         limit.limitValid === false
-          ? "Please answer between " + min + " and " + max + " characters"
+          ? this.props.t("LimitBetweenChar") + " " + min + " " + this.props.t("And") + " " + max + " " + this.props.t("Characters")
           : limit.limitMessage;
     } else if (min !== null) {
       if (textLength < min) {
         limit.limitValid = false;
         limit.limitMessage =
           limit.limitValid === false
-            ? "Please answer with " + min + " or more characters"
+            ? this.props.t("LimitWithChar") + " " + min + " " + this.props.t("Or") + " " + this.props.t("Characters")
             : limit.limitMessage;
       }
     } else if (max !== null) {
@@ -1564,7 +1567,7 @@ class WebLink extends React.Component {
         limit.limitValid = false;
         limit.limitMessage =
           limit.limitValid === false
-            ? "Please answer within " + max + " characters"
+            ? this.props.t("LimitWithinChar") + " " + max + " " + this.props.t("Characters")
             : limit.limitMessage;
       }
     }
@@ -1573,14 +1576,13 @@ class WebLink extends React.Component {
 
   /** As per the content type - restrict the input text validation */
   inputElementValidation(text, contentType) {
-    console.log('text inside validation', text)
     if (contentType == "number") {
       let regNumber = /^[0-9.]+$/
       if (regNumber.test(text)) {
         return true
       }
       else {
-        this.showNotification("Please enter numeric value only", "info")
+        this.showNotification(this.props.t("NumericValidationMsg"), "info")
         return false
       }
     }
@@ -1590,7 +1592,7 @@ class WebLink extends React.Component {
         return true
       }
       else {
-        this.showNotification("Please enter a valid email", "info")
+        this.showNotification(this.props.t("ValidEmailMsg"), "info")
         return false
       }
     }
@@ -1600,7 +1602,7 @@ class WebLink extends React.Component {
         return true
       }
       else {
-        this.showNotification("Please enter alphabets value only", "info")
+        this.showNotification(this.props.t("AlphabetValidationMsg"), "info")
         return false
       }
     }
@@ -1907,7 +1909,7 @@ class WebLink extends React.Component {
     }
     else {
 
-      this.showNotification("Please answer this question", "info");
+      this.showNotification(this.props.t("AnswerValidation"), "info");
       this.setState(() => ({ show: false }));
     }
 
@@ -1975,8 +1977,7 @@ class WebLink extends React.Component {
   handleSubmit = () => {
     /** check for text input character limit validation */
     if (this.state.selectedQuestion.type === "input" && this.state.selectedQuestion.properties.hasOwnProperty("limitchar") &&
-      this.state.selectedQuestion.properties.limitchar === 1
-      && (this.state.selectedQuestion.properties.hasOwnProperty("datePickerOn") && this.state.selectedQuestion.properties.datePickerOn != 1)) {
+      this.state.selectedQuestion.properties.limitchar === 1 && (this.state.selectedQuestion.properties.datePickerOn != 1)) {
       let limit_check = this.limitCharValidation(this.state.selectedQuestion, this.state.updatedText);
       if (
         limit_check.limitValid === false
@@ -1988,7 +1989,7 @@ class WebLink extends React.Component {
 
     /** Check text input content type validation */
     if (this.state.selectedQuestion.type === "input" && this.state.selectedQuestion.properties.hasOwnProperty("content_type") &&
-      (this.state.selectedQuestion.properties.hasOwnProperty("datePickerOn") && this.state.selectedQuestion.properties.datePickerOn != 1)) {
+      (this.state.selectedQuestion.properties.datePickerOn != 1)) {
       let answerText = this.state.updatedText ? this.state.updatedText : ""
       if (answerText && this.safeTrim(answerText)) {
         if (!this.inputElementValidation(answerText, this.state.selectedQuestion.properties.content_type)) {
@@ -2002,7 +2003,7 @@ class WebLink extends React.Component {
       let count = this.state.selectedChoiceOptions ? this.state.selectedChoiceOptions.length : 0
       let objProperty = this.state.selectedQuestion.properties
       if (count < objProperty.minlimit) {
-        this.showNotification('Please select minimum ' + objProperty.minlimit + ' options', "info")
+        this.showNotification(this.props.t("Minimum_Validation_Msg") + objProperty.minlimit + " " + this.props.t("Option"), "info")
         return
       }
     }
@@ -2014,7 +2015,7 @@ class WebLink extends React.Component {
         let lengthofSet = this.state.selectedQuestion.properties.attribute_Set && this.state.selectedQuestion.properties.attribute_Set.length || 0
         /** logic is every set has least and most selection so its lenth * 2 */
         if (ansObj.length < (lengthofSet * 2)) {
-          this.showNotification('Please select least and most item for all set of question', "info")
+          this.showNotification(this.props.t("MaxDiffSelectMsg"), "info")
           return;
         }
       }
@@ -2082,10 +2083,10 @@ class WebLink extends React.Component {
             nextExists: false,
             cust_id: 0,
             error: idExists ? true : false,
-            alertMessage: idExists ? 'Survey Submitted Successfully' : this.state.alertMessage
+            alertMessage: idExists ? this.props.t("SurveySubmitted") : this.state.alertMessage
           });
 
-          this.showSuccessNotification("Survey Submitted Successfully", "info");
+          this.showSuccessNotification(this.props.t("SurveySubmitted"), "info");
 
         })
         .catch(error => {
@@ -2093,13 +2094,13 @@ class WebLink extends React.Component {
             this.showNotification(error.response.data.mandatoryError, "info");
           }
           else {
-            this.showNotification("Server error occurred in submitting the survey", "info");
+            this.showNotification(this.props.t("ServerError"), "info");
           }
         });
 
     }
     else {
-      this.showNotification("Please answer this question", "info");
+      this.showNotification(this.props.t("AnswerValidation"), "info");
     }
 
   };
@@ -3649,7 +3650,7 @@ class WebLink extends React.Component {
 
 
   render() {
-
+    const { t, i18n } = this.props;
     let questions = this.state.questions;
     let index = this.state.index;
     let increasingIndex = 0
@@ -4149,7 +4150,7 @@ class WebLink extends React.Component {
                       this.state.selectedQuestion.properties.scale_type === "maxdiff" ? (
                       <div className={`${this.state.isSlidingAllowed == true ? "scaleTableClass maxDiffCss" : "scaleTableClass maxDiffCss sliderArrow"}`}>
                         {(this.state.maxdifftableRow && this.state.maxdifftableRow.length > 0) ? <div className="slider-arrow">
-                          <h6>{(this.state.currentSliderPage + 1) + " Of " + this.state.maxdifftableRow.length}</h6>
+                          <h6>{t("Set") + " " + (this.state.currentSliderPage + 1) + " " + t("Of") + " " + this.state.maxdifftableRow.length}</h6>
                         </div> : ""}
                         <Slider
                           key={this.state.index}
@@ -4626,7 +4627,7 @@ class WebLink extends React.Component {
                       variant="contained"
                       color="primary"
                     >
-                      Back
+                      {t("Back")}
                     </Button>
                   )}
                   <Button
@@ -4643,7 +4644,7 @@ class WebLink extends React.Component {
                       marginBottom: "50px"
                     }}
                   >
-                    {this.state.nextExists === false ? "Submit" : "Next"}
+                    {this.state.nextExists === false ? t("Submit") : t("Next")}
                   </Button>
 
                 </div>
@@ -4657,4 +4658,4 @@ class WebLink extends React.Component {
     );
   }
 }
-export default withStyles(styles)(WebLink);
+export default withStyles(styles)(withTranslation()(WebLink));
