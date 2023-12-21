@@ -51,6 +51,7 @@ import "ag-grid-community/dist/styles/ag-grid.css";
 import "ag-grid-community/dist/styles/ag-theme-balham.css";
 
 import PreviewButton from "./PreviewButton";
+import EditButton from "./EditButton";
 import PhotoEditor from "./Imageeditor.jsx";
 import CustomHeader from "../../components/CustomHeader/CustomHeader";
 
@@ -221,6 +222,8 @@ class AgMissionResponse extends React.Component {
       sepMission: [],
       preview: false,
       previewMission: {},
+      editView: false,
+      editMission: {},
       data: [],
       tablePrepend: 2,
       statusOptions: [],
@@ -247,6 +250,7 @@ class AgMissionResponse extends React.Component {
 
       frameworkComponents: {
         previewButton: PreviewButton,
+        EditButton: EditButton,
         createImageSpan: CreateImageSpan,
         createVideoSpan: CreateVideoSpan,
         agColumnHeader: CustomHeader,
@@ -323,6 +327,8 @@ class AgMissionResponse extends React.Component {
     this.getDepartmentList();
     this.getClientList();
     this.getlanguagelist();
+
+    localStorage.removeItem("defaultfilterState")
   }
 
   /* Handle the close event of payment popup. */
@@ -506,6 +512,7 @@ class AgMissionResponse extends React.Component {
           paymentEnableDetails: e.value,
           paymentProjName: e.label
         });
+        localStorage.removeItem("defaultfilterState")
       })
       .catch(error => {
         console.error(error);
@@ -572,6 +579,8 @@ class AgMissionResponse extends React.Component {
         loadedlistItems = [];
         this.getMissionResponse('', defaultApirecordId, defaultApiPage);
         this.getClientresponseconfig()
+
+        localStorage.removeItem("defaultfilterState")
       }
     );
   };
@@ -679,6 +688,7 @@ class AgMissionResponse extends React.Component {
       {
         quickFilterText: ""
       });
+    localStorage.removeItem("defaultfilterState")
   }
 
   /*  Handles the event to apply the filter in the mission response table. */
@@ -1966,6 +1976,11 @@ class AgMissionResponse extends React.Component {
             this.doTheThing();
             this.stopLoading();
           }
+          if (this.state.editView == true) {
+            setTimeout(() => {
+              this.reloadEditMissionPreview()
+            }, 100);
+          }
         });
       })
       .catch(error => {
@@ -2273,7 +2288,14 @@ class AgMissionResponse extends React.Component {
         },
         filter: "customFilter"
       },
-
+      {
+        headerName: "Action",
+        field: "Edit",
+        lockPosition: true,
+        type: "g",
+        width: 120,
+        cellRenderer: "EditButton"
+      },
       {
         headerName: "Action",
         field: "preview",
@@ -2602,6 +2624,13 @@ class AgMissionResponse extends React.Component {
       let id = sepMission[0].survey_tag_id
       this.getMissionResponsepage(this.state.selectedlanguage.value, id, defaultApiPage, page)
     }
+
+    /** set stored filter state again to be persistence */
+    const storedFilterModel = this.loadFilterModelFromLocalStorage();
+    if (storedFilterModel) {
+      this.api.setFilterModel(storedFilterModel);
+    }
+
   };
   /*  Handles the function to design the column header and column definition.*/
   doTheThingpage = (page, exportCsv) => {
@@ -3021,7 +3050,7 @@ class AgMissionResponse extends React.Component {
         if (Number.isInteger(text)) {
           text = text.toString();
         }
-        if (prop[prop.length - 1] && prop[prop.length - 1] !== undefined) {
+        if (prop[prop.length - 1] && prop[prop.length - 1] !== undefined && (prop && prop.length > 1)) {
           prop[prop.length - 1].split(",").forEach(img => {
             if (img) {
               textImages.push({
@@ -3073,6 +3102,156 @@ class AgMissionResponse extends React.Component {
       );
     }
   };
+
+  /*  Handles the function to format the data for Editview. */
+  renderEditMission = (key, value, columnQue) => {
+    const { classes } = this.props;
+    if (columnQue && columnQue.type == "q") {
+      if (columnQue.type == "q" && (columnQue.queType == "upload" || columnQue.queType == "capture")) {
+        if (columnQue.mediaType == "video") {
+          return (
+            <video height="150" width="200" controls disablePictureInPicture={true} preload='metadata' controlslist={"nodownload"} src={value[value.length - 2] + '' + '#t=0.2'} />
+          )
+        }
+        else if (columnQue.mediaType == "audio") {
+          return (
+            <audio controls preload='none' controlsList={"nodownload"} src={value[value.length - 2]} />
+          )
+        }
+        else {
+          if (value && typeof value === "object") {
+            return (
+              this.editModeObjectRender(key, value, columnQue, true)
+            )
+          }
+          else {
+            return (
+              <div>
+                <h8 onClick={() => this.onAnswerEditClick(key, value, columnQue)}>{value}</h8>
+              </div>
+            );
+          }
+        }
+      }
+      else if (columnQue.type == "q" && (columnQue.queType == "choice" || columnQue.queType == "scale")) {
+        return (
+          this.editModeObjectRender(key, value, columnQue, false)
+        )
+      }
+      else if (columnQue.type == "q" && columnQue.queType == "barcode") {
+        if (value && typeof value === "object") {
+          return (
+            this.editModeObjectRender(key, value, columnQue, true)
+          )
+        }
+        else {
+          return (
+            <div>
+              <h8 onClick={() => this.onAnswerEditClick(key, value, columnQue)}>{value}</h8>
+            </div>
+          );
+        }
+      }
+      else {
+        return (
+          <div>
+            <h8 onClick={() => { this.onAnswerEditClick(key, value, columnQue) }}>{value}</h8>
+          </div>
+        );
+      }
+    }
+    else {
+      return (
+        <div>
+          <Tooltip
+            title={value ? value + " " : " "}
+            placement={"bottom"}
+            enterDelay={300}
+            classes={{ tooltip: classes.tooltipText }}
+          >
+            <span>{value}</span>
+          </Tooltip>
+        </div>
+      );
+    }
+  }
+  /** Comman object rendring for the edit mode */
+  editModeObjectRender = (key, value, columnQue, isUpload) => {
+    let textImages = [];
+    let imagesLoader = [];
+    let text = value[0] ? value[0] : "";
+    let opacity = value[0] ? value[0] === 1 ? 0.2 : 1 : 1;
+    // hide property for image
+    text = value[0] === 1 ? "" : text;
+    if (Number.isInteger(text)) {
+      text = text.toString();
+    }
+    if (value[value.length - 1] && value[value.length - 1] !== undefined && (value && value.length > 1)) {
+      value[value.length - 1].split(",").forEach(img => {
+        if (img) {
+          textImages.push({
+            src: img,
+            thumbnail: img,
+            thumbnailWidth: 5,
+            thumbnailHeight: 5
+          });
+          imagesLoader.push(true)
+        }
+      });
+    }
+    return (
+      <div onClick={() => { this.onAnswerEditClick(key, value, columnQue) }}>
+        <span>
+          <p
+            style={{
+              marginTop: 0,
+              marginBottom: 0
+            }}>{text}</p>
+        </span>
+        {textImages.length > 0 && textImages.map((image, index) => (
+          <img
+            key={image.src}
+            src={image.src}
+            alt={image.src}
+            height={isUpload == true ? "50" : "25"}
+            style={{
+              objectFit: "contain",
+              margin: "5px 5px 5px 0px"
+            }}
+          />
+        ))}
+      </div>
+    );
+  }
+  /** Handle click on edit answer in preview mode */
+  onAnswerEditClick = (key, value, columnQue) => {
+    var rowNode = this.api.getRowNode(this.state.survey_tag_id);
+    const eventData = {
+      api: rowNode.gridApi,
+      colDef: columnQue,
+      //column: rowNode.columnController.columnDefs,
+      columnApi: rowNode.columnController.columnApi,
+      context: rowNode.columnController.context,
+      data: rowNode.data,
+      // event: rowNode.columnController.columnDefs,
+      //node: rowNode.columnController.columnDefs,
+      rowIndex: rowNode.rowIndex,
+      value: value
+    };
+    this.onCellClicked(eventData)
+  }
+  /** Relaod edit mode preview section after editing any answer */
+  reloadEditMissionPreview = () => {
+    var rowNode = this.api.getRowNode(this.state.survey_tag_id);
+    if (rowNode) {
+      this.setState({
+        previewMission: rowNode.data,
+        editMission: rowNode.data
+      }, () => {
+        this.buildPreview()
+      })
+    }
+  }
   /*  
    *  Params used - answer_id,consumer_id,question_id,question_type,answer,survey_answer_tag_id to form the data.
    *  used the api to update the edited response.
@@ -3212,9 +3391,9 @@ class AgMissionResponse extends React.Component {
     }
   };
   /*  
- *  Params used - mission_id.
- *  used the api to filter metric data.
- */
+  *  Params used - mission_id.
+  *  used the api to filter metric data.
+  */
   metricFilter = (missionId) => {
     api2.get("v1/survey_report/metric_filter?mission_id=" + missionId)
       .then(resp => {
@@ -3223,10 +3402,10 @@ class AgMissionResponse extends React.Component {
         })
       })
   }
-  /*  
-   *  Params used - mission_id.
-   *  used the api to delete the metric column.
-   */
+  /*
+  *  Params used - mission_id.
+  *  used the api to delete the metric column.
+  */
   deleteColumn = (id) => {
     api2
       .delete("v1/survey_report/metrics", { data: { id: id } })
@@ -3310,6 +3489,7 @@ class AgMissionResponse extends React.Component {
   closePreview = () => {
     this.setState({
       preview: false,
+      editView: false,
       page: 0,
       pagecount: this.state.datapagecount,
       rowsPerPage: this.state.rowsPerPage,
@@ -3323,19 +3503,21 @@ class AgMissionResponse extends React.Component {
     this.state.columnDefs.forEach(c => {
       previewMissionkeys.forEach((k, index) => {
         if (c.headerName !== 'Action' && c.headerName !== 'Payment' && c.field === k) {
-          list.push(
-            <Fragment key={index}>
-              <Grid container alignItems="center">
-                <Typography gutterBottom variant="h6" style={{ marginLeft: 20, fontSize: 12, fontWeight: 600 }}>
-                  &bull; {c.id ? c.id + '_' + c.headerName : c.headerName}
-                </Typography>
-              </Grid>
-              <Grid container alignItems="center" style={{ marginLeft: 40, fontSize: 12 }}>
-                {this.renderText(previewMissionvalues[index])}
-              </Grid>
-              <Divider variant="middle" />
-            </Fragment>
-          );
+          if (previewMissionvalues[index]) {
+            list.push(
+              <Fragment key={index}>
+                <Grid container alignItems="center">
+                  <Typography gutterBottom variant="h6" style={{ marginLeft: 20, fontSize: 12, fontWeight: 600 }}>
+                    &bull; {c.id ? c.id + '_' + c.headerName : c.headerName}
+                  </Typography>
+                </Grid>
+                <Grid container alignItems="center" style={{ marginLeft: 40, fontSize: 12 }}>
+                  {(this.state.editView == true && this.state.preview == true) ? this.renderEditMission(previewMissionkeys[index], previewMissionvalues[index], c) : this.renderText(previewMissionvalues[index])}
+                </Grid>
+                <Divider variant="middle" />
+              </Fragment>
+            );
+          }
         }
       })
     })
@@ -3372,6 +3554,22 @@ class AgMissionResponse extends React.Component {
   methodFromParent(cell) {
     this.setState({
       preview: true,
+      previewMission: cell.data,
+      editView: false,
+      editMission: {},
+      page: 0,
+      pagecount: this.state.datapagecount,
+      rowsPerPage: this.state.rowsPerPage,
+    });
+  }
+
+  /* Function call from child component to edit the cell data,pagecount and number of rows per page. */
+  methodFromParentEdit(cell) {
+    this.setState({
+      editView: true,
+      preview: true,
+      editMission: cell.data,
+      clickedCellEdit: cell,
       previewMission: cell.data,
       page: 0,
       pagecount: this.state.datapagecount,
@@ -3473,12 +3671,21 @@ class AgMissionResponse extends React.Component {
       }
       return 0;
     })
+
+    /** Storing default filter state in local for persistence custom filter is already persistence*/
+    let filterModel = params.api.getFilterModel();
+    localStorage.setItem('defaultfilterState', JSON.stringify(filterModel));
+
     this.setState({
       activefiltermenu: activemenu
     }, () => { this.api.refreshHeader(); })
 
   }
-
+  /** get filter state from local storage */
+  loadFilterModelFromLocalStorage = () => {
+    const filterModel = localStorage.getItem('defaultfilterState');
+    return filterModel ? JSON.parse(filterModel) : null;
+  };
 
   /* Handles the navigation of page. */
   handleChangePage = (event, page) => {
@@ -3536,14 +3743,11 @@ class AgMissionResponse extends React.Component {
     const { classes } = this.props;
     const { msgColor, br, message, page, pagecount, rowsPerPage } = this.state;
     this.apikey = localStorage.getItem("api_key")
-    // console.log("agmissionResponse 3472 this.apikey")
-    // console.log(this.apikey)
     var hideButton = true
     if (localStorage.getItem('role') !== null && localStorage.getItem('role') !== "CLIENT") {
       hideButton = false
     }
     if (this.state.Createclientscreen === true) {
-      console.log(this.state.clientscreendata)
       return <Redirect
         to={{
           pathname: '/home/create-client-screen',
@@ -3746,7 +3950,7 @@ class AgMissionResponse extends React.Component {
                     <GridItem xs={6} sm={6} md={6}>
                       <Card style={{ marginTop: 20 }}>
                         <h1 style={{ padding: "10px 20px", fontSize: 14, fontWeight: 600 }}>
-                          PREVIEW
+                          {(this.state.editView == true && this.state.preview == true) ? "EDIT SURVEY" : "PREVIEW"}
                           <Button
                             style={{
                               margin: "0px 0px",
@@ -3788,7 +3992,7 @@ class AgMissionResponse extends React.Component {
                             onModelUpdated={this.calculateRowCount}
                             onColumnMoved={this.columnMoved}
                             onColumnResized={this.onColumnResized}
-                            // rowData={this.state.listItems}
+                            rowData={this.state.listItems}
                             //onCellValueChanged={this.onCellValueChanged}
                             onRowDataChanged={this.updateColumns}
                             getRowNodeId={function (data) { return data.survey_tag_id; }}

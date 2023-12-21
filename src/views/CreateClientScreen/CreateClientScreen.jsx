@@ -86,25 +86,7 @@ function getSteps() {
   ];
 }
 
-/* Handles the snackbar message notification. */
-function showNotification(msg, color) {
-  this.setState({
-    message: msg,
-    msgColor: color
-  });
 
-  let place = "br";
-  var x = [];
-  x[place] = true;
-  this.setState(x);
-  this.alertTimeout = setTimeout(
-    function () {
-      x[place] = false;
-      this.setState(x);
-    }.bind(this),
-    3000
-  );
-}
 
 
 class ClientScreen extends Component {
@@ -114,7 +96,7 @@ class ClientScreen extends Component {
     super(props);
     this.state = {
       /* Snackbar props. */
-      msgColor: "",
+      msgColor: "info",
       message: "",
       br: false,
       seletectdetail: this.props.location.state.data,
@@ -158,6 +140,26 @@ class ClientScreen extends Component {
         seletectdetail: this.props.location.state.data
       })
     }
+  }
+
+  /* Handles the snackbar message notification. */
+  showNotification(msg, color) {
+    this.setState({
+      message: msg,
+      msgColor: color
+    });
+
+    let place = "br";
+    var x = [];
+    x[place] = true;
+    this.setState(x);
+    this.alertTimeout = setTimeout(
+      function () {
+        x[place] = false;
+        this.setState(x);
+      }.bind(this),
+      3000
+    );
   }
 
   /* Handles the events to update columndef in pageOne.jsx. */
@@ -217,8 +219,10 @@ class ClientScreen extends Component {
         .then(resp => {
 
           if (resp.data.status === 200) {
-            showNotification("Client Response Screen Updated Successfully", "success");
-            this.setState({ redirect: true });
+            this.showNotification("Client Response Screen Updated Successfully", "success");
+            setTimeout(() => {
+              this.setState({ redirect: true });
+            }, 1500);
           }
         })
         .catch(error => {
@@ -232,8 +236,10 @@ class ClientScreen extends Component {
         .post("v1/client_response_config", data)
         .then(resp => {
           if (resp.data.status === 200) {
-            showNotification("Client Response Screen Created Successfully", "success");
-            this.setState({ redirect: true });
+            this.showNotification("Client Response Screen Created Successfully", "success");
+            setTimeout(() => {
+              this.setState({ redirect: true });
+            }, 1500);
           }
         })
         .catch(error => {
