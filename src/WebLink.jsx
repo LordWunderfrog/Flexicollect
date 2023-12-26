@@ -507,6 +507,50 @@ class WebLink extends React.Component {
     if (this.state.selectedAnswer && this.state.selectedAnswer.other_value) {
       otheroptionvalue = this.state.selectedAnswer.other_value;
     }
+
+    /** Randomise option if random is selected */
+    if (this.state.selectedQuestion.type === "choice" && this.state.selectedQuestion.properties.hasOwnProperty('random') && this.state.selectedQuestion.properties.random == 1) {
+      const shuffleItem = [];
+      let otherObject = {};
+      let noneofaboveObjet = {};
+      updatedChoiceOptions.forEach(item => {
+        if (item.id == 'other') {
+          otherObject = item
+        }
+        else if (item.id == 'noneofabove') {
+          noneofaboveObjet = item
+        }
+        else {
+          if (item.sublabel && item.sublabel.length > 0) {
+            this.shuffle(item.sublabel)
+            shuffleItem.push(item);
+          }
+          else {
+            shuffleItem.push(item);
+          }
+        }
+      });
+      updatedChoiceOptions = this.shuffle(shuffleItem)
+      if (otherObject && Object.keys(otherObject).length > 0) {
+        updatedChoiceOptions.push(otherObject)
+      }
+      if (noneofaboveObjet && Object.keys(noneofaboveObjet).length > 0) {
+        updatedChoiceOptions.push(noneofaboveObjet) /** None of above always last */
+      }
+    }
+    else {
+      /** None of above always last */
+      updatedChoiceOptions.forEach(item => {
+        if (item.id == 'noneofabove') {
+          const noneOfAboveIndex = this.getIndexById(updatedChoiceOptions, "noneofabove");
+          if (noneOfAboveIndex !== -1) {
+            updatedChoiceOptions.splice(noneOfAboveIndex, 1);
+            updatedChoiceOptions.push(item);
+          }
+        }
+      });
+    }
+
     this.setState({
       updatedChoiceOptions: updatedChoiceOptions,
       selectedChoiceOptions: selectedChoiceOptions,
@@ -515,6 +559,15 @@ class WebLink extends React.Component {
     });
 
   };
+
+  getIndexById(arr, id) {
+    for (let i = 0; i < arr.length; i++) {
+      if (arr[i].id === id) {
+        return i;
+      }
+    }
+    return -1;
+  }
 
   /* Handles the event to update the other option value to the state variable.*/
   setOtherValue(e) {
@@ -712,6 +765,21 @@ class WebLink extends React.Component {
       updatedChoiceOptions: updatedChoiceOptions,
       otheroptiontextbox: otheroptiontextbox
     });
+  }
+
+  /** Shuffle Array */
+  shuffle(arrList) {
+    let ctr = arrList.length;
+    let temp;
+    let index;
+    while (ctr > 0) {
+      index = Math.floor(Math.random() * ctr);
+      ctr--;
+      temp = arrList[ctr];
+      arrList[ctr] = arrList[index];
+      arrList[index] = temp;
+    }
+    return arrList;
   }
 
   /* Handles the event to validate the scale type and renders the options in the modal popup. */
