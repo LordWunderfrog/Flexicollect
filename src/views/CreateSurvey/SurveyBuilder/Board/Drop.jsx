@@ -2486,6 +2486,7 @@ class Card extends React.Component {
         fieldprops.properties.multilevel = 0;
         fieldprops.properties.setlimit = 0;
         fieldprops.properties.noneofabove = 0;
+        fieldprops.properties.random = 0;
         fieldprops.properties.setlimit_type = ""
         this.setState({
             fieldprops
@@ -6860,10 +6861,10 @@ class Card extends React.Component {
                                 <div className="below-lanbel-body">
                                     <div className="switch-text-boxes switch-text-boxes-mandatory clear">
                                         <div className="switch-textboxes xtboxestext"
-                                            style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
+                                            style={(this.state.currentlanguage.value !== "English" || this.state.fieldprops.properties.display_type === "dropdown") ? disabledive : {}}
                                         >Random Options</div>
                                         <div className="switches-boxes"
-                                            style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
+                                            style={(this.state.currentlanguage.value !== "English" || this.state.fieldprops.properties.display_type === "dropdown") ? disabledive : {}}
                                         >
                                             <Switch checked={Boolean(this.state.fieldprops.properties.random)}
                                                 onChange={this.random("random")} value="random" color="primary" />
@@ -6876,13 +6877,12 @@ class Card extends React.Component {
                                 <div className="below-lanbel-body">
                                     <div className="switch-text-boxes switch-text-boxes-mandatory clear">
                                         <div className="switch-textboxes xtboxestext"
-                                            style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
+                                            style={(this.state.currentlanguage.value !== "English" || this.state.fieldprops.properties.display_type === "dropdown") ? disabledive : {}}
                                         >Set Selection Limit</div>
                                         <div className="switches-boxes"
-                                            style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
+                                            style={(this.state.currentlanguage.value !== "English" || this.state.fieldprops.properties.display_type === "dropdown") ? disabledive : {}}
                                         >
                                             <Switch checked={Boolean(this.state.fieldprops.properties.setlimit)}
-                                                style={this.state.fieldprops.properties.display_type === "dropdown" ? disabledive : null}
                                                 onChange={this.setlimit('setlimit')} value="setlimit" color="primary" />
                                         </div>
                                     </div>
