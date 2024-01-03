@@ -4552,11 +4552,12 @@ class Card extends React.Component {
                                     onBlur={() => this.handleBlur(this.state.fieldprops.properties.question_text)}
                                     // onChange={e => this.updateprops(e, "inputquestion")}
                                     onChange={(html, delta, source) => {
-                                        const containsImage = html.includes('<img');
-                                        if (containsImage) {
-                                            this.showNotification("Image not allowed. Please use bellow information type image option to add image", "danger")
-                                            return
-                                        }
+                                        // const containsImage = html.includes('<img');
+                                        // if (containsImage) {
+                                        //     this.showNotification("Image not allowed. Please use bellow information type image option to add image", "danger")
+
+                                        //     return
+                                        // }
                                         if (source === 'user') {
                                             this.inputquestion(html, "inputquestion")
                                         }
@@ -4590,11 +4591,11 @@ class Card extends React.Component {
                                     formats={this.formats}
                                     // onChange={e => this.updateprops(e, "inputsubheading")}
                                     onChange={(html, delta, source) => {
-                                        const containsImage = html.includes('<img');
-                                        if (containsImage) {
-                                            this.showNotification("Image not allowed. Please use bellow information type image option to add image", "danger")
-                                            return
-                                        }
+                                        // const containsImage = html.includes('<img');
+                                        // if (containsImage) {
+                                        //     this.showNotification("Image not allowed. Please use bellow information type image option to add image", "danger")
+                                        //     return
+                                        // }
                                         if (source === 'user') {
                                             this.inputsubheading(html, "inputsubheading")
                                         }
@@ -4647,11 +4648,11 @@ class Card extends React.Component {
                                             modules={this.modules_minimal}
                                             formats={this.formats}
                                             onChange={(html, delta, source) => {
-                                                const containsImage = html.includes('<img');
-                                                if (containsImage) {
-                                                    this.showNotification("Image not allowed. Please use bellow information type image option to add image", "danger")
-                                                    return
-                                                }
+                                                // const containsImage = html.includes('<img');
+                                                // if (containsImage) {
+                                                //     this.showNotification("Image not allowed. Please use bellow information type image option to add image", "danger")
+                                                //     return
+                                                // }
                                                 if (source === 'user') {
                                                     this.info_text(html, "info_text")
                                                 }
@@ -4921,11 +4922,11 @@ class Card extends React.Component {
                                     //     }
                                     //   }}
                                     onChange={(html, delta, source) => {
-                                        const containsImage = html.includes('<img');
-                                        if (containsImage) {
-                                            this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
-                                            return
-                                        }
+                                        // const containsImage = html.includes('<img');
+                                        // if (containsImage) {
+                                        //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
+                                        //     return
+                                        // }
                                         if (source === 'user') {
                                             this.inputquestion(html, "inputquestion")
                                         }
@@ -4976,11 +4977,11 @@ class Card extends React.Component {
                                     modules={this.modules_minimal}
                                     formats={this.formats}
                                     onChange={(html, delta, source) => {
-                                        const containsImage = html.includes('<img');
-                                        if (containsImage) {
-                                            this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
-                                            return
-                                        }
+                                        // const containsImage = html.includes('<img');
+                                        // if (containsImage) {
+                                        //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
+                                        //     return
+                                        // }
                                         if (source === 'user') {
                                             this.inputsubheading(html, "inputsubheading")
                                             //   this.updateprops(html, "inputsubheading")
@@ -5143,11 +5144,11 @@ class Card extends React.Component {
                                     modules={this.modules_minimal}
                                     formats={this.formats}
                                     onChange={(html, delta, source) => {
-                                        const containsImage = html.includes('<img');
-                                        if (containsImage) {
-                                            this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
-                                            return
-                                        }
+                                        // const containsImage = html.includes('<img');
+                                        // if (containsImage) {
+                                        //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
+                                        //     return
+                                        // }
                                         if (source === 'user') {
                                             this.inputsublabel(html, "inputsublabel")
                                         }
@@ -5233,11 +5234,11 @@ class Card extends React.Component {
                                     modules={this.modules_minimal}
                                     formats={this.formats}
                                     onChange={(html, delta, source) => {
-                                        const containsImage = html.includes('<img');
-                                        if (containsImage) {
-                                            this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
-                                            return
-                                        }
+                                        // const containsImage = html.includes('<img');
+                                        // if (containsImage) {
+                                        //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
+                                        //     return
+                                        // }
                                         if (source === 'user') {
                                             this.inputquestion(html, "inputquestion")
                                         }
@@ -5275,11 +5276,11 @@ class Card extends React.Component {
                                     formats={this.formats}
                                     // onChange={this.richTextInput}
                                     onChange={(html, delta, source) => {
-                                        const containsImage = html.includes('<img');
-                                        if (containsImage) {
-                                            this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
-                                            return
-                                        }
+                                        // const containsImage = html.includes('<img');
+                                        // if (containsImage) {
+                                        //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
+                                        //     return
+                                        // }
                                         if (source === 'user') {
                                             this.inputsubheading(html, "inputsubheading")
                                         }
@@ -5602,11 +5603,11 @@ class Card extends React.Component {
                                     onFocus={() => this.handleFocus(this.state.fieldprops.properties.question_text)}
                                     onBlur={() => this.handleBlur(this.state.fieldprops.properties.question_text)}
                                     onChange={(html, delta, source) => {
-                                        const containsImage = html.includes('<img');
-                                        if (containsImage) {
-                                            this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
-                                            return
-                                        }
+                                        // const containsImage = html.includes('<img');
+                                        // if (containsImage) {
+                                        //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
+                                        //     return
+                                        // }
                                         if (source === 'user') {
                                             this.inputquestion(html, "inputquestion")
                                         }
@@ -5639,11 +5640,11 @@ class Card extends React.Component {
                                     modules={this.modules_minimal}
                                     formats={this.formats}
                                     onChange={(html, delta, source) => {
-                                        const containsImage = html.includes('<img');
-                                        if (containsImage) {
-                                            this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
-                                            return
-                                        }
+                                        // const containsImage = html.includes('<img');
+                                        // if (containsImage) {
+                                        //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
+                                        //     return
+                                        // }
                                         if (source === 'user') {
                                             this.inputsubheading(html, "inputsubheading")
                                         }
@@ -5950,11 +5951,11 @@ class Card extends React.Component {
                                     onFocus={() => this.handleFocus(this.state.fieldprops.properties.question_text)}
                                     onBlur={() => this.handleBlur(this.state.fieldprops.properties.question_text)}
                                     onChange={(html, delta, source) => {
-                                        const containsImage = html.includes('<img');
-                                        if (containsImage) {
-                                            this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
-                                            return
-                                        }
+                                        // const containsImage = html.includes('<img');
+                                        // if (containsImage) {
+                                        //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
+                                        //     return
+                                        // }
                                         if (source === 'user') {
                                             this.inputquestion(html, "inputquestion")
                                         }
@@ -5987,11 +5988,11 @@ class Card extends React.Component {
                                     modules={this.modules_minimal}
                                     formats={this.formats}
                                     onChange={(html, delta, source) => {
-                                        const containsImage = html.includes('<img');
-                                        if (containsImage) {
-                                            this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
-                                            return
-                                        }
+                                        // const containsImage = html.includes('<img');
+                                        // if (containsImage) {
+                                        //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
+                                        //     return
+                                        // }
                                         if (source === 'user') {
                                             this.inputsubheading(html, "inputsubheading")
                                         }
@@ -6652,11 +6653,11 @@ class Card extends React.Component {
                                         onFocus={() => this.handleFocus(this.state.fieldprops.properties.question_text)}
                                         onBlur={() => this.handleBlur(this.state.fieldprops.properties.question_text)}
                                         onChange={(html, delta, source) => {
-                                            const containsImage = html.includes('<img');
-                                            if (containsImage) {
-                                                this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
-                                                return
-                                            }
+                                            // const containsImage = html.includes('<img');
+                                            // if (containsImage) {
+                                            //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
+                                            //     return
+                                            // }
                                             if (source === 'user') {
                                                 this.inputquestion(html, "inputquestion")
                                             }
@@ -6689,11 +6690,11 @@ class Card extends React.Component {
                                         modules={this.modules_minimal}
                                         formats={this.formats}
                                         onChange={(html, delta, source) => {
-                                            const containsImage = html.includes('<img');
-                                            if (containsImage) {
-                                                this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
-                                                return
-                                            }
+                                            // const containsImage = html.includes('<img');
+                                            // if (containsImage) {
+                                            //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
+                                            //     return
+                                            // }
                                             if (source === 'user') {
                                                 this.inputsubheading(html, "inputsubheading")
                                             }
@@ -7023,11 +7024,11 @@ class Card extends React.Component {
                                                                         modules={this.modules_minimal}
                                                                         formats={this.formats}
                                                                         onChange={(html, delta, source) => {
-                                                                            const containsImage = html.includes('<img');
-                                                                            if (containsImage) {
-                                                                                this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
-                                                                                return
-                                                                            }
+                                                                            // const containsImage = html.includes('<img');
+                                                                            // if (containsImage) {
+                                                                            //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
+                                                                            //     return
+                                                                            // }
                                                                             if (source === 'user') {
                                                                                 this.label(html, "label", index)
                                                                             }
@@ -7082,11 +7083,11 @@ class Card extends React.Component {
                                                                                                 modules={this.modules_minimal}
                                                                                                 formats={this.formats}
                                                                                                 onChange={(html, delta, source) => {
-                                                                                                    const containsImage = html.includes('<img');
-                                                                                                    if (containsImage) {
-                                                                                                        this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
-                                                                                                        return
-                                                                                                    }
+                                                                                                    // const containsImage = html.includes('<img');
+                                                                                                    // if (containsImage) {
+                                                                                                    //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
+                                                                                                    //     return
+                                                                                                    // }
                                                                                                     if (source === 'user') {
                                                                                                         this.childlabel(html, "childlabel", index, key)
                                                                                                     }
@@ -7219,11 +7220,11 @@ class Card extends React.Component {
                                     onFocus={() => this.handleFocus(this.state.fieldprops.properties.question_text)}
                                     onBlur={() => this.handleBlur(this.state.fieldprops.properties.question_text)}
                                     onChange={(html, delta, source) => {
-                                        const containsImage = html.includes('<img');
-                                        if (containsImage) {
-                                            this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
-                                            return
-                                        }
+                                        // const containsImage = html.includes('<img');
+                                        // if (containsImage) {
+                                        //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
+                                        //     return
+                                        // }
                                         if (source === 'user') {
                                             this.inputquestion(html, "inputquestion")
                                         }
@@ -7256,11 +7257,11 @@ class Card extends React.Component {
                                     modules={this.modules_minimal}
                                     formats={this.formats}
                                     onChange={(html, delta, source) => {
-                                        const containsImage = html.includes('<img');
-                                        if (containsImage) {
-                                            this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
-                                            return
-                                        }
+                                        // const containsImage = html.includes('<img');
+                                        // if (containsImage) {
+                                        //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
+                                        //     return
+                                        // }
                                         if (source === 'user') {
                                             this.inputsubheading(html, "inputsubheading")
                                         }
@@ -7489,11 +7490,11 @@ class Card extends React.Component {
                                     onFocus={() => this.handleFocus(this.state.fieldprops.properties.question_text)}
                                     onBlur={() => this.handleBlur(this.state.fieldprops.properties.question_text)}
                                     onChange={(html, delta, source) => {
-                                        const containsImage = html.includes('<img');
-                                        if (containsImage) {
-                                            this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
-                                            return
-                                        }
+                                        // const containsImage = html.includes('<img');
+                                        // if (containsImage) {
+                                        //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
+                                        //     return
+                                        // }
                                         if (source === 'user') {
                                             this.inputquestion(html, "inputquestion")
                                         }
@@ -7620,11 +7621,11 @@ class Card extends React.Component {
                                         modules={this.modules_minimal}
                                         formats={this.formats}
                                         onChange={(html, delta, source) => {
-                                            const containsImage = html.includes('<img');
-                                            if (containsImage) {
-                                                this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
-                                                return
-                                            }
+                                            // const containsImage = html.includes('<img');
+                                            // if (containsImage) {
+                                            //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
+                                            //     return
+                                            // }
                                             if (source === 'user') {
                                                 this.inputsubheading(html, "inputsubheading")
                                             }
