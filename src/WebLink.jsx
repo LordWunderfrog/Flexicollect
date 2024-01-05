@@ -4415,6 +4415,9 @@ class WebLink extends React.Component {
                                             style={{
                                               position: "absolute",
                                               right: 10,
+                                              width: "20%",
+                                              height: "30px",
+                                              objectFit: "contain",
                                             }}
                                           />
                                         )}
@@ -4495,7 +4498,10 @@ class WebLink extends React.Component {
                                                       src={subval.label_image}
                                                       style={{
                                                         position: "absolute",
-                                                        right: 5
+                                                        right: 5,
+                                                        width: "20%",
+                                                        height: "30px",
+                                                        objectFit: "contain",
                                                       }}
                                                     />
                                                   )}{" "}
