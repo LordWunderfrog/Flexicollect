@@ -4366,47 +4366,101 @@ class WebLink extends React.Component {
                                         borderRight: "2px solid rgba(0,0,0,0.15)",
                                         borderTop: (index === 0) ? "2px solid rgba(0,0,0,0.15)" : "0px solid rgba(0,0,0,0.15)",
                                         borderBottom: "2px solid rgba(0,0,0,0.15)",
+                                        display: "flex",
+                                        justifyContent: "space-between",
                                         padding: 15,
                                       }}
                                     >
+                                      <div style={{ width: "50%" }}>
+                                        {selectedQuestion.properties.multilevel === 0 &&
+                                          selectedQuestion.properties.choice_type ===
+                                          "single" ? (
+
+                                          <input
+                                            name="choice"
+                                            type="radio"
+                                            id={index}
+                                            defaultChecked={value.defaultValue}
+                                            onChange={(e) => this.onChoiceClick(value, e)}
+                                            style={{
+                                              //marginTop: 3,
+                                              verticalAlign: "top",
+                                              fontStyle: "Roboto"
+                                            }}
+                                          />
+                                        ) : selectedQuestion.properties.multilevel === 0 &&
+                                          selectedQuestion.properties.choice_type ===
+                                          "multiple" ? (
+                                          <input
+                                            type="checkbox"
+                                            id={index}
+                                            // defaultChecked={value.defaultValue}
+                                            checked={value.defaultValue}
+                                            onChange={(e) => this.onChoiceClick(value, e)}
+                                            style={{
+                                              //marginTop: 3,
+                                              verticalAlign: "top",
+                                              fontStyle: "Roboto"
+                                            }}
+                                          />
+                                        ) : (
+                                          ""
+                                        )}
+                                        <label htmlFor={index}>{value.label}</label>{" "}
 
 
-                                      {selectedQuestion.properties.multilevel === 0 &&
-                                        selectedQuestion.properties.choice_type ===
-                                        "single" ? (
-
-                                        <input
-                                          name="choice"
-                                          type="radio"
-                                          id={index}
-                                          defaultChecked={value.defaultValue}
-                                          onChange={(e) => this.onChoiceClick(value, e)}
-                                          style={{
-                                            //marginTop: 3,
-                                            verticalAlign: "top",
-                                            fontStyle: "Roboto"
+                                        {selectedQuestion.properties.multilevel === 0 && value.id === "other" ?
+                                          <TextField style={{
+                                            display: "flex"
                                           }}
-                                        />
-                                      ) : selectedQuestion.properties.multilevel === 0 &&
-                                        selectedQuestion.properties.choice_type ===
-                                        "multiple" ? (
-                                        <input
-                                          type="checkbox"
-                                          id={index}
-                                          // defaultChecked={value.defaultValue}
-                                          checked={value.defaultValue}
-                                          onChange={(e) => this.onChoiceClick(value, e)}
-                                          style={{
-                                            //marginTop: 3,
-                                            verticalAlign: "top",
-                                            fontStyle: "Roboto"
-                                          }}
-                                        />
-                                      ) : (
-                                        ""
-                                      )}
+                                            multiline={true}
+                                            disabled={!value.defaultValue}
+                                            defaultValue={selectedAnswer.other_value ? selectedAnswer.other_value : ''}
+                                            value={this.state.otheroptionvalue}
+                                            onChange={(e) => this.setOtherValue(e)}
+                                          /> : ('')
+                                        }
+                                      </div>
 
-                                      <label htmlFor={index}>{value.label}</label>{" "}
+                                      <div style={{ width: "50%" }}>
+                                        {value.label_image &&
+                                          value.label_image.length > 0 && (
+                                            selectedQuestion.properties.multilevel === 0 && selectedQuestion.properties.image_size == "large" ?
+                                              <img
+                                                alt="label"
+                                                src={value.label_image}
+                                                style={{
+                                                  maxWidth: "100%",
+                                                  width: "auto",
+                                                  height: "auto",
+                                                }}
+                                              />
+                                              :
+                                              selectedQuestion.properties.multilevel === 0 && selectedQuestion.properties.image_size == "medium" ?
+                                                <img
+                                                  alt="label"
+                                                  src={value.label_image}
+                                                  style={{
+                                                    width: "auto",
+                                                    height: "50px",
+                                                    objectFit: "contain",
+                                                  }}
+                                                />
+                                                :
+                                                <img
+                                                  alt="label"
+                                                  src={value.label_image}
+                                                  style={{
+                                                    right: 60,
+                                                    width: "auto",
+                                                    height: "30px",
+                                                    objectFit: "contain",
+                                                  }}
+                                                />
+                                          )}
+                                      </div>
+
+                                      {/* <label htmlFor={index}>{value.label}</label>{" "}
                                       {value.label_image &&
                                         value.label_image.length > 0 && (
                                           <img
@@ -4420,18 +4474,8 @@ class WebLink extends React.Component {
                                               objectFit: "contain",
                                             }}
                                           />
-                                        )}
-                                      {selectedQuestion.properties.multilevel === 0 && value.id === "other" ?
-                                        <TextField style={{
-                                          display: "flex"
-                                        }}
-                                          multiline={true}
-                                          disabled={!value.defaultValue}
-                                          defaultValue={selectedAnswer.other_value ? selectedAnswer.other_value : ''}
-                                          value={this.state.otheroptionvalue}
-                                          onChange={(e) => this.setOtherValue(e)}
-                                        /> : ('')
-                                      }
+                                        )} */}
+
                                     </div>
 
                                     <div
