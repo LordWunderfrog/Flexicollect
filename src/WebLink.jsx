@@ -2196,13 +2196,12 @@ class WebLink extends React.Component {
             unMetTarget[k].hasOwnProperty("multifield") &&
             unMetTarget[k].multifield.length > 0
           ) {
-            //
+
             if (!unMetTarget[k].hasOwnProperty('loop') && (unMetTarget[k].do === "loop" ||
               unMetTarget[k].do === "loop_input" || unMetTarget[k].do === "loop_set")) {
               this.hide_unMetTarget_loopques(unMetTarget[k], questionsArray, currentQuesIndx)
             }
-            //
-            //
+
             if (unMetTarget[k].do === "loop") {
               this.clear_looponly(questionsArray, unMetTarget[k], currentQuesIndx, 'loop')
               this.clear_loop_answer(questionsArray, unMetTarget[k], currentQuesIndx, 'loop')
@@ -2214,7 +2213,7 @@ class WebLink extends React.Component {
               this.clear_loopinput(questionsArray, unMetTarget[k], currentQuesIndx, 'loop_input')
               this.clear_loop_answer(questionsArray, unMetTarget[k], currentQuesIndx, 'loop_input')
             }
-            //
+
             questionsArray = this.state.questions
             for (let j = 0; j < unMetTarget[k].multifield.length; j++) {
               for (let i = 0; i < questionsArray.length; i++) {
@@ -2234,7 +2233,29 @@ class WebLink extends React.Component {
                       }
                     }
                   }
-                  // break;
+                  else {
+                    /**To solve issue of hide multiple condition not working inside the looping condition added this else part 
+                        * in target and unmate target both section */
+                    if (
+                      unMetTarget[k].multifield[j].value ===
+                      questionsArray[i].question.handler
+                    ) {
+
+                      if (unMetTarget[k].do === "show_multiple") {
+                        questionsArray[i].isHide = false;
+                      } else if (unMetTarget[k].do === "hide_multiple") {
+                        questionsArray[i].isHide = false;
+                      }
+                      if (unMetTarget[k].hasOwnProperty('isHide') && unMetTarget[k].isHide) {
+                        if (unMetTarget[k].multifield[j].hasOwnProperty('trigger') && unMetTarget[k].multifield[j].trigger) {
+                          // skip triggerd ques in the list
+                        } else {
+                          questionsArray[i].isHide = true;
+                          this.clear_loop_answer(questionsArray, target[k], i, 'hide')
+                        }
+                      }
+                    }
+                  }
                 } else {
                   if (
                     unMetTarget[k].multifield[j].value ===
@@ -2246,7 +2267,6 @@ class WebLink extends React.Component {
                     } else if (unMetTarget[k].do === "hide_multiple") {
                       questionsArray[i].isHide = false;
                     }
-                    //
                     if (unMetTarget[k].hasOwnProperty('isHide') && unMetTarget[k].isHide) {
                       if (unMetTarget[k].multifield[j].hasOwnProperty('trigger') && unMetTarget[k].multifield[j].trigger) {
                         // skip triggerd ques in the list
@@ -2255,7 +2275,6 @@ class WebLink extends React.Component {
                         this.clear_loop_answer(questionsArray, target[k], i, 'hide')
                       }
                     }
-                    //
                   }
                 }
               }
@@ -2264,18 +2283,18 @@ class WebLink extends React.Component {
           } else {
             for (let i = 0; i < questionsArray.length; i++) {
               if (unMetTarget[k].loop) {
-                if (unMetTarget[k].value === questionsArray[i].question.handler && questionsArray[i].loop_triggered_qid === unMetTarget[k].loop_triggered_qid
+                if (unMetTarget[k].handler === questionsArray[i].question.handler && questionsArray[i].loop_triggered_qid === unMetTarget[k].loop_triggered_qid
                   && questionsArray[i].loop_set_num === unMetTarget[k].loop_set_num
                 ) {
                   if (unMetTarget[k].do === "show") {
                     if (unMetTarget[k].loop_number < questionsArray[i].loop_number) {
                       questionsArray[i].isHide = false;
-                      break;
+                      // break;  //Hide break to solve issue of loop inside loop(one more loop inside that) is not showing the condtion
                     }
                   } else if (unMetTarget[k].do === "hide") {
                     if (unMetTarget[k].loop_number < questionsArray[i].loop_number) {
                       questionsArray[i].isHide = false;
-                      break;
+                      // break;  //Hide break to solve issue of loop inside loop(one more loop inside that) is not hiding the condtion
                     }
                   }
                 }
@@ -2299,13 +2318,10 @@ class WebLink extends React.Component {
             target[k].hasOwnProperty("multifield") &&
             target[k].multifield.length > 0
           ) {
-            //
             if (!target[k].hasOwnProperty('loop') && (target[k].do === "loop" ||
               target[k].do === "loop_input" || target[k].do === "loop_set")) {
               this.hide_unMetTarget_loopques(target[k], questionsArray, currentQuesIndx)
             }
-            //
-            //
             if (target[k].do === "loop") {
               this.create_loop(questionsArray, target[k], currentQuesIndx, 'loop')
             } else if (target[k].do === "loop_set" && !target[k].hasOwnProperty('condition')) {
@@ -2314,7 +2330,6 @@ class WebLink extends React.Component {
               this.create_loop(questionsArray, target[k], currentQuesIndx, 'loop_input')
             }
             questionsArray = this.state.questions
-            //
             for (let j = 0; j < target[k].multifield.length; j++) {
               for (let i = 0; i < questionsArray.length; i++) {
                 if (target[k].loop) {
@@ -2334,7 +2349,28 @@ class WebLink extends React.Component {
                       }
                     }
                   }
-                  // break;
+                  else {
+                    /**To solve issue of hide multiple condition not working inside the looping condition added this else part 
+                        * in target and unmate target both section */
+                    if (
+                      target[k].multifield[j].value ===
+                      questionsArray[i].question.handler
+                    ) {
+                      if (target[k].do === "show_multiple") {
+                        questionsArray[i].isHide = false;
+                      } else if (target[k].do === "hide_multiple") {
+                        questionsArray[i].isHide = true;
+                        this.clear_loop_answer(questionsArray, target[k], i, 'hide')
+                      }
+                      if (target[k].hasOwnProperty('isHide') && target[k].isHide === true) {
+                        if (target[k].multifield[j].hasOwnProperty('trigger') && target[k].multifield[j].trigger) {
+                          target[k].multifield[j].trigger = false
+                        } else {
+                          questionsArray[i].isHide = false;
+                        }
+                      }
+                    }
+                  }
                 } else {
                   if (
                     target[k].multifield[j].value ===
@@ -2346,7 +2382,6 @@ class WebLink extends React.Component {
                       questionsArray[i].isHide = true;
                       this.clear_loop_answer(questionsArray, target[k], i, 'hide')
                     }
-                    //
                     if (target[k].hasOwnProperty('isHide') && target[k].isHide === true) {
                       if (target[k].multifield[j].hasOwnProperty('trigger') && target[k].multifield[j].trigger) {
                         target[k].multifield[j].trigger = false
@@ -2354,8 +2389,6 @@ class WebLink extends React.Component {
                         questionsArray[i].isHide = false;
                       }
                     }
-                    //
-
                   }
                 }
               }
@@ -2364,18 +2397,18 @@ class WebLink extends React.Component {
           } else {
             for (let i = 0; i < questionsArray.length; i++) {
               if (target[k].loop) {
-                if (target[k].value === questionsArray[i].question.handler && questionsArray[i].loop_triggered_qid === target[k].loop_triggered_qid
+                if (target[k].handler === questionsArray[i].question.handler && questionsArray[i].loop_triggered_qid === target[k].loop_triggered_qid
                   && questionsArray[i].loop_set_num === target[k].loop_set_num) {
                   if (target[k].do === "show") {
                     if (target[k].loop_number < questionsArray[i].loop_number) {
                       questionsArray[i].isHide = false;
-                      break;
+                      // break;  //Hide break to solve issue of loop inside loop(one more loop inside that) is not showing the condtion
                     }
                   } else if (target[k].do === "hide") {
                     if (target[k].loop_number < questionsArray[i].loop_number) {
                       questionsArray[i].isHide = true;
                       this.clear_loop_answer(questionsArray, target[k], i, 'hide_loop')
-                      break;
+                      // break;  //Hide break to solve issue of loop inside loop(one more loop inside that) is not hiding the condtion
                     }
 
                   }
@@ -2396,9 +2429,6 @@ class WebLink extends React.Component {
           questionsArray = this.state.questions
         }
       }
-
-
-
     }
     if (this.state.selectedQuestion.properties.hasOwnProperty('noreturn') && this.state.selectedQuestion.properties.noreturn === 1) {
       this.validateNoReturn();
@@ -2994,7 +3024,8 @@ class WebLink extends React.Component {
       }
       if (arry.length > 0) {
         for (var i = arry.length - 1; i >= 0; i--) {
-          newcondition.splice(arry[i], 1);
+          /** Hide this to solve the issue of loop inside loop is not working */
+          //newcondition.splice(arry[i], 1);
         }
       }
 
