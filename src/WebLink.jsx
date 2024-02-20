@@ -2224,12 +2224,12 @@ class WebLink extends React.Component {
                     if (unMetTarget[k].do === "show_multiple") {
                       if (unMetTarget[k].loop_number < questionsArray[i].loop_number) {
                         questionsArray[i].isHide = false;
-                        break;
+                        //break;
                       }
                     } else if (unMetTarget[k].do === "hide_multiple") {
                       if (unMetTarget[k].loop_number < questionsArray[i].loop_number) {
                         questionsArray[i].isHide = false;
-                        break;
+                        //break;
                       }
                     }
                   }
@@ -2298,6 +2298,16 @@ class WebLink extends React.Component {
                     }
                   }
                 }
+                else {
+                  /** solve issue of hide is not working if target is outside loop then if condition not getting true */
+                  if (unMetTarget[k].handler === questionsArray[i].question.handler) {
+                    if (unMetTarget[k].do === "show") {
+                      questionsArray[i].isHide = false;
+                    } else if (unMetTarget[k].do === "hide") {
+                      questionsArray[i].isHide = false;
+                    }
+                  }
+                }
               } else {
                 if (unMetTarget[k].handler === questionsArray[i].question.handler) {
                   if (unMetTarget[k].do === "show") {
@@ -2339,13 +2349,13 @@ class WebLink extends React.Component {
                     if (target[k].do === "show_multiple") {
                       if (target[k].loop_number < questionsArray[i].loop_number) {
                         questionsArray[i].isHide = false;
-                        break;
+                        //break;
                       }
                     } else if (target[k].do === "hide_multiple") {
                       if (target[k].loop_number < questionsArray[i].loop_number) {
                         questionsArray[i].isHide = true;
                         this.clear_loop_answer(questionsArray, target[k], i, 'hide_loop')
-                        break;
+                        //break;
                       }
                     }
                   }
@@ -2410,7 +2420,17 @@ class WebLink extends React.Component {
                       this.clear_loop_answer(questionsArray, target[k], i, 'hide_loop')
                       // break;  //Hide break to solve issue of loop inside loop(one more loop inside that) is not hiding the condtion
                     }
-
+                  }
+                }
+                else {
+                  /** solve issue of hide is not working if target is outside loop then if condition not getting true */
+                  if (target[k].handler === questionsArray[i].question.handler) {
+                    if (target[k].do === "show") {
+                      questionsArray[i].isHide = false;
+                    } else if (target[k].do === "hide") {
+                      questionsArray[i].isHide = true;
+                      this.clear_loop_answer(questionsArray, target[k], i, 'hide')
+                    }
                   }
                 }
               } else {
@@ -2420,7 +2440,6 @@ class WebLink extends React.Component {
                   } else if (target[k].do === "hide") {
                     questionsArray[i].isHide = true;
                     this.clear_loop_answer(questionsArray, target[k], i, 'hide')
-
                   }
                 }
               }
@@ -2580,10 +2599,8 @@ class WebLink extends React.Component {
             q.loop_triggered_qid === questionsArray[parentIndex].question_id
           ) {
             if (loop_set_num === true) {
-
               arry.push(index)
-            } else if (loop_set_num < q.loop_set_num) {
-
+            } else if (loop_set_num <= q.loop_set_num && index > parentIndex) {  ////Added index > parentIndex condition to solve issue of clear loop question while loop inside loop
               arry.push(index)
             }
           }

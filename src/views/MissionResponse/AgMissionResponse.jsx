@@ -1774,7 +1774,11 @@ class AgMissionResponse extends React.Component {
       }
     }
   };
-
+  handleDeleteImage = () => {
+    // For delete image 
+    // Call edit survey answer api over here but its not allowing blank image object to remove image and edit anwer. 
+    // So we need API change for that
+  }
   /** Delete survey Answer
    *  TO delete answer edited survey answer and called edit survey 
    *  answer api to remove cell answer with passing blank/not selected
@@ -4289,7 +4293,7 @@ class AgMissionResponse extends React.Component {
               <PhotoEditor
                 ref={this.Editor}
                 FilterRowData={this.state.FilterRowData}
-
+                //handleDeleteImage={this.handleDeleteImage}
                 selectedAnswer={this.state.imageEdit}
                 questions={this.state.questions}
                 colDef={this.state.columnDefs}

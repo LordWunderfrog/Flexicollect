@@ -10,7 +10,7 @@ import "./Imageeditor.css";
 
 import Switchlimit from "@material-ui/core/Switch";
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
-
+import AlertDialog from "components/AlertDialog/AlertDialog";
 
 // Install Fabric Js npm install --no-save --no-optional fabric@~1.6.7
 
@@ -66,6 +66,7 @@ class PhotoEditor extends React.Component {
       filteredMissions: [],
       FilterRowData: [],
       onChange: false,
+      alertDisplay: false
     }
   }
 
@@ -573,6 +574,17 @@ class PhotoEditor extends React.Component {
     }, () => { this.props.updateAnswer('hide') })
   }
 
+  handleClickDelete = () => {
+    this.setState({ alertDisplay: true })
+  }
+  handleAlertClose = deleteImage => event => {
+    if (deleteImage) {
+      // Call this method in Agmissionresponse screen to delete image
+      this.props.handleDeleteImage()
+    }
+    this.setState({ alertDisplay: false });
+  };
+
   /* Used to return the image data of edited image.  */
   getdataURL() {
     return this.state.dataURL
@@ -621,6 +633,22 @@ class PhotoEditor extends React.Component {
                       cursor: 'pointer'
                     }}
                   >&times;</div>
+                  {/* <button
+                    className="tui-image-editor__apply-btn"
+                    onClick={this.handleClickDelete}
+                    href=''
+                    style={{
+                      border: "none",
+                      padding: "8px 20px",
+                      cursor: "pointer",
+                      float: "right",
+                      margin: "10px",
+                      borderRadius: "5px",
+                      background: "#074e9e",
+                      color: "#fff"
+                    }}
+                  > Delete</button> */}
+
                   <button
                     className="tui-image-editor__apply-btn"
                     onClick={this.handleClickDownload}
@@ -759,7 +787,12 @@ class PhotoEditor extends React.Component {
               </div>
             </div>
 
-
+            {/* <AlertDialog
+              title={"Delete"}
+              description="Are you sure you want to delete this image? Once deleted it cannot be retrieved"
+              open={this.state.alertDisplay}
+              handleDialogClose={this.handleAlertClose}
+            /> */}
 
           </div>
         ) : ("")}
