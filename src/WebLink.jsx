@@ -419,6 +419,7 @@ class WebLink extends React.Component {
               selectedChoiceOptions.push({
                 id: question.id,
                 label: question.label,
+                label_text: question.label_text,
                 label_image: question.label_image
               });
             }
@@ -435,6 +436,7 @@ class WebLink extends React.Component {
             selectedChoiceOptions.push({
               id: question.id,
               label: question.label,
+              label_text: question.label_text,
               label_image: question.label_image
             });
           }
@@ -442,6 +444,7 @@ class WebLink extends React.Component {
         updatedChoiceOptions.push({
           id: question.id,
           label: question.label,
+          label_text: question.label_text,
           label_image: question.label_image,
           defaultValue: defaultSelection
         });
@@ -469,8 +472,10 @@ class WebLink extends React.Component {
                 selectedChoiceOptions.push({
                   id: question.id,
                   label: question.label,
+                  label_text: question.label_text,
                   label_image: question.label_image,
                   sublabel: questionsublabel.sublabel,
+                  sublabel_text: questionsublabel.sublabel_text,
                   sub_label_image: questionsublabel.label_image,
                   sublabel_id: questionsublabel.id
                 });
@@ -478,6 +483,7 @@ class WebLink extends React.Component {
                   id: questionsublabel.id,
                   label_image: questionsublabel.label_image,
                   sublabel: questionsublabel.sublabel,
+                  sublabel_text: questionsublabel.sublabel_text,
                   defaultValue: true
                 });
                 matched = true;
@@ -489,6 +495,7 @@ class WebLink extends React.Component {
               id: questionsublabel.id,
               label_image: questionsublabel.label_image,
               sublabel: questionsublabel.sublabel,
+              sublabel_text: questionsublabel.sublabel_text,
               defaultValue: false
             });
           }
@@ -497,6 +504,7 @@ class WebLink extends React.Component {
         updatedChoiceOptions.push({
           id: question.id,
           label: question.label,
+          label_text: question.label_text,
           label_image: question.label_image,
           sublabel: subLabelItem
         });
@@ -598,6 +606,7 @@ class WebLink extends React.Component {
         selectedChoiceOptions.push({
           id: value.id,
           label: value.label,
+          label_text: value.label_text,
           label_image: value.label_image
         });
       } else {
@@ -613,6 +622,7 @@ class WebLink extends React.Component {
       selectedChoiceOptions.push({
         id: value.id,
         label: value.label,
+        label_text: value.label_text,
         label_image: value.label_image
       });
     }
@@ -694,7 +704,9 @@ class WebLink extends React.Component {
         selectedChoiceOptions.push({
           id: parent.id,
           label: parent.label,
+          label_text: parent.label_text,
           sublabel: subvalue.sublabel,
+          sublabel_text: subvalue.sublabel_text,
           sublabel_id: subvalue.id,
           label_image: parent.label_image,
           sub_label_image: subvalue.label_image
@@ -715,8 +727,10 @@ class WebLink extends React.Component {
       selectedChoiceOptions.push({
         id: parent.id,
         label: parent.label,
+        label_text: parent.label_text,
         sub_id: subvalue.id,
         sublabel: subvalue.sublabel,
+        sublabel_text: subvalue.sublabel_text,
         label_image: parent.label_image,
         sub_label_image: subvalue.label_image
       });
@@ -1263,7 +1277,6 @@ class WebLink extends React.Component {
       .get("/weblink_consumer_id?id=" + mission_id)
 
       .then(resp => {
-
         if (resp.data.status === 200 && resp.data.id > 0) {
           localStorage.setItem("api_key", resp.data.api_key);
           this.setState({ cust_id: resp.data.id }, () => { this.getSurveyResponse() });
@@ -1833,6 +1846,7 @@ class WebLink extends React.Component {
           if (this.state.selectedQuestion.properties.choice_type === "single") {
             answer["id"] = updatedChoiceOptions[0].id;
             answer["label"] = updatedChoiceOptions[0].label;
+            answer["label_text"] = updatedChoiceOptions[0].label_text;
             answer["label_image"] = updatedChoiceOptions[0].label_image;
             answer["choice_type"] = this.state.selectedQuestion.properties.choice_type;
             answer["multilevel"] = this.state.selectedQuestion.properties.multilevel;
@@ -3965,7 +3979,12 @@ class WebLink extends React.Component {
                           fontStyle: "Roboto"
                         }}
                       >
-                        {selectedQuestion.properties.question}
+                        {/* {selectedQuestion.properties.question} */}
+                        {React.createElement("div", {
+                          dangerouslySetInnerHTML: {
+                            __html: selectedQuestion.properties.question_text
+                          }
+                        })}
                       </h4>
                       {selectedQuestion.properties.mandatory && selectedQuestion.properties.mandatory === 1 ? <h4
                         align="center"
@@ -3989,7 +4008,12 @@ class WebLink extends React.Component {
                         fontStyle: "Roboto"
                       }}
                     >
-                      {selectedQuestion.properties.subheading ? selectedQuestion.properties.subheading : ""}
+                      {/* {selectedQuestion.properties.subheading ? selectedQuestion.properties.subheading : ""} */}
+                      {React.createElement("div", {
+                        dangerouslySetInnerHTML: {
+                          __html: selectedQuestion.properties.subheading ? selectedQuestion.properties.subheading_text : ""
+                        }
+                      })}
                     </h6>
                   </div>
                   <div
@@ -4384,7 +4408,12 @@ class WebLink extends React.Component {
                             fontStyle: "Roboto"
                           }}
                         >
-                          {selectedQuestion.properties.sublabel ? selectedQuestion.properties.sublabel : ""}
+                          {/* {selectedQuestion.properties.sublabel ? selectedQuestion.properties.sublabel : ""} */}
+                          {React.createElement("div", {
+                            dangerouslySetInnerHTML: {
+                              __html: selectedQuestion.properties.sublabel ? selectedQuestion.properties.sublabel_text : ""
+                            }
+                          })}
                         </h6>
                       </div>
                     ) : (
@@ -4460,8 +4489,14 @@ class WebLink extends React.Component {
                                         ) : (
                                           ""
                                         )}
-                                        <label htmlFor={index}>{value.label}</label>{" "}
-
+                                        {/* <label htmlFor={index}>{value.label}</label>{" "} */}
+                                        <label htmlFor={index}>
+                                          {React.createElement("div", {
+                                            dangerouslySetInnerHTML: {
+                                              __html: value.label_text
+                                            }
+                                          })}
+                                        </label>{" "}
 
                                         {selectedQuestion.properties.multilevel === 0 && value.id === "other" ?
                                           <TextField style={{
@@ -4603,7 +4638,15 @@ class WebLink extends React.Component {
                                                       }}
                                                     />
                                                   )}{" "}
-                                                <label htmlFor={increasingIndex}>{subval.sublabel}</label>
+                                                {/* <label htmlFor={increasingIndex}>{subval.sublabel}</label> */}
+                                                <label htmlFor={increasingIndex}>
+                                                  {React.createElement("div", {
+                                                    dangerouslySetInnerHTML: {
+                                                      __html: subval.sublabel_text
+                                                    }
+                                                  })}
+                                                </label>
+
                                                 {selectedQuestion.properties.multilevel === 1 && subval.id === "other" &&
                                                   <TextField style={{
                                                     display: "flex"
