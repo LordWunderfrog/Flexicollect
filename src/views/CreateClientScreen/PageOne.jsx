@@ -1547,7 +1547,8 @@ class PageOne extends Component {
         return params.value;
       }
     };
-
+    let missionName = this.props.seletectdetail ? this.props.seletectdetail.mission_name : ""
+    params.fileName = missionName;
     this.api.exportDataAsCsv(params);
   };
 
