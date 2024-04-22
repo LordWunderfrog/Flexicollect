@@ -419,6 +419,7 @@ class WebLink extends React.Component {
               selectedChoiceOptions.push({
                 id: question.id,
                 label: question.label,
+                label_text: question.label_text,
                 label_image: question.label_image
               });
             }
@@ -435,6 +436,7 @@ class WebLink extends React.Component {
             selectedChoiceOptions.push({
               id: question.id,
               label: question.label,
+              label_text: question.label_text,
               label_image: question.label_image
             });
           }
@@ -442,6 +444,7 @@ class WebLink extends React.Component {
         updatedChoiceOptions.push({
           id: question.id,
           label: question.label,
+          label_text: question.label_text,
           label_image: question.label_image,
           defaultValue: defaultSelection
         });
@@ -469,8 +472,10 @@ class WebLink extends React.Component {
                 selectedChoiceOptions.push({
                   id: question.id,
                   label: question.label,
+                  label_text: question.label_text,
                   label_image: question.label_image,
                   sublabel: questionsublabel.sublabel,
+                  sublabel_text: questionsublabel.sublabel_text,
                   sub_label_image: questionsublabel.label_image,
                   sublabel_id: questionsublabel.id
                 });
@@ -478,6 +483,7 @@ class WebLink extends React.Component {
                   id: questionsublabel.id,
                   label_image: questionsublabel.label_image,
                   sublabel: questionsublabel.sublabel,
+                  sublabel_text: questionsublabel.sublabel_text,
                   defaultValue: true
                 });
                 matched = true;
@@ -489,6 +495,7 @@ class WebLink extends React.Component {
               id: questionsublabel.id,
               label_image: questionsublabel.label_image,
               sublabel: questionsublabel.sublabel,
+              sublabel_text: questionsublabel.sublabel_text,
               defaultValue: false
             });
           }
@@ -497,6 +504,7 @@ class WebLink extends React.Component {
         updatedChoiceOptions.push({
           id: question.id,
           label: question.label,
+          label_text: question.label_text,
           label_image: question.label_image,
           sublabel: subLabelItem
         });
@@ -598,6 +606,7 @@ class WebLink extends React.Component {
         selectedChoiceOptions.push({
           id: value.id,
           label: value.label,
+          label_text: value.label_text,
           label_image: value.label_image
         });
       } else {
@@ -613,6 +622,7 @@ class WebLink extends React.Component {
       selectedChoiceOptions.push({
         id: value.id,
         label: value.label,
+        label_text: value.label_text,
         label_image: value.label_image
       });
     }
@@ -694,7 +704,9 @@ class WebLink extends React.Component {
         selectedChoiceOptions.push({
           id: parent.id,
           label: parent.label,
+          label_text: parent.label_text,
           sublabel: subvalue.sublabel,
+          sublabel_text: subvalue.sublabel_text,
           sublabel_id: subvalue.id,
           label_image: parent.label_image,
           sub_label_image: subvalue.label_image
@@ -715,8 +727,10 @@ class WebLink extends React.Component {
       selectedChoiceOptions.push({
         id: parent.id,
         label: parent.label,
+        label_text: parent.label_text,
         sub_id: subvalue.id,
         sublabel: subvalue.sublabel,
+        sublabel_text: subvalue.sublabel_text,
         label_image: parent.label_image,
         sub_label_image: subvalue.label_image
       });
@@ -1263,7 +1277,6 @@ class WebLink extends React.Component {
       .get("/weblink_consumer_id?id=" + mission_id)
 
       .then(resp => {
-
         if (resp.data.status === 200 && resp.data.id > 0) {
           localStorage.setItem("api_key", resp.data.api_key);
           this.setState({ cust_id: resp.data.id }, () => { this.getSurveyResponse() });
@@ -1833,6 +1846,7 @@ class WebLink extends React.Component {
           if (this.state.selectedQuestion.properties.choice_type === "single") {
             answer["id"] = updatedChoiceOptions[0].id;
             answer["label"] = updatedChoiceOptions[0].label;
+            answer["label_text"] = updatedChoiceOptions[0].label_text;
             answer["label_image"] = updatedChoiceOptions[0].label_image;
             answer["choice_type"] = this.state.selectedQuestion.properties.choice_type;
             answer["multilevel"] = this.state.selectedQuestion.properties.multilevel;
@@ -2196,13 +2210,12 @@ class WebLink extends React.Component {
             unMetTarget[k].hasOwnProperty("multifield") &&
             unMetTarget[k].multifield.length > 0
           ) {
-            //
+
             if (!unMetTarget[k].hasOwnProperty('loop') && (unMetTarget[k].do === "loop" ||
               unMetTarget[k].do === "loop_input" || unMetTarget[k].do === "loop_set")) {
               this.hide_unMetTarget_loopques(unMetTarget[k], questionsArray, currentQuesIndx)
             }
-            //
-            //
+
             if (unMetTarget[k].do === "loop") {
               this.clear_looponly(questionsArray, unMetTarget[k], currentQuesIndx, 'loop')
               this.clear_loop_answer(questionsArray, unMetTarget[k], currentQuesIndx, 'loop')
@@ -2214,7 +2227,7 @@ class WebLink extends React.Component {
               this.clear_loopinput(questionsArray, unMetTarget[k], currentQuesIndx, 'loop_input')
               this.clear_loop_answer(questionsArray, unMetTarget[k], currentQuesIndx, 'loop_input')
             }
-            //
+
             questionsArray = this.state.questions
             for (let j = 0; j < unMetTarget[k].multifield.length; j++) {
               for (let i = 0; i < questionsArray.length; i++) {
@@ -2225,16 +2238,38 @@ class WebLink extends React.Component {
                     if (unMetTarget[k].do === "show_multiple") {
                       if (unMetTarget[k].loop_number < questionsArray[i].loop_number) {
                         questionsArray[i].isHide = false;
-                        break;
+                        //break;
                       }
                     } else if (unMetTarget[k].do === "hide_multiple") {
                       if (unMetTarget[k].loop_number < questionsArray[i].loop_number) {
                         questionsArray[i].isHide = false;
-                        break;
+                        //break;
                       }
                     }
                   }
-                  // break;
+                  else {
+                    /**To solve issue of hide multiple condition not working inside the looping condition added this else part 
+                        * in target and unmate target both section */
+                    if (
+                      unMetTarget[k].multifield[j].value ===
+                      questionsArray[i].question.handler
+                    ) {
+
+                      if (unMetTarget[k].do === "show_multiple") {
+                        questionsArray[i].isHide = false;
+                      } else if (unMetTarget[k].do === "hide_multiple") {
+                        questionsArray[i].isHide = false;
+                      }
+                      if (unMetTarget[k].hasOwnProperty('isHide') && unMetTarget[k].isHide) {
+                        if (unMetTarget[k].multifield[j].hasOwnProperty('trigger') && unMetTarget[k].multifield[j].trigger) {
+                          // skip triggerd ques in the list
+                        } else {
+                          questionsArray[i].isHide = true;
+                          this.clear_loop_answer(questionsArray, target[k], i, 'hide')
+                        }
+                      }
+                    }
+                  }
                 } else {
                   if (
                     unMetTarget[k].multifield[j].value ===
@@ -2246,7 +2281,6 @@ class WebLink extends React.Component {
                     } else if (unMetTarget[k].do === "hide_multiple") {
                       questionsArray[i].isHide = false;
                     }
-                    //
                     if (unMetTarget[k].hasOwnProperty('isHide') && unMetTarget[k].isHide) {
                       if (unMetTarget[k].multifield[j].hasOwnProperty('trigger') && unMetTarget[k].multifield[j].trigger) {
                         // skip triggerd ques in the list
@@ -2255,7 +2289,6 @@ class WebLink extends React.Component {
                         this.clear_loop_answer(questionsArray, target[k], i, 'hide')
                       }
                     }
-                    //
                   }
                 }
               }
@@ -2264,18 +2297,28 @@ class WebLink extends React.Component {
           } else {
             for (let i = 0; i < questionsArray.length; i++) {
               if (unMetTarget[k].loop) {
-                if (unMetTarget[k].value === questionsArray[i].question.handler && questionsArray[i].loop_triggered_qid === unMetTarget[k].loop_triggered_qid
+                if (unMetTarget[k].handler === questionsArray[i].question.handler && questionsArray[i].loop_triggered_qid === unMetTarget[k].loop_triggered_qid
                   && questionsArray[i].loop_set_num === unMetTarget[k].loop_set_num
                 ) {
                   if (unMetTarget[k].do === "show") {
                     if (unMetTarget[k].loop_number < questionsArray[i].loop_number) {
                       questionsArray[i].isHide = false;
-                      break;
+                      // break;  //Hide break to solve issue of loop inside loop(one more loop inside that) is not showing the condtion
                     }
                   } else if (unMetTarget[k].do === "hide") {
                     if (unMetTarget[k].loop_number < questionsArray[i].loop_number) {
                       questionsArray[i].isHide = false;
-                      break;
+                      // break;  //Hide break to solve issue of loop inside loop(one more loop inside that) is not hiding the condtion
+                    }
+                  }
+                }
+                else {
+                  /** solve issue of hide is not working if target is outside loop then if condition not getting true */
+                  if (unMetTarget[k].handler === questionsArray[i].question.handler) {
+                    if (unMetTarget[k].do === "show") {
+                      questionsArray[i].isHide = false;
+                    } else if (unMetTarget[k].do === "hide") {
+                      questionsArray[i].isHide = false;
                     }
                   }
                 }
@@ -2299,13 +2342,10 @@ class WebLink extends React.Component {
             target[k].hasOwnProperty("multifield") &&
             target[k].multifield.length > 0
           ) {
-            //
             if (!target[k].hasOwnProperty('loop') && (target[k].do === "loop" ||
               target[k].do === "loop_input" || target[k].do === "loop_set")) {
               this.hide_unMetTarget_loopques(target[k], questionsArray, currentQuesIndx)
             }
-            //
-            //
             if (target[k].do === "loop") {
               this.create_loop(questionsArray, target[k], currentQuesIndx, 'loop')
             } else if (target[k].do === "loop_set" && !target[k].hasOwnProperty('condition')) {
@@ -2314,7 +2354,6 @@ class WebLink extends React.Component {
               this.create_loop(questionsArray, target[k], currentQuesIndx, 'loop_input')
             }
             questionsArray = this.state.questions
-            //
             for (let j = 0; j < target[k].multifield.length; j++) {
               for (let i = 0; i < questionsArray.length; i++) {
                 if (target[k].loop) {
@@ -2324,17 +2363,38 @@ class WebLink extends React.Component {
                     if (target[k].do === "show_multiple") {
                       if (target[k].loop_number < questionsArray[i].loop_number) {
                         questionsArray[i].isHide = false;
-                        break;
+                        //break;
                       }
                     } else if (target[k].do === "hide_multiple") {
                       if (target[k].loop_number < questionsArray[i].loop_number) {
                         questionsArray[i].isHide = true;
                         this.clear_loop_answer(questionsArray, target[k], i, 'hide_loop')
-                        break;
+                        //break;
                       }
                     }
                   }
-                  // break;
+                  else {
+                    /**To solve issue of hide multiple condition not working inside the looping condition added this else part 
+                        * in target and unmate target both section */
+                    if (
+                      target[k].multifield[j].value ===
+                      questionsArray[i].question.handler
+                    ) {
+                      if (target[k].do === "show_multiple") {
+                        questionsArray[i].isHide = false;
+                      } else if (target[k].do === "hide_multiple") {
+                        questionsArray[i].isHide = true;
+                        this.clear_loop_answer(questionsArray, target[k], i, 'hide')
+                      }
+                      if (target[k].hasOwnProperty('isHide') && target[k].isHide === true) {
+                        if (target[k].multifield[j].hasOwnProperty('trigger') && target[k].multifield[j].trigger) {
+                          target[k].multifield[j].trigger = false
+                        } else {
+                          questionsArray[i].isHide = false;
+                        }
+                      }
+                    }
+                  }
                 } else {
                   if (
                     target[k].multifield[j].value ===
@@ -2346,7 +2406,6 @@ class WebLink extends React.Component {
                       questionsArray[i].isHide = true;
                       this.clear_loop_answer(questionsArray, target[k], i, 'hide')
                     }
-                    //
                     if (target[k].hasOwnProperty('isHide') && target[k].isHide === true) {
                       if (target[k].multifield[j].hasOwnProperty('trigger') && target[k].multifield[j].trigger) {
                         target[k].multifield[j].trigger = false
@@ -2354,8 +2413,6 @@ class WebLink extends React.Component {
                         questionsArray[i].isHide = false;
                       }
                     }
-                    //
-
                   }
                 }
               }
@@ -2364,20 +2421,30 @@ class WebLink extends React.Component {
           } else {
             for (let i = 0; i < questionsArray.length; i++) {
               if (target[k].loop) {
-                if (target[k].value === questionsArray[i].question.handler && questionsArray[i].loop_triggered_qid === target[k].loop_triggered_qid
+                if (target[k].handler === questionsArray[i].question.handler && questionsArray[i].loop_triggered_qid === target[k].loop_triggered_qid
                   && questionsArray[i].loop_set_num === target[k].loop_set_num) {
                   if (target[k].do === "show") {
                     if (target[k].loop_number < questionsArray[i].loop_number) {
                       questionsArray[i].isHide = false;
-                      break;
+                      // break;  //Hide break to solve issue of loop inside loop(one more loop inside that) is not showing the condtion
                     }
                   } else if (target[k].do === "hide") {
                     if (target[k].loop_number < questionsArray[i].loop_number) {
                       questionsArray[i].isHide = true;
                       this.clear_loop_answer(questionsArray, target[k], i, 'hide_loop')
-                      break;
+                      // break;  //Hide break to solve issue of loop inside loop(one more loop inside that) is not hiding the condtion
                     }
-
+                  }
+                }
+                else {
+                  /** solve issue of hide is not working if target is outside loop then if condition not getting true */
+                  if (target[k].handler === questionsArray[i].question.handler) {
+                    if (target[k].do === "show") {
+                      questionsArray[i].isHide = false;
+                    } else if (target[k].do === "hide") {
+                      questionsArray[i].isHide = true;
+                      this.clear_loop_answer(questionsArray, target[k], i, 'hide')
+                    }
                   }
                 }
               } else {
@@ -2387,7 +2454,6 @@ class WebLink extends React.Component {
                   } else if (target[k].do === "hide") {
                     questionsArray[i].isHide = true;
                     this.clear_loop_answer(questionsArray, target[k], i, 'hide')
-
                   }
                 }
               }
@@ -2396,9 +2462,6 @@ class WebLink extends React.Component {
           questionsArray = this.state.questions
         }
       }
-
-
-
     }
     if (this.state.selectedQuestion.properties.hasOwnProperty('noreturn') && this.state.selectedQuestion.properties.noreturn === 1) {
       this.validateNoReturn();
@@ -2549,11 +2612,15 @@ class WebLink extends React.Component {
           if (!check && m.value === q.question.handler && q.hasOwnProperty('loop_triggered_qid') &&
             q.loop_triggered_qid === questionsArray[parentIndex].question_id
           ) {
-            if (loop_set_num === true) {
-
+            /** change condition
+             *  change the condition like that will only remove particular looping set of question if change my answer for looping 
+             *  question need to add or not. If add then it will add that set of question and if no then it will remove that set of 
+             *  question - inshort clear loop question while loop inside loop            
+            */
+            let endLoopIndex = parentIndex + conditions.length //last index of loop set for remove last access set of looping. 
+            if (loop_set_num === true && index > parentIndex && index < endLoopIndex) {
               arry.push(index)
-            } else if (loop_set_num < q.loop_set_num) {
-
+            } else if (index > parentIndex && index < endLoopIndex) {
               arry.push(index)
             }
           }
@@ -2994,7 +3061,8 @@ class WebLink extends React.Component {
       }
       if (arry.length > 0) {
         for (var i = arry.length - 1; i >= 0; i--) {
-          newcondition.splice(arry[i], 1);
+          /** Hide this to solve the issue of loop inside loop is not working */
+          //newcondition.splice(arry[i], 1);
         }
       }
 
@@ -3166,8 +3234,122 @@ class WebLink extends React.Component {
    * @param {Array} conditions Conditions Array
    * @param {String} selected Selected value
    */
-  choiceMultiLevelTarget(conditions, selected, target, unMetTarget, label) {
+  /** origenal logic */
+  // choiceMultiLevelTarget(conditions, selected, target, unMetTarget, label) {
 
+  //   for (let i = 0; i < conditions.length; i++) {
+  //     if (conditions[i].target.do !== 'release') {
+  //       let match = 0;
+  //       // Match with current question answer when target is value
+  //       for (let j = 0; j < conditions[i].source.length; j++) {
+  //         let isMatch = false;
+  //         let isNotEqual = true;
+  //         if (conditions[i].source[j].state !== '') {
+  //           if (conditions[i].source[j].target !== 'field') {
+  //             if (conditions[i].source[j].target === "Value_Multiple_Any") {
+  //               if (conditions[i].source[j].match_value.length && conditions[i].source[j].match_value.length > 0) {
+  //                 if (conditions[i].source[j].state === "equal") {
+  //                   for (let eq = 0; eq < selected.length; eq++) {
+  //                     for (let mv = 0; mv < conditions[i].source[j].match_value.length; mv++) {
+  //                       if (
+  //                         selected[eq][`${label}`] ===
+  //                         conditions[i].source[j].match_value[mv].value
+  //                       ) {
+  //                         isMatch = true;
+  //                       }
+  //                     }
+  //                   }
+  //                 } else if (conditions[i].source[j].state === "notequal") {
+  //                   for (let neq = 0; neq < selected.length; neq++) {
+  //                     for (let mv = 0; mv < conditions[i].source[j].match_value.length; mv++) {
+  //                       if (
+  //                         selected[neq][`${label}`] ===
+  //                         conditions[i].source[j].match_value[mv].value
+  //                       ) {
+  //                         isNotEqual = false;
+  //                       }
+  //                     }
+  //                   }
+  //                   isMatch = isNotEqual;
+  //                 }
+  //               }
+  //             } else if (conditions[i].source[j].target === "Value_Multiple_All") {
+  //               // let multiple_match = false;
+  //               if (conditions[i].source[j].match_value.length && conditions[i].source[j].match_value.length > 0) {
+  //                 if (conditions[i].source[j].state === "equal") {
+  //                   let match_index = []
+  //                   for (let eq = 0; eq < selected.length; eq++) {
+  //                     for (let mv = 0; mv < conditions[i].source[j].match_value.length; mv++) {
+  //                       if (
+  //                         selected[eq][`${label}`] ===
+  //                         conditions[i].source[j].match_value[mv].value
+  //                       ) {
+  //                         // multiple_match = true;
+  //                         match_index.push(mv)
+  //                       } else {
+  //                         // multiple_match = false
+  //                       }
+  //                     }
+  //                     isMatch = match_index.length === conditions[i].source[j].match_value.length
+  //                     // isMatch = multiple_match
+  //                   }
+  //                 } else if (conditions[i].source[j].state === "notequal") {
+  //                   let match_index = []
+  //                   for (let neq = 0; neq < selected.length; neq++) {
+  //                     for (let mv = 0; mv < conditions[i].source[j].match_value.length; mv++) {
+  //                       if (
+  //                         selected[neq][`${label}`] !==
+  //                         conditions[i].source[j].match_value[mv].value
+  //                       ) {
+  //                         // multiple_match = true;
+  //                         match_index.push(mv)
+  //                       } else {
+  //                         // multiple_match = false;
+  //                       }
+  //                     }
+  //                   }
+  //                   isMatch = match_index.length === conditions[i].source[j].match_value.length
+  //                   // isMatch = multiple_match;
+  //                 }
+  //               }
+  //             }
+  //             if (conditions[i].source[j].state === 'equal') {
+  //               for (let eq = 0; eq < selected.length; eq++) {
+  //                 if (selected[eq][`${label}`] === conditions[i].source[j].match_value) {
+  //                   isMatch = true;
+  //                 }
+  //               }
+  //             } else if (conditions[i].source[j].state === 'notequal') {
+  //               for (let neq = 0; neq < selected.length; neq++) {
+  //                 if (selected[neq][`${label}`] === conditions[i].source[j].match_value) {
+  //                   isNotEqual = false;
+  //                 }
+  //               }
+  //               isMatch = isNotEqual;
+  //             }
+  //             if (isMatch) {
+  //               match = match + 1;
+  //             }
+  //           }
+  //         }
+  //       }
+  //       if (conditions[i].rule && conditions[i].rule === "any" && match > 0) {
+  //         target.push(conditions[i].target);
+  //       }
+  //       else if (conditions[i].rule && conditions[i].rule === "and" && match === conditions[i].source.length) {
+  //         target.push(conditions[i].target);
+  //       }
+  //       else {
+  //         unMetTarget.push(conditions[i].target);
+  //       }
+  //     }
+
+  //   }
+
+  // }
+
+  /** Changed logic but still failing in some scenarios */
+  choiceMultiLevelTarget(conditions, selected, target, unMetTarget, label, release) {
     for (let i = 0; i < conditions.length; i++) {
       if (conditions[i].target.do !== 'release') {
         let match = 0;
@@ -3175,29 +3357,53 @@ class WebLink extends React.Component {
         for (let j = 0; j < conditions[i].source.length; j++) {
           let isMatch = false;
           let isNotEqual = true;
-          if (conditions[i].source[j].state !== '') {
-            if (conditions[i].source[j].target !== 'field') {
+          if (conditions[i].source[j].state !== "") {
+            if (conditions[i].source[j].target !== "field") {
               if (conditions[i].source[j].target === "Value_Multiple_Any") {
                 if (conditions[i].source[j].match_value.length && conditions[i].source[j].match_value.length > 0) {
                   if (conditions[i].source[j].state === "equal") {
                     for (let eq = 0; eq < selected.length; eq++) {
                       for (let mv = 0; mv < conditions[i].source[j].match_value.length; mv++) {
-                        if (
-                          selected[eq][`${label}`] ===
-                          conditions[i].source[j].match_value[mv].value
-                        ) {
-                          isMatch = true;
+                        if (conditions[i].source[j].match_value[mv].hasOwnProperty('id')) {
+                          if (conditions[i].source[j].match_value[mv].hasOwnProperty('p_id') && conditions[i].source[j].match_value[mv].hasOwnProperty('id')) {
+                            if (selected[eq]['sublabel_id'] === conditions[i].source[j].match_value[mv].id && selected[eq]['id'] === conditions[i].source[j].match_value[mv].p_id) {
+                              isMatch = true;
+                            }
+                          } else {
+                            if (
+                              selected[eq]['id'] ===
+                              conditions[i].source[j].match_value[mv].id
+                            ) {
+                              isMatch = true;
+                            }
+                          }
+                        } else {
+                          if (selected[eq][`${label}`] === conditions[i].source[j].match_value[mv].value) {
+                            isMatch = true;
+                          }
                         }
                       }
                     }
                   } else if (conditions[i].source[j].state === "notequal") {
                     for (let neq = 0; neq < selected.length; neq++) {
                       for (let mv = 0; mv < conditions[i].source[j].match_value.length; mv++) {
-                        if (
-                          selected[neq][`${label}`] ===
-                          conditions[i].source[j].match_value[mv].value
-                        ) {
-                          isNotEqual = false;
+                        if (conditions[i].source[j].match_value[mv].hasOwnProperty('id')) {
+                          if (conditions[i].source[j].match_value[mv].hasOwnProperty('p_id') && conditions[i].source[j].match_value[mv].hasOwnProperty('id')) {
+                            if (selected[neq]['sublabel_id'] === conditions[i].source[j].match_value[mv].id && selected[neq]['id'] === conditions[i].source[j].match_value[mv].p_id) {
+                              isNotEqual = false;
+                            }
+                          } else {
+                            if (
+                              selected[neq]['id'] ===
+                              conditions[i].source[j].match_value[mv].id
+                            ) {
+                              isNotEqual = false;
+                            }
+                          }
+                        } else {
+                          if (selected[neq][`${label}`] === conditions[i].source[j].match_value[mv].value) {
+                            isNotEqual = false;
+                          }
                         }
                       }
                     }
@@ -3205,59 +3411,142 @@ class WebLink extends React.Component {
                   }
                 }
               } else if (conditions[i].source[j].target === "Value_Multiple_All") {
-                // let multiple_match = false;
                 if (conditions[i].source[j].match_value.length && conditions[i].source[j].match_value.length > 0) {
                   if (conditions[i].source[j].state === "equal") {
-                    let match_index = []
-                    for (let eq = 0; eq < selected.length; eq++) {
-                      for (let mv = 0; mv < conditions[i].source[j].match_value.length; mv++) {
-                        if (
-                          selected[eq][`${label}`] ===
-                          conditions[i].source[j].match_value[mv].value
-                        ) {
-                          // multiple_match = true;
-                          match_index.push(mv)
+                    let all_match = true;
+                    for (let mv = 0; mv < conditions[i].source[j].match_value.length; mv++) {
+                      let value_matched = false;
+                      for (let eq = 0; eq < selected.length; eq++) {
+                        if (conditions[i].source[j].match_value[mv].hasOwnProperty('id')) {
+                          if (conditions[i].source[j].match_value[mv].hasOwnProperty('p_id') && conditions[i].source[j].match_value[mv].hasOwnProperty('id')) {
+                            if (selected[eq]['sublabel_id'] === conditions[i].source[j].match_value[mv].id && selected[eq]['id'] === conditions[i].source[j].match_value[mv].p_id) {
+                              value_matched = true;
+                              break;
+                            }
+                          } else {
+                            if (selected[eq]['id'] === conditions[i].source[j].match_value[mv].id) {
+                              value_matched = true;
+                              break;
+                            }
+                          }
                         } else {
-                          // multiple_match = false
+                          if (selected[eq][`${label}`] === conditions[i].source[j].match_value[mv].value) {
+                            value_matched = true;
+                            break;
+                          }
                         }
                       }
-                      isMatch = match_index.length === conditions[i].source[j].match_value.length
-                      // isMatch = multiple_match
+                      if (!value_matched) {
+                        all_match = false;
+                        break;
+                      }
                     }
+                    isMatch = all_match;
                   } else if (conditions[i].source[j].state === "notequal") {
-                    let match_index = []
-                    for (let neq = 0; neq < selected.length; neq++) {
-                      for (let mv = 0; mv < conditions[i].source[j].match_value.length; mv++) {
-                        if (
-                          selected[neq][`${label}`] !==
-                          conditions[i].source[j].match_value[mv].value
-                        ) {
-                          // multiple_match = true;
-                          match_index.push(mv)
+                    let any_not_matched = false;
+                    for (let mv = 0; mv < conditions[i].source[j].match_value.length; mv++) {
+                      let value_not_matched = true;
+                      for (let neq = 0; neq < selected.length; neq++) {
+                        if (conditions[i].source[j].match_value[mv].hasOwnProperty('id')) {
+                          if (conditions[i].source[j].match_value[mv].hasOwnProperty('p_id') && conditions[i].source[j].match_value[mv].hasOwnProperty('id')) {
+                            if (selected[neq]['sublabel_id'] === conditions[i].source[j].match_value[mv].id && selected[neq]['id'] === conditions[i].source[j].match_value[mv].p_id) {
+                              value_not_matched = false;
+                              break;
+                            }
+                          } else {
+                            if (selected[neq]['id'] === conditions[i].source[j].match_value[mv].id) {
+                              value_not_matched = false;
+                              break;
+                            }
+                          }
                         } else {
-                          // multiple_match = false;
+                          if (selected[neq][`${label}`] === conditions[i].source[j].match_value[mv].value) {
+                            value_not_matched = false;
+                            break;
+                          }
+                        }
+                      }
+                      if (!value_not_matched) {
+                        any_not_matched = true;
+                        break;
+                      }
+                    }
+                    isMatch = !any_not_matched;
+                  }
+                }
+              }
+              else {
+                /** Normal equlas / not equlas condition */
+                if (conditions[i].source[j].state === "equal") {
+                  if (conditions[i].source[j].hasOwnProperty('id')) {
+                    if (conditions[i].source[j].hasOwnProperty('p_id') && conditions[i].source[j].hasOwnProperty('id')) {
+                      for (let eq = 0; eq < selected.length; eq++) {
+                        if (
+                          selected[eq]['id'] ==
+                          conditions[i].source[j].p_id &&
+                          selected[eq]['sublabel_id'] ==
+                          conditions[i].source[j].id
+                        ) {
+                          isMatch = true;
+                        }
+                      }
+                    } else {
+                      for (let eq = 0; eq < selected.length; eq++) {
+                        if (
+                          selected[eq]['id'] ==
+                          conditions[i].source[j].id
+                        ) {
+                          isMatch = true;
                         }
                       }
                     }
-                    isMatch = match_index.length === conditions[i].source[j].match_value.length
-                    // isMatch = multiple_match;
+                  } else {
+                    for (let eq = 0; eq < selected.length; eq++) {
+                      if (
+                        selected[eq][`${label}`] ==
+                        conditions[i].source[j].match_value
+                      ) {
+                        isMatch = true;
+                      }
+                    }
                   }
+                } else if (conditions[i].source[j].state === "notequal") {
+                  if (conditions[i].source[j].hasOwnProperty('id')) {
+                    if (conditions[i].source[j].hasOwnProperty('p_id') && conditions[i].source[j].hasOwnProperty('id')) {
+                      for (let eq = 0; eq < selected.length; eq++) {
+                        if (
+                          selected[eq]['id'] ===
+                          conditions[i].source[j].p_id &&
+                          selected[eq]['sublabel_id'] ===
+                          conditions[i].source[j].id
+                        ) {
+                          isNotEqual = false;
+                        }
+                      }
+                    } else {
+                      for (let eq = 0; eq < selected.length; eq++) {
+                        if (
+                          selected[eq]['id'] ===
+                          conditions[i].source[j].id
+                        ) {
+                          isNotEqual = false;
+                        }
+                      }
+                    }
+                  } else {
+                    for (let neq = 0; neq < selected.length; neq++) {
+                      if (
+                        selected[neq][`${label}`] ==
+                        conditions[i].source[j].match_value
+                      ) {
+                        isNotEqual = false;
+                      }
+                    }
+                  }
+                  isMatch = isNotEqual;
                 }
               }
-              if (conditions[i].source[j].state === 'equal') {
-                for (let eq = 0; eq < selected.length; eq++) {
-                  if (selected[eq][`${label}`] === conditions[i].source[j].match_value) {
-                    isMatch = true;
-                  }
-                }
-              } else if (conditions[i].source[j].state === 'notequal') {
-                for (let neq = 0; neq < selected.length; neq++) {
-                  if (selected[neq][`${label}`] === conditions[i].source[j].match_value) {
-                    isNotEqual = false;
-                  }
-                }
-                isMatch = isNotEqual;
-              }
+
               if (isMatch) {
                 match = match + 1;
               }
@@ -3266,17 +3555,17 @@ class WebLink extends React.Component {
         }
         if (conditions[i].rule && conditions[i].rule === "any" && match > 0) {
           target.push(conditions[i].target);
-        }
-        else if (conditions[i].rule && conditions[i].rule === "and" && match === conditions[i].source.length) {
+        } else if (
+          conditions[i].rule &&
+          conditions[i].rule === "and" &&
+          match == conditions[i].source.length
+        ) {
           target.push(conditions[i].target);
-        }
-        else {
+        } else {
           unMetTarget.push(conditions[i].target);
         }
       }
-
     }
-
   }
 
   /**
@@ -3911,7 +4200,12 @@ class WebLink extends React.Component {
                           fontStyle: "Roboto"
                         }}
                       >
-                        {selectedQuestion.properties.question}
+                        {/* {selectedQuestion.properties.question} */}
+                        {React.createElement("div", {
+                          dangerouslySetInnerHTML: {
+                            __html: selectedQuestion.properties.question_text
+                          }
+                        })}
                       </h4>
                       {selectedQuestion.properties.mandatory && selectedQuestion.properties.mandatory === 1 ? <h4
                         align="center"
@@ -3935,7 +4229,12 @@ class WebLink extends React.Component {
                         fontStyle: "Roboto"
                       }}
                     >
-                      {selectedQuestion.properties.subheading ? selectedQuestion.properties.subheading : ""}
+                      {/* {selectedQuestion.properties.subheading ? selectedQuestion.properties.subheading : ""} */}
+                      {React.createElement("div", {
+                        dangerouslySetInnerHTML: {
+                          __html: selectedQuestion.properties.subheading ? selectedQuestion.properties.subheading_text : ""
+                        }
+                      })}
                     </h6>
                   </div>
                   <div
@@ -4330,7 +4629,12 @@ class WebLink extends React.Component {
                             fontStyle: "Roboto"
                           }}
                         >
-                          {selectedQuestion.properties.sublabel ? selectedQuestion.properties.sublabel : ""}
+                          {/* {selectedQuestion.properties.sublabel ? selectedQuestion.properties.sublabel : ""} */}
+                          {React.createElement("div", {
+                            dangerouslySetInnerHTML: {
+                              __html: selectedQuestion.properties.sublabel ? selectedQuestion.properties.sublabel_text : ""
+                            }
+                          })}
                         </h6>
                       </div>
                     ) : (
@@ -4406,8 +4710,14 @@ class WebLink extends React.Component {
                                         ) : (
                                           ""
                                         )}
-                                        <label htmlFor={index}>{value.label}</label>{" "}
-
+                                        {/* <label htmlFor={index}>{value.label}</label>{" "} */}
+                                        <label htmlFor={index}>
+                                          {React.createElement("div", {
+                                            dangerouslySetInnerHTML: {
+                                              __html: value.label_text
+                                            }
+                                          })}
+                                        </label>{" "}
 
                                         {selectedQuestion.properties.multilevel === 0 && value.id === "other" ?
                                           <TextField style={{
@@ -4549,7 +4859,15 @@ class WebLink extends React.Component {
                                                       }}
                                                     />
                                                   )}{" "}
-                                                <label htmlFor={increasingIndex}>{subval.sublabel}</label>
+                                                {/* <label htmlFor={increasingIndex}>{subval.sublabel}</label> */}
+                                                <label htmlFor={increasingIndex}>
+                                                  {React.createElement("div", {
+                                                    dangerouslySetInnerHTML: {
+                                                      __html: subval.sublabel_text
+                                                    }
+                                                  })}
+                                                </label>
+
                                                 {selectedQuestion.properties.multilevel === 1 && subval.id === "other" &&
                                                   <TextField style={{
                                                     display: "flex"

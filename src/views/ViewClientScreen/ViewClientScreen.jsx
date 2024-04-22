@@ -2107,6 +2107,9 @@ class ViewClientScreen extends Component {
       }
     })
     params.columnKeys = columnKeys;
+
+    let missionName = this.state.selectedMission ? this.state.selectedMission.label : ""
+    params.fileName = missionName;
     this.api.exportDataAsCsv(params);
   };
 
