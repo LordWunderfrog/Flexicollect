@@ -863,7 +863,7 @@ class ViewClientScreen extends Component {
         for (let b = 0; b < r.responses.length; b++) {
           let a = r.responses[b];
           if (a.type === 'input' && a.answers && a.answers !== null && a.answers !== ""
-            && a.answers !== {} && a.answers.text && a.answers.text !== "") {
+            && a.answers != {} && a.answers.text && a.answers.text !== "") {
             let text = a.answers.text;
             let tran_req = await fetch(Constants.google_translate_content_URI
               + "&q=" + text + "&target=" + language_code,
@@ -880,7 +880,7 @@ class ViewClientScreen extends Component {
             }
           }
           else if (a.type === "barcode" && a.answers && a.answers !== null && a.answers !== ""
-            && a.answers !== {} && a.answers.product_name && a.answers.product_name !== "") {
+            && a.answers != {} && a.answers.product_name && a.answers.product_name !== "") {
             let text = a.answers.product_name;
             // console.log(text)
             let tran_req = await fetch(Constants.google_translate_content_URI
@@ -917,7 +917,7 @@ class ViewClientScreen extends Component {
         for (let b = 0; b < r.responses.length; b++) {
           let a = r.responses[b];
           if (a.type === 'input' && a.answers && a.answers !== null && a.answers !== ""
-            && a.answers !== {} && a.answers.text && a.answers.text !== "") {
+            && a.answers != {} && a.answers.text && a.answers.text !== "") {
             let text = a.answers.text;
             let tran_req = await fetch(Constants.google_translate_content_URI
               + "&q=" + text + "&target=" + language_code,
@@ -934,7 +934,7 @@ class ViewClientScreen extends Component {
             }
           }
           else if (a.type === "barcode" && a.answers && a.answers !== null && a.answers !== ""
-            && a.answers !== {} && a.answers.product_name && a.answers.product_name !== "") {
+            && a.answers != {} && a.answers.product_name && a.answers.product_name !== "") {
             let text = a.answers.product_name;
             // console.log(text)
             let tran_req = await fetch(Constants.google_translate_content_URI
@@ -1253,8 +1253,10 @@ class ViewClientScreen extends Component {
             qe.mediaType = q.question.properties.media_type;
             qe.width = 300;
           }
-          qe.cellStyle = {
-            'white-space': 'normal'
+          if (q.type != 'info') {
+            qe.cellStyle = {
+              'white-space': 'normal'
+            }
           }
           columns.push(qe);
 
@@ -1656,7 +1658,7 @@ class ViewClientScreen extends Component {
               ans = answ;
             }
           });
-          if (ans !== {} && ans.type && ans.type === 'barcode' && ans.answers && ans.answers.image) {
+          if (ans != {} && ans.type && ans.type === 'barcode' && ans.answers && ans.answers.image) {
             if (c.field.includes('-B_oimage')) {
               arr[c.field] = [0, ans.answers.image_orig ? ans.answers.image_orig + '?thumbnail=yes' : ans.answers.image + '?thumbnail=yes', ans.answers.image_orig ? ans.answers.image_orig : ans.answers.image]
             }
@@ -1674,7 +1676,7 @@ class ViewClientScreen extends Component {
               arr[c.field] = ans.answers.product_name
             }
           }
-          else if (ans !== {} && ans.type && ans.type === 'upload' && ans.answers && ans.answers.media_type && ans.answers.media_type === 'image') {
+          else if (ans != {} && ans.type && ans.type === 'upload' && ans.answers && ans.answers.media_type && ans.answers.media_type === 'image') {
             if (c.field.includes('-U_oimage')) {
               arr[c.field] = [0, ans.answers.image_orig ? (ans.answers.image_orig + '?thumbnail=yes') : (ans.answers.media + '?thumbnail=yes'), ans.answers.image_orig ? ans.answers.image_orig : ans.answers.media]
             }
@@ -1686,7 +1688,7 @@ class ViewClientScreen extends Component {
               }
             }
           }
-          else if (ans !== {} && ans.type && ans.type === 'capture' && ans.answers && ans.answers.image) {
+          else if (ans != {} && ans.type && ans.type === 'capture' && ans.answers && ans.answers.image) {
             if (c.field.includes('-C_oimage')) {
               arr[c.field] = [0, ans.answers.image_orig ? (ans.answers.image_orig + '?thumbnail=yes') : (ans.answers.image + '?thumbnail=yes'), ans.answers.image_orig ? ans.answers.image_orig : ans.answers.image];
             }
@@ -1708,14 +1710,19 @@ class ViewClientScreen extends Component {
               }
             }
           }
-          else if (ans !== {} && ans.type && ans.type !== 'info' && ans.type !== 'input' && ans.type !== 'gps') {
+          else if (ans != {} && ans.type && ans.type !== 'info' && ans.type !== 'input' && ans.type !== 'gps') {
             this.state.questions.forEach((q, i) => {
               if (ans.question_id === q.question_id && ans.type && q.type && ans.type === q.type) {
                 arr[c.field] = this.formatAnswer(ans, q.question.properties);
               }
             })
           } else {
-            arr[c.field] = this.formatAnswer(ans, false);
+            if (c.queType == 'info') {
+              arr[c.field] = this.formatAnswer(ans, c);
+            }
+            else {
+              arr[c.field] = this.formatAnswer(ans, false);
+            }
           }
         } else if (c.type === "m") {
           arr[c.field] = this.getMissionMetric(
@@ -1924,7 +1931,13 @@ class ViewClientScreen extends Component {
         return ans
 
       default:
-        return "";
+        if (q.queType == 'info') {
+          /** Display information text in response and report screen */
+          return q.headerName
+        }
+        else {
+          return "";
+        }
     }
   }
 
@@ -2159,9 +2172,10 @@ class ViewClientScreen extends Component {
                   &bull; {c.headerName}
                 </Typography>
               </Grid>
-              <Grid container alignItems="center" style={{ marginLeft: 40, fontSize: 12 }}>
+              {/** condition to not display condition text as its already in title text */}
+              {c.queType != 'info' ? <Grid container alignItems="center" style={{ paddingLeft: 40, fontSize: 12 }}>
                 {this.renderText(previewMissionvalues[index])}
-              </Grid>
+              </Grid> : null}
               <Divider variant="middle" />
             </Fragment>
           );
