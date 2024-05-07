@@ -696,9 +696,10 @@ class PageOne extends Component {
           else if (q.question.properties.media_type === 'video' || q.question.properties.media_type === 'audio') {
             qe.cellRenderer = "createVideoSpan";
           }
-
-          qe.cellStyle = {
-            'white-space': 'normal'
+          if (q.type != 'info') {
+            qe.cellStyle = {
+              'white-space': 'normal'
+            }
           }
         }
         columns.push(qe);
@@ -998,7 +999,7 @@ class PageOne extends Component {
             ans = answ;
           }
         });
-        if (ans !== {} && ans.type && ans.type === 'barcode' && ans.answers && ans.answers.image) {
+        if (ans != {} && ans.type && ans.type === 'barcode' && ans.answers && ans.answers.image) {
           if (c.field.includes('-B_oimage')) {
             arr[c.field] = [0, ans.answers.image_orig ? ans.answers.image_orig + '?thumbnail=yes' : ans.answers.image + '?thumbnail=yes']
           }
@@ -1016,7 +1017,7 @@ class PageOne extends Component {
             arr[c.field] = ans.answers.product_name
           }
         }
-        else if (ans !== {} && ans.type && ans.type === 'upload' && ans.answers && ans.answers.media_type && ans.answers.media_type === 'image') {
+        else if (ans != {} && ans.type && ans.type === 'upload' && ans.answers && ans.answers.media_type && ans.answers.media_type === 'image') {
           if (c.field.includes('-U_oimage')) {
             arr[c.field] = [0, ans.answers.image_orig ? (ans.answers.image_orig + '?thumbnail=yes') : (ans.answers.media + '?thumbnail=yes')]
           }
@@ -1028,7 +1029,7 @@ class PageOne extends Component {
             }
           }
         }
-        else if (ans !== {} && ans.type && ans.type === 'capture' && ans.answers && ans.answers.image) {
+        else if (ans != {} && ans.type && ans.type === 'capture' && ans.answers && ans.answers.image) {
           if (c.field.includes('-C_oimage')) {
             arr[c.field] = [0, ans.answers.image_orig ? (ans.answers.image_orig + '?thumbnail=yes') : (ans.answers.image + '?thumbnail=yes')];
           }
@@ -1050,14 +1051,19 @@ class PageOne extends Component {
             }
           }
         }
-        else if (ans !== {} && ans.type && ans.type !== 'info' && ans.type !== 'input' && ans.type !== 'gps') {
+        else if (ans != {} && ans.type && ans.type !== 'info' && ans.type !== 'input' && ans.type !== 'gps') {
           this.state.questions.forEach((q, i) => {
             if (ans.question_id === q.question_id && ans.type && q.type && ans.type === q.type) {
               arr[c.field] = this.formatAnswer(ans, q.question.properties);
             }
           })
         } else {
-          arr[c.field] = this.formatAnswer(ans, false);
+          if (c.queType == 'info') {
+            arr[c.field] = this.formatAnswer(ans, c);
+          }
+          else {
+            arr[c.field] = this.formatAnswer(ans, false);
+          }
         }
         arr[c.survey_tag_id] = missionResponse.survey_tag_id
       } else if (c.type === "m") {
@@ -1274,7 +1280,13 @@ class PageOne extends Component {
         return ans
 
       default:
-        return "";
+        if (q.queType == 'info') {
+          /** Display information text in response and report screen */
+          return q.headerName
+        }
+        else {
+          return "";
+        }
     }
   }
 
