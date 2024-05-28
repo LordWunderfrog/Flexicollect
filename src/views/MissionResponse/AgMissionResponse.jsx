@@ -2421,9 +2421,9 @@ class AgMissionResponse extends React.Component {
         }
       }
       else {
-        // qe.cellStyle = {
-        //   'white-space': 'normal'
-        // }
+        qe.cellStyle = {
+          'white-space': 'normal'
+        }
         columns.push(qe);
       }
       tableFields.push(qe.headerName.toLowerCase());
@@ -2793,12 +2793,14 @@ class AgMissionResponse extends React.Component {
             }
           })
         } else {
-          if (c.queType == 'info') {
-            arr[c.field] = this.formatAnswer(ans, c);
-          }
-          else {
-            arr[c.field] = this.formatAnswer(ans, false);
-          }
+          arr[c.field] = this.formatAnswer(ans, false);
+          /** Commented code for info text not want to  display anymore in report and response screen */
+          // if (c.queType == 'info') {
+          //   arr[c.field] = this.formatAnswer(ans, c);
+          // }
+          // else {
+          //   arr[c.field] = this.formatAnswer(ans, false);
+          // }
         }
       } else if (c.type === "m") {
         arr[c.field] = this.getMissionMetric(
@@ -3001,13 +3003,15 @@ class AgMissionResponse extends React.Component {
         }
         return ans
       default:
-        if (q.queType == 'info') {
-          /** Display information text in response and report screen */
-          return q.headerName
-        }
-        else {
-          return "";
-        }
+        return "";
+      /** Commented code for info text not want to  display anymore in report and response screen */
+      // if (q.queType == 'info') {
+      //   /** Display information text in response and report screen */
+      //   return q.headerName
+      // }
+      // else {
+      //   return "";
+      // }
     }
   }
   /*  Handles the function to return scaletable option. */
@@ -3528,10 +3532,9 @@ class AgMissionResponse extends React.Component {
                     &bull; {c.id ? c.id + '_' + c.headerName : c.headerName}
                   </Typography>
                 </Grid>
-                {/** condition to not display condition text as its already in title text */}
-                {c.queType != 'info' ? <Grid container alignItems="center" style={{ paddingLeft: 40, fontSize: 12 }}>
+                <Grid container alignItems="center" style={{ paddingLeft: 40, fontSize: 12 }}>
                   {(this.state.editView == true && this.state.preview == true) ? this.renderEditMission(previewMissionkeys[index], previewMissionvalues[index], c) : this.renderText(previewMissionvalues[index])}
-                </Grid> : null}
+                </Grid>
                 <Divider variant="middle" />
               </Fragment>
             );

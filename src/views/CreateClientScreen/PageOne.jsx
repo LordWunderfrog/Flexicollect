@@ -696,11 +696,16 @@ class PageOne extends Component {
           else if (q.question.properties.media_type === 'video' || q.question.properties.media_type === 'audio') {
             qe.cellRenderer = "createVideoSpan";
           }
-          if (q.type != 'info') {
-            qe.cellStyle = {
-              'white-space': 'normal'
-            }
+
+          qe.cellStyle = {
+            'white-space': 'normal'
           }
+          /** Commented code for info text not want to  display anymore in report and response screen */
+          // if (q.type != 'info') {
+          //   qe.cellStyle = {
+          //     'white-space': 'normal'
+          //   }
+          // }
         }
         columns.push(qe);
       }
@@ -1058,12 +1063,14 @@ class PageOne extends Component {
             }
           })
         } else {
-          if (c.queType == 'info') {
-            arr[c.field] = this.formatAnswer(ans, c);
-          }
-          else {
-            arr[c.field] = this.formatAnswer(ans, false);
-          }
+          arr[c.field] = this.formatAnswer(ans, false);
+          /** Commented code for info text not want to  display anymore in report and response screen */
+          // if (c.queType == 'info') {
+          //   arr[c.field] = this.formatAnswer(ans, c);
+          // }
+          // else {
+          //   arr[c.field] = this.formatAnswer(ans, false);
+          // }
         }
         arr[c.survey_tag_id] = missionResponse.survey_tag_id
       } else if (c.type === "m") {
@@ -1280,13 +1287,15 @@ class PageOne extends Component {
         return ans
 
       default:
-        if (q.queType == 'info') {
-          /** Display information text in response and report screen */
-          return q.headerName
-        }
-        else {
-          return "";
-        }
+        return "";
+      /** Commented code for info text not want to  display anymore in report and response screen */
+      // if (q.queType == 'info') {
+      //   /** Display information text in response and report screen */
+      //   return q.headerName
+      // }
+      // else {
+      //   return "";
+      // }
     }
   }
 
