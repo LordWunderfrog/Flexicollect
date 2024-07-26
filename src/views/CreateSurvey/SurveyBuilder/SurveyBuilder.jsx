@@ -114,6 +114,7 @@ class SurveyBuilder extends React.Component {
           oldconditions={this.props.oldconditions}
           autosave={() => this.autoSave()}
           platformType={this.props.platformType}
+          mappingProfileEnable={this.props.mappingProfileEnable}
           props="check props"
           refcode={this.props.refcode}
           selectedlanguage={this.props.selectedlanguage}

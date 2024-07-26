@@ -119,6 +119,8 @@ class CreateSurvey extends React.Component {
             draftid: 0,
             updatedate: "",
             platformType: "",
+            selectedProfile: "",
+            mappingProfileEnable: false,
             isAssigned: "",
             refcode: "",
             duplicatemissionRefCode: false,
@@ -1356,6 +1358,18 @@ class CreateSurvey extends React.Component {
 
     };
 
+    /** Handle mapping profile change */
+    handleProfileChange = event => {
+        this.setState({
+            selectedProfile: event
+        });
+    }
+    handleMappingProfileChange = event => {
+        this.setState({
+            mappingProfileEnable: event
+        });
+    }
+
     /* Handles the snackbar message notification. */
     ShowNotification = (msg, color, time) => {
         this.setState({
@@ -1575,6 +1589,43 @@ class CreateSurvey extends React.Component {
         return choicecheck;
     }
 
+    /** Handle the validation for mapping profile is toggle on then its 
+     * compulsory to select product number and question group and sub group */
+    checkMappingProfile = () => {
+        let mapProfileCheck = true;
+        let defaultdrops = this.state.drops;
+        if (this.state.mappingProfileEnable) {
+            for (let i = 0; i < defaultdrops.length; i++) {
+                let q = defaultdrops[i];
+                if (q.type !== 'info' && q.type !== 'gps') {
+                    if (q.properties && !q.properties.hasOwnProperty("currentProductNumber")) {
+                        mapProfileCheck = false;
+                        break;
+                    } else if (q.properties && !q.properties.hasOwnProperty("currentQuestionGroup")) {
+                        mapProfileCheck = false;
+                        break;
+                    } else if (q.properties && !q.properties.hasOwnProperty("currentQuestionSubGroup1")) {
+                        mapProfileCheck = false;
+                        break;
+                    }
+                    else if (q.properties && !q.properties.hasOwnProperty("currentQuestionSubGroup2")) {
+                        mapProfileCheck = false;
+                        break;
+                    }
+                    else if (q.properties && !q.properties.hasOwnProperty("currentQuestionSubGroup3")) {
+                        mapProfileCheck = false;
+                        break;
+                    }
+                }
+            }
+            if (!mapProfileCheck) { this.ShowNotification("Profile mapping is enabled. Please select product number, question group and sub group in all element", "danger", 5000); }
+            return mapProfileCheck;
+        }
+        else {
+            return mapProfileCheck
+        }
+    }
+
     safeTrim(value) {
         if (typeof value === 'string') {
             return value.trim();
@@ -1611,7 +1662,7 @@ class CreateSurvey extends React.Component {
                 this.OtherLanguagegenerate()
             } else {
                 if (activeStep === 1) {
-                    next = this.CheckScale() && this.CheckChoice();
+                    next = this.CheckScale() && this.CheckChoice() && this.checkMappingProfile();
                     if (next) {
                         this.editlanguage(true);
                         this.OtherLancongenerate();
@@ -1619,7 +1670,7 @@ class CreateSurvey extends React.Component {
                 }
                 if (next) {
                     this.setState({
-                        activeStep: activeStep + 1,
+                        activeStep: activeStep < 2 ? activeStep + 1 : activeStep,
                         lopen: false,
                         ropen: false
                     }, () => this.handleOnClick2('darft', 'auto', false))
@@ -1940,7 +1991,9 @@ class CreateSurvey extends React.Component {
             responses: 0,
             published: PubDate,
             platform_type: this.state.platformType && this.state.platformType !== "" ? this.state.platformType : "App Only",
-            refcode: this.state.refcode
+            refcode: this.state.refcode,
+            mappingProfileEnable: this.state.mappingProfileEnable,
+            selectedProfile: this.state.selectedProfile
         };
 
         const self = this;
@@ -1969,7 +2022,7 @@ class CreateSurvey extends React.Component {
                                 draftid: resp.data.survey_id,
                                 id: resp.data.survey_id,
                                 updatedate: FormattedPubDate,
-                                activeStep: this.state.activeStep + 1,
+                                activeStep: this.state.activeStep < 2 ? this.state.activeStep + 1 : this.state.activeStep,
                                 lopen: false,
                                 ropen: false
                             }, () => {
@@ -2049,7 +2102,9 @@ class CreateSurvey extends React.Component {
             published: PubDate,
             platform_type: this.state.platformType && this.state.platformType !== "" ? this.state.platformType : "App Only",
             refcode: this.state.refcode,
-            positionChanged: this.state.positionChanged === true ? 1 : 0
+            positionChanged: this.state.positionChanged === true ? 1 : 0,
+            mappingProfileEnable: this.state.mappingProfileEnable,
+            selectedProfile: this.state.selectedProfile
         };
         if (this.state.dropcurrentlanguage.value !== "English") {
             data.questions = this.state.defaultdrops
@@ -2069,7 +2124,7 @@ class CreateSurvey extends React.Component {
                             const FormattedPubDate = `Auto Saved at ${dd}/${mm}/${yyyy} ${timer[0]}`;
                             self.setState({
                                 updatedate: FormattedPubDate,
-                                activeStep: this.state.activeStep + 1,
+                                activeStep: this.state.activeStep < 2 ? this.state.activeStep + 1 : this.state.activeStep,
                                 lopen: false,
                                 ropen: false
                             });
@@ -2119,7 +2174,7 @@ class CreateSurvey extends React.Component {
     }
 
     render() {
-        const validater = this.state.activeStep === 0 ? (this.state.name === "" || this.state.duplicatemissionRefCode) : this.state.drops.length === 0;
+        const validater = this.state.activeStep === 0 ? (this.state.name === "" || this.state.duplicatemissionRefCode || (this.state.mappingProfileEnable && this.state.selectedProfile === "")) : this.state.drops.length === 0;
 
         const platformType = this.state.platformType;
 
@@ -2139,6 +2194,7 @@ class CreateSurvey extends React.Component {
         const validate = this.state.validate
         const minutes = this.state.minutes
         const isAssigned = this.state.isAssigned
+        const mappingProfileEnable = this.state.mappingProfileEnable
         let refcode = this.state.refcode
         let oldrefcode = this.state.oldrefcode;
         let languagelist = this.state.languagelist;
@@ -2155,6 +2211,8 @@ class CreateSurvey extends React.Component {
          * @param {Number} [stepIndex]
          * @param {string} [handleInputChange]
          * @param {string} [handlePlatformType]
+         * @param {string} [handleProfileChange]
+         * @param {string} [handleMappingProfileChange]
          * @param {string} [handleqtypeChange]
          * @param {string} [dropChange]
          * @param {string} [elemetsbar]
@@ -2166,6 +2224,8 @@ class CreateSurvey extends React.Component {
             handleInputChange,
             handleProjectChange,
             handlePlatformType,
+            handleProfileChange,
+            handleMappingProfileChange,
             handleqtypeChange,
             dropChange,
             deleteDrops,
@@ -2193,6 +2253,8 @@ class CreateSurvey extends React.Component {
                             handleqtypeChange={handleqtypeChange}
                             handleprojects={handleProjectChange}
                             handlePlatformType={handlePlatformType}
+                            handleProfileChange={handleProfileChange}
+                            handleMappingProfileChange={handleMappingProfileChange}
                             surveyname={previewname}
                             qtype={qtype}
                             prevtags={prevtags}
@@ -2223,6 +2285,7 @@ class CreateSurvey extends React.Component {
                             oldconditions={previewconditions}
                             autosave={autoSave}
                             platformType={platformType}
+                            mappingProfileEnable={mappingProfileEnable}
                             refcode={refcode}
                             selectedlanguage={selectedlanguage}
                             changedroplanguage={changedroplanguage}
@@ -2320,6 +2383,8 @@ class CreateSurvey extends React.Component {
                                                     this.handleInputChange,
                                                     this.handleProjectChange,
                                                     this.handlePlatformType,
+                                                    this.handleProfileChange,
+                                                    this.handleMappingProfileChange,
                                                     this.handleqtypeChange,
                                                     this.dropChange,
                                                     this.deleteDrops,

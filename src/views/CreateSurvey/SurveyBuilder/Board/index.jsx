@@ -2466,6 +2466,7 @@ class Board extends Component {
                   downArrowFuncLanguage={this.props.downArrowFuncLanguage}
                   upArrowFuncLanguage={this.props.upArrowFuncLanguage}
                   updateProperties={() => this.updateProperties()}
+                  mappingProfileEnable={this.props.mappingProfileEnable}
                 />
               </div> : ""}
 

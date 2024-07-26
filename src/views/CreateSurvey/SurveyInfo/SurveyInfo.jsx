@@ -16,6 +16,7 @@ import allQuestion from "assets/img/all.png";
 import singleQuestion from "assets/img/single.png";
 import messageQuestion from "assets/img/msg.png";
 import Select from "react-select";
+import Switch from "@material-ui/core/Switch";
 
 // API
 import api2 from ".../../helpers/api2";
@@ -86,6 +87,8 @@ class SurveyInfo extends React.Component {
       projectSource: [],
       missions: [],
       projects: [],
+      profileList: [],
+      selectedProfile: "",
       platformType: {},
       isAssigned: "",
       refcode: "",
@@ -114,7 +117,8 @@ class SurveyInfo extends React.Component {
       isAssigned: this.props.isAssigned,
       refcode: this.props.refcode,
       languagelist: this.props.languagelist,
-      selectedlanguage: this.props.selectedlanguage
+      selectedlanguage: this.props.selectedlanguage,
+      profileList: [{ value: 1, label: 'User A' }, { value: 2, label: 'User B' }, { value: 3, label: 'User C' }, { value: 4, label: 'User D' }]
     })
   }
 
@@ -304,6 +308,20 @@ class SurveyInfo extends React.Component {
     this.setState({ selectedValue: event.target.value }, this.props.handleqtypeChange(event));
   };
 
+  /** Handles selection of the profile for mapping */
+  handleProfileSelection(name, event) {
+    this.setState({
+      selectedProfile: event
+    });
+    this.props.handleProfileChange(event);
+  }
+
+  /** Handles toggle for mapping profile make compulsory */
+  handleMapProfileToggle = event => {
+    event.preventDefault();
+    this.props.handleMappingProfileChange(!this.state.mappingProfileEnable)
+  };
+
   render() {
     return (
       <Fragment>
@@ -444,6 +462,34 @@ class SurveyInfo extends React.Component {
               : ""}
           </Row>
           <br />
+
+          <Row className="padder">
+            <Col md={3} className="survey-input2">
+              <div>
+                <span style={{ marginLeft: "10px" }}>Mapping Profile</span>
+                <Switch
+                  checked={this.props.mappingProfileEnable}
+                  color={'primary'}
+                  onChange={this.handleMapProfileToggle}
+                />
+              </div>
+            </Col>
+
+            <Col md={3}>
+              <div>
+                <span style={{ marginLeft: "10px" }}>Select Profile</span>
+                <Select
+                  options={this.state.profileList}
+                  value={this.state.selectedProfile}
+                  onChange={this.handleProfileSelection.bind(this, 'MappingProfile')}
+                  name="MappingProfile"
+                  className="selectinfo"
+                />
+              </div>
+            </Col>
+          </Row>
+          <br />
+
           <Col sm={6} className="survey-input">
             <Row className="show-grid">
               <Col xs={4} md={4}>
