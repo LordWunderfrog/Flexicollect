@@ -4203,7 +4203,7 @@ class WebLink extends React.Component {
                         {/* {selectedQuestion.properties.question} */}
                         {React.createElement("div", {
                           dangerouslySetInnerHTML: {
-                            __html: selectedQuestion.properties.question_text
+                            __html: selectedQuestion.properties.question_text ? selectedQuestion.properties.question_text : selectedQuestion.properties.question
                           }
                         })}
                       </h4>
@@ -4232,7 +4232,7 @@ class WebLink extends React.Component {
                       {/* {selectedQuestion.properties.subheading ? selectedQuestion.properties.subheading : ""} */}
                       {React.createElement("div", {
                         dangerouslySetInnerHTML: {
-                          __html: selectedQuestion.properties.subheading ? selectedQuestion.properties.subheading_text : ""
+                          __html: selectedQuestion.properties.subheading_text ? selectedQuestion.properties.subheading_text : selectedQuestion.properties.subheading
                         }
                       })}
                     </h6>
@@ -4632,7 +4632,7 @@ class WebLink extends React.Component {
                           {/* {selectedQuestion.properties.sublabel ? selectedQuestion.properties.sublabel : ""} */}
                           {React.createElement("div", {
                             dangerouslySetInnerHTML: {
-                              __html: selectedQuestion.properties.sublabel ? selectedQuestion.properties.sublabel_text : ""
+                              __html: selectedQuestion.properties.sublabel_text ? selectedQuestion.properties.sublabel_text : selectedQuestion.properties.sublabel
                             }
                           })}
                         </h6>
@@ -4714,7 +4714,7 @@ class WebLink extends React.Component {
                                         <label htmlFor={index}>
                                           {React.createElement("div", {
                                             dangerouslySetInnerHTML: {
-                                              __html: value.label_text
+                                              __html: value.label_text ? value.label_text : value.label
                                             }
                                           })}
                                         </label>{" "}
@@ -4863,7 +4863,7 @@ class WebLink extends React.Component {
                                                 <label htmlFor={increasingIndex}>
                                                   {React.createElement("div", {
                                                     dangerouslySetInnerHTML: {
-                                                      __html: subval.sublabel_text
+                                                      __html: subval.sublabel_text ? subval.sublabel_text : subval.sublabel
                                                     }
                                                   })}
                                                 </label>

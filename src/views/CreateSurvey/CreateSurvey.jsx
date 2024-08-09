@@ -1619,7 +1619,7 @@ class CreateSurvey extends React.Component {
                 }
                 if (next) {
                     this.setState({
-                        activeStep: activeStep + 1,
+                        activeStep: activeStep < 2 ? activeStep + 1 : activeStep,
                         lopen: false,
                         ropen: false
                     }, () => this.handleOnClick2('darft', 'auto', false))
@@ -1969,7 +1969,7 @@ class CreateSurvey extends React.Component {
                                 draftid: resp.data.survey_id,
                                 id: resp.data.survey_id,
                                 updatedate: FormattedPubDate,
-                                activeStep: this.state.activeStep + 1,
+                                activeStep: this.state.activeStep < 2 ? this.state.activeStep + 1 : this.state.activeStep,
                                 lopen: false,
                                 ropen: false
                             }, () => {
@@ -2069,7 +2069,7 @@ class CreateSurvey extends React.Component {
                             const FormattedPubDate = `Auto Saved at ${dd}/${mm}/${yyyy} ${timer[0]}`;
                             self.setState({
                                 updatedate: FormattedPubDate,
-                                activeStep: this.state.activeStep + 1,
+                                activeStep: this.state.activeStep < 2 ? this.state.activeStep + 1 : this.state.activeStep,
                                 lopen: false,
                                 ropen: false
                             });

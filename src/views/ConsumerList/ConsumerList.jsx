@@ -40,27 +40,6 @@ import { Form } from "react-bootstrap";
 /* API */
 import api2 from "../../helpers/api2";
 
-/* Handles the snackbar message notification. */
-function showNotification(msg, color) {
-  this.setState({
-    message: msg,
-    msgColor: color,
-
-  });
-
-  let place = "br";
-  var x = [];
-  x[place] = true;
-  this.setState(x);
-  this.alertTimeout = setTimeout(
-    function () {
-      x[place] = false;
-      this.setState(x);
-    }.bind(this),
-    3000
-  );
-}
-
 const styles = {
   cardCategoryWhite: {
     "&,& a,& a:hover,& a:focus": {
@@ -206,6 +185,27 @@ class ConsumerList extends React.Component {
           response: true
         });
       });
+  }
+
+  /* Handles the snackbar message notification. */
+  showNotification(msg, color) {
+    this.setState({
+      message: msg,
+      msgColor: color,
+
+    });
+
+    let place = "br";
+    var x = [];
+    x[place] = true;
+    this.setState(x);
+    this.alertTimeout = setTimeout(
+      function () {
+        x[place] = false;
+        this.setState(x);
+      }.bind(this),
+      3000
+    );
   }
 
   /* Handles the event to form the consumer data based on page size. */
@@ -577,7 +577,7 @@ class ConsumerList extends React.Component {
         //     (x, i) => i !== index
         //   )
         // });
-        showNotification("Consumer Deleted Successfully", "success");
+        this.showNotification("Consumer Deleted Successfully", "success");
         loadedlistItems = [];
         this.setState({
           page: 0,
@@ -587,13 +587,13 @@ class ConsumerList extends React.Component {
       }
       else {
         this.stopLoading();
-        showNotification("Error in Deleting Consumer", "danger");
+        this.showNotification("Error in Deleting Consumer", "danger");
       }
 
     })
       .catch(error => {
         this.stopLoading();
-        showNotification("Error in Deleting Consumer" + error.message, "danger");
+        this.showNotification("Error in Deleting Consumer" + error.message, "danger");
       });
 
   };
