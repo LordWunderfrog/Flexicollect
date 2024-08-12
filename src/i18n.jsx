@@ -6,7 +6,7 @@ i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    fallbackLng: 'en',
+    fallbackLng: 'English',
     resources: {
       Afrikaans: {
         translation: {
@@ -258,6 +258,42 @@ i18n
           SurveySubmitted: "Umfrage erfolgreich abgeschickt",
           Cancel: "Abbrechen",
           Ok: "OK",
+        }
+      },
+      Greek: {
+        translation: {
+          Next: "Next",
+          Submit: "Υποβολή",
+          Back: "Πίσω",
+          EnterDetail: "Παρακαλώ εισάγετε το λεπτομερειών σας:",
+          EnterEmail: "εισάγετε Email",
+          EnterMobileNumber: "εισάγετε τον αριθμό κινητού",
+          TermsCondition: "I agree to the Terms of Service and Privacy Policy",
+          EmptyMsg: "Email / Mobile cannot be empty. Try again!",
+          Least: "Ελάχιστο",
+          Most: "Μέγιστο",
+          Set: "Ορισμός",
+          Of: "από",
+          MaxDiffSelectMsg: "Παρακαλώ επιλέξτε το ελάχιστο και το μέγιστο στοιχείο για όλες τις ερωτήσεις",
+          Minimum_Validation_Msg: "Παρακαλώ επιλέξτε το ελάχιστο",
+          Maximum_Validation_Msg: "Παρακαλώ επιλέξτε το μέγιστο",
+          Option: "επιλογές",
+          WrongCredantialMsg: "There seems to be an issue with your email or phone number - Please contact support at flexicollect-support@eolasinternational.com",
+          MissionNotAvailalble: "Sorry this mission is no longer available",
+          LimitBetweenChar: "Please answer between",
+          LimitWithChar: "Please answer with",
+          LimitWithinChar: "Please answer within",
+          Characters: "characters",
+          And: "and",
+          Or: "or more",
+          NumericValidationMsg: "Please enter numeric value only",
+          ValidEmailMsg: "Παρακαλώ εισάγετε μια έγκυρη διεύθυνση ηλεκτρονικού ταχυδρομείου",
+          AlphabetValidationMsg: "Please enter alphabets value only",
+          AnswerValidation: "Please answer this question",
+          ServerError: "Server error occurred in submitting the survey",
+          SurveySubmitted: "Survey Submitted Successfully",
+          Cancel: "Άκυρο",
+          Ok: "ΟΚ",
         }
       },
       Hindi: {
