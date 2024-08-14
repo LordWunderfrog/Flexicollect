@@ -184,7 +184,7 @@ class ProjectList extends React.Component {
         .get("projects?page=" + pagenumber)
         .then(resp => {
           self.setState({
-            projects: [...this.state.filteredProjects, ...resp.data.projects],
+            projects: [...this.state.projects, ...resp.data.projects],
             filteredProjects: [...this.state.filteredProjects, ...resp.data.projects],
             totalRecords: resp.data.total_count,
             hasMoreProjectData: this.state.filteredProjects.length <= resp.data.total_count ? true : false,
