@@ -849,6 +849,7 @@ class ModalPopUp extends Component {
                 function (value, index) {
                   return (
                     <li
+                      key={index}
                       style={{
                         height: "35px",
                         width: "30px",
@@ -942,7 +943,7 @@ class ModalPopUp extends Component {
                           .table_options
                         ? this.state.selectedQuestion.properties.table_content.table_options.map(
                           (options, index) => (
-                            <TableCell>{options.value}</TableCell>
+                            <TableCell key={index}>{options.value}</TableCell>
                           )
                         )
                         : ""}
@@ -1005,7 +1006,7 @@ class ModalPopUp extends Component {
                           .table_options
                         ? this.state.selectedQuestion.properties.table_content.table_options.map(
                           (options, index) => (
-                            <TableCell>{options.value}</TableCell>
+                            <TableCell key={index}>{options.value}</TableCell>
                           )
                         )
                         : ""}
@@ -1175,6 +1176,7 @@ class ModalPopUp extends Component {
                     function (value, index) {
                       return (
                         <li
+                          key={index}
                           style={{
                             fontSize: "12px",
                             position: "relative",
