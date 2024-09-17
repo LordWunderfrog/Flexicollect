@@ -296,6 +296,7 @@ export default class CustomFilter extends Component {
   filterfunc(i, params) {
 
     return this.state.text[i]
+      .toString()
       .toLowerCase()
       .split(" ")
       .every(filterWord => {

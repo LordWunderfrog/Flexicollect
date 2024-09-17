@@ -73,8 +73,10 @@ const styles = {
   },
   gridHeader: {
     width: "100%",
-    marginLeft: "3%",
-    marginBottom: "1%"
+    paddingLeft: "3%",
+    paddingRight: "4%",
+    marginTop: "15px",
+    marginBottom: "10px"
   },
   loadingDiv: {
     width: "100%",
@@ -98,7 +100,9 @@ class ProjectList extends React.Component {
       deleteProjectName: "",
       deleteProjectId: "",
       deleteProjectIndex: "",
-      hasMoreProjectData: true
+      hasMoreProjectData: true,
+      projectPageNumber: 1,  //pagination
+      totalRecords: 0
     };
   }
 
@@ -107,16 +111,55 @@ class ProjectList extends React.Component {
   }
 
   /* Handles the api to fetch the project list. */
+  // getProjectList() {
+  //   var self = this;
+  //   api2
+  //     .get("projects")
+  //     .then(resp => {
+  //       console.log('Project List is', resp)
+  //       self.setState({
+  //         projects: resp.data,
+  //         filteredProjects: resp.data.slice(0, pageSize),
+  //         hasMoreProjectData: resp.data && resp.data.length >= pageSize ? true : false,
+  //         response: true
+  //       });
+  //     })
+  //     .catch(error => {
+  //       console.error(error);
+  //       self.setState({
+  //         response: true
+  //       });
+  //     });
+  // }
+
+  /** pagination of data */
+  // fetchMoreProjectData = () => {
+  //   if (this.state.filteredProjects.length == this.state.projects.length) {
+  //     this.setState({ hasMoreProjectData: false });
+  //     return;
+  //   }
+  //   setTimeout(() => {
+  //     let start = this.state.filteredProjects.length
+  //     let end = this.state.filteredProjects.length + pageSize
+  //     let spliceArray = this.state.projects.slice(start, end)
+  //     let concatedArray = this.state.filteredProjects.concat(spliceArray)
+  //     this.setState({
+  //       filteredProjects: concatedArray
+  //     });
+  //   }, 500);
+  // };
+
   getProjectList() {
     var self = this;
     api2
-      .get("projects")
+      .get("projects?page=" + this.state.projectPageNumber)
       .then(resp => {
 
         self.setState({
-          projects: resp.data,
-          filteredProjects: resp.data.slice(0, pageSize),
-          hasMoreProjectData: resp.data && resp.data.length >= pageSize ? true : false,
+          projects: resp.data.projects,
+          filteredProjects: resp.data.projects,
+          totalRecords: resp.data.total_count,
+          hasMoreProjectData: this.state.filteredProjects.length <= resp.data.total_count ? true : false,
           response: true
         });
       })
@@ -127,6 +170,35 @@ class ProjectList extends React.Component {
         });
       });
   }
+
+  /** pagination of data */
+  fetchMoreProjectData = () => {
+    if ((this.state.filteredProjects.length >= this.state.totalRecords) && this.state.totalRecords !== 0) {
+      this.setState({ hasMoreProjectData: false });
+      return;
+    }
+    else {
+      var self = this;
+      let pagenumber = this.state.projectPageNumber + 1
+      api2
+        .get("projects?page=" + pagenumber)
+        .then(resp => {
+          self.setState({
+            projects: [...this.state.projects, ...resp.data.projects],
+            filteredProjects: [...this.state.filteredProjects, ...resp.data.projects],
+            totalRecords: resp.data.total_count,
+            hasMoreProjectData: this.state.filteredProjects.length <= resp.data.total_count ? true : false,
+            response: true,
+            projectPageNumber: pagenumber
+          });
+        })
+        .catch(error => {
+          self.setState({
+            response: true
+          });
+        });
+    }
+  };
 
   /* Handles the event to update the view. */
   switchView(view) {
@@ -174,8 +246,57 @@ class ProjectList extends React.Component {
       [name]: value
     });
 
-    this.filterProject(value);
+    // this.filterProject(value); // unused after added pagination
+
+    /** Handle blank serch text */
+    if (!value) {
+      this.setState({
+        projects: [],
+        filteredProjects: [],
+        hasMoreProjectData: true,
+        projectPageNumber: 1,
+        response: false
+      }, () => {
+        setTimeout(() => {
+          this.getProjectList()
+        }, 1000);
+      })
+    }
   };
+
+  /** Handle search button and enter event for search */
+  searchButtonAction = () => {
+    this.handleProjectSerch(this.state.search)
+  }
+  handleKeyPress = (event) => {
+    if (event.key === 'Enter') {
+      this.handleProjectSerch(this.state.search)
+    }
+  };
+
+  /** handle search api call */
+  handleProjectSerch = (value) => {
+    console.log('Search value', value)
+    var self = this;
+    api2
+      .get("filter-projects?filter=" + value)
+      .then(resp => {
+        console.log('search api resp', resp)
+        self.setState({
+          projects: resp.data,
+          filteredProjects: resp.data,
+          hasMoreProjectData: false,
+          projectPageNumber: 1,
+          response: true
+        });
+      })
+      .catch(error => {
+        console.error(error);
+        self.setState({
+          response: true
+        });
+      });
+  }
 
   /* Handles the event when the user deletes an item. */
   deleteItem = (id, index, project_name) => event => {
@@ -192,34 +313,28 @@ class ProjectList extends React.Component {
   handleDialogClose = deleteProject => event => {
     if (deleteProject) {
       api2.delete("projects?id=" + this.state.deleteProjectId).then(resp => {
+        // this.setState({
+        //   projects: this.state.projects.filter(
+        //     (x, i) => i !== this.state.deleteProjectIndex
+        //   ),
+        //   filteredProjects: this.state.filteredProjects.filter(
+        //     (x, i) => i !== this.state.deleteProjectIndex
+        //   )
+        // });
         this.setState({
-          projects: this.state.projects.filter(
-            (x, i) => i !== this.state.deleteProjectIndex
-          ),
-          filteredProjects: this.state.filteredProjects.filter(
-            (x, i) => i !== this.state.deleteProjectIndex
-          )
-        });
+          projects: [],
+          filteredProjects: [],
+          hasMoreProjectData: true,
+          projectPageNumber: 1,
+          response: false
+        }, () => {
+          setTimeout(() => {
+            this.getProjectList()
+          }, 1000);
+        })
       });
     }
     this.setState({ dialogOpen: false });
-  };
-
-  /** pagination of data */
-  fetchMoreProjectData = () => {
-    if (this.state.filteredProjects.length == this.state.projects.length) {
-      this.setState({ hasMoreProjectData: false });
-      return;
-    }
-    setTimeout(() => {
-      let start = this.state.filteredProjects.length
-      let end = this.state.filteredProjects.length + pageSize
-      let spliceArray = this.state.projects.slice(start, end)
-      let concatedArray = this.state.filteredProjects.concat(spliceArray)
-      this.setState({
-        filteredProjects: concatedArray
-      });
-    }, 500);
   };
 
   render() {
@@ -259,35 +374,43 @@ class ProjectList extends React.Component {
           <Grid
             container
             alignItems="center"
+            justify="space-between"
             id="gridHeader"
             style={{ padding: "0%", margin: "0 !important" }}
           >
-            <GridItem xs={6} sm={4} md={2}>
-              <Typography variant="h6">
-                Projects ({this.state.projects.length})
+            <div className="d-md-flex">
+              <Typography variant="h6" className="mr-5">
+                Projects ({this.state.totalRecords})
               </Typography>
-            </GridItem>
 
-            <GridItem xs={6} sm={4} md={2}>
-              <Form.Control
-                type="text"
-                name="search"
-                value={this.state.search}
-                onChange={this.handleInputChange}
-                style={{ height: 33, borderRadius: "2rem" }}
-                placeholder="Search"
-              />
-            </GridItem>
+              <div className="d-flex">
+                <input
+                  type="search"
+                  name="search"
+                  id="search-form"
+                  value={this.state.search}
+                  className="search-input"
+                  onChange={this.handleInputChange}
+                  placeholder="Search"
+                  onKeyDown={this.handleKeyPress}
+                />
+                <Button
+                  variant="primary"
+                  style={{
+                    borderRadius: "30px",
+                    fontSize: "0.8rem",
+                    background: "#0069d9"
+                  }}
+                  onClick={e => this.searchButtonAction()}
+                >
+                  Search
+                </Button>
+              </div>
+            </div>
 
-            <GridItem id="filler" xs={4} sm={4} md={4} />
-            {/** Hide Swipe between greed and list */}
-            {/* <GridItem
-              gridCss={{ padding: "0px !important" }}
-              xs={6}
-              sm={4}
-              md={2}
-            >
-              <Button
+            <div className="d-flex align-items-center">
+              {/** Hide Swipe between greed and list */}
+              {/* <Button
                 onClick={() => this.switchView("grid")}
                 variant={this.state.view === "grid" ? "light" : ""}
                 className={"view-switch-button"}
@@ -300,23 +423,22 @@ class ProjectList extends React.Component {
                 className={"view-switch-button"}
               >
                 <i className="fa fa-list" aria-hidden="true" />
-              </Button>
-            </GridItem> */}
-
-            <GridItem xs={6} sm={4} md={2}>
+              </Button> */}
               <Link to="/home/create-project">
                 <Button
                   variant="primary"
                   style={{
                     borderRadius: "30px",
                     fontSize: "0.8rem",
-                    background: "#0069d9"
+                    background: "#0069d9",
+                    whiteSpace: "nowrap"
                   }}
                 >
                   Create Project
                 </Button>
               </Link>
-            </GridItem>
+            </div>
+
           </Grid>
         </div>
 
@@ -341,7 +463,7 @@ class ProjectList extends React.Component {
                       hasMore={this.state.hasMoreProjectData}
                       // height={800}
                       loader={
-                        <h5 className="pt-4 text-center">Loading...</h5>
+                        this.state.hasMoreProjectData ? <h5 className="pt-4 text-center">Loading...</h5> : null
                       }
                       endMessage={<div></div>}
                       scrollableTarget="scrollableDiv"

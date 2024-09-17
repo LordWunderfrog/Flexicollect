@@ -94,7 +94,7 @@ const Entities = require('html-entities').AllHtmlEntities;
 const entities = new Entities();
 
 let loadedlistItems = [];
-const defaultApiPage = 2000;
+const defaultApiPage = 100;
 const defaultApirecordId = 0;
 
 const styles = {
@@ -200,6 +200,7 @@ const customComparator = (valueA, valueB) => {
     }
   }
 };
+const disabledive = { 'pointerEvents': 'none', opacity: 0.4, 'cursor': "none" }
 class AgMissionResponse extends React.Component {
   constructor(props, context) {
     super(props, context);
@@ -302,7 +303,9 @@ class AgMissionResponse extends React.Component {
       loadpage: [0],
       pagecount: 0,
       datapagecount: 0,
-      rowsPerPage: 50,
+      rowsPerPage: 100,
+      currentPage: 1,
+      totalrecords: 0,
       record: 0,
       metrics_data: [],
       listItems: [],
@@ -487,7 +490,6 @@ class AgMissionResponse extends React.Component {
         missions: miss
       })
 
-      this.getMissionResponse('', defaultApirecordId, defaultApiPage);
       this.getClientresponseconfig();
     }
   }
@@ -573,11 +575,12 @@ class AgMissionResponse extends React.Component {
         paymentMissionName: e.label,
         selectedlanguage: { label: "Select a Language", value: '' },
         page: 0,
+        currentPage: 1,
         pagecount: this.state.datapagecount,
       },
       () => {
         loadedlistItems = [];
-        this.getMissionResponse('', defaultApirecordId, defaultApiPage);
+        this.getMissionResponse('');
         this.getClientresponseconfig()
 
         localStorage.removeItem("defaultfilterState")
@@ -1357,6 +1360,7 @@ class AgMissionResponse extends React.Component {
             this.state.updatedAnswer = this.state.selectedAnswer;
             this.state.updatedAnswer["id"] = selectedChoiceOptions[0].id;
             this.state.updatedAnswer["label"] = selectedChoiceOptions[0].label;
+            this.state.updatedAnswer["label_text"] = selectedChoiceOptions[0].label;
             this.state.updatedAnswer["label_image"] = selectedChoiceOptions[0].label_image;
           }
         }
@@ -1364,6 +1368,7 @@ class AgMissionResponse extends React.Component {
           if (selectedChoiceOptions && selectedChoiceOptions.length > 0) {
             this.state.updatedAnswer["id"] = selectedChoiceOptions[0].id;
             this.state.updatedAnswer["label"] = selectedChoiceOptions[0].label;
+            this.state.updatedAnswer["label_text"] = selectedChoiceOptions[0].label;
             this.state.updatedAnswer["label_image"] = selectedChoiceOptions[0].label_image;
             this.state.updatedAnswer["choice_type"] = this.state.selectedQuestion.properties.choice_type;
             this.state.updatedAnswer["multilevel"] = this.state.selectedQuestion.properties.multilevel;
@@ -1644,10 +1649,10 @@ class AgMissionResponse extends React.Component {
           .post("/web_survey_answers", newData)
           .then(resp => {
             if (background_update === 'save' || background_update === 'hide_close') {
-              this.setState({ openModal: false, openPopup: false });
-              // this.closeLightbox();
-              this.getMissionResponse(this.state.selectedlanguage.value, defaultApirecordId, defaultApiPage);
+              this.onEditAnswerRefresh(this.state.selectedlanguage.value)
               this.setState({
+                openModal: false,
+                openPopup: false,
                 selectedAnswer: {},
                 answer_id: "",
                 selectedQuestion: {},
@@ -1658,7 +1663,6 @@ class AgMissionResponse extends React.Component {
           .catch(error => {
             if (!background_update) {
               this.setState({ openModal: false, openPopup: false });
-              // this.closeLightbox();
             }
             console.error(error);
             this.setState({
@@ -1718,11 +1722,9 @@ class AgMissionResponse extends React.Component {
             api2
               .patch("web_survey_answers", data)
               .then(resp => {
-
-                this.setState({ openModal: false });
                 this.closeLightbox();
                 //this.setSelectedAnswer();
-                this.getMissionResponse(this.state.selectedlanguage.value, defaultApirecordId, defaultApiPage);
+                this.onEditAnswerRefresh(this.state.selectedlanguage.value)
                 this.setState({
                   selectedAnswer: {},
                   answer_id: "",
@@ -1731,7 +1733,6 @@ class AgMissionResponse extends React.Component {
                 });
               })
               .catch(error => {
-                this.setState({ openModal: false });
                 this.closeLightbox();
                 this.setState({
                   selectedAnswer: {},
@@ -1745,10 +1746,8 @@ class AgMissionResponse extends React.Component {
             api2
               .post("web_survey_answers", newData)
               .then(resp => {
-
-                this.setState({ openModal: false });
                 this.closeLightbox();
-                this.getMissionResponse(this.state.selectedlanguage.value, defaultApirecordId, defaultApiPage);
+                this.onEditAnswerRefresh(this.state.selectedlanguage.value)
                 this.setState({
                   selectedAnswer: {},
                   answer_id: "",
@@ -1757,7 +1756,6 @@ class AgMissionResponse extends React.Component {
                 });
               })
               .catch(error => {
-                this.setState({ openModal: false });
                 this.closeLightbox();
                 console.error(error);
                 this.setState({
@@ -1771,7 +1769,6 @@ class AgMissionResponse extends React.Component {
         }
       }
       else {
-        this.setState({ openModal: false });
         this.closeLightbox();
       }
     }
@@ -1925,7 +1922,7 @@ class AgMissionResponse extends React.Component {
   * Handles the api to fetch the mission response by using above params.
   * Updates the language list,status options,mission response,column order,metrics data, and page count respectively.
   * */
-  getMissionResponse = (Language, record, pagesize) => {
+  getMissionResponse = (Language) => {
     this.openLoading();
     loadedlistItems = [];
     var self = this;
@@ -1933,8 +1930,9 @@ class AgMissionResponse extends React.Component {
     if (Language !== '' && Language !== null && Language !== undefined) {
       language = Language
     }
-    let url = "v2/survey_report?id=" + this.state.missionId + '&language=' + language + '&record=' + record + '&pagesize=' + pagesize;
-
+    //let url = "v2/survey_report?id=" + this.state.missionId + '&language=' + language + '&record=' + record + '&pagesize=' + pagesize;
+    let apipagenumber = this.state.currentPage
+    let url = "v2/survey_report?id=" + this.state.missionId + '&language=' + language + '&record=' + 0 + '&per_page=' + this.state.rowsPerPage + '&page=' + apipagenumber;
     api2
       .get(url)
       .then(resp => {
@@ -1968,8 +1966,10 @@ class AgMissionResponse extends React.Component {
           points: resp.data.points,
           survey_id: resp.data.survey_id,
           languagelist: survey_languages,
-          datapagecount: resp.data.total,
-          pagecount: resp.data.total,
+          datapagecount: resp.data.total_count,
+          pagecount: resp.data.total_count,
+          totalrecords: resp.data.total_count,
+          currentPage: 1,
           page: 0,
           listItems: [],
           backupphotos: this.state.backupphotos ? true : false
@@ -2001,25 +2001,27 @@ class AgMissionResponse extends React.Component {
   * Above param values are passed in the url to fetch survey report.
   * Update the mission response to the state variable.
   */
-  getMissionResponsepage = (Language, record, pagesize, page, changerow, exportCsv) => {
+  getMissionResponsepage = (Language, page) => {
     var self = this;
-    let url = "v2/survey_report?id=" + this.state.missionId + '&language=""&record=' + record + '&pagesize=' + pagesize;
+    // let url = "v2/survey_report?id=" + this.state.missionId + '&language=""&record=' + record + '&pagesize=' + pagesize;
+    // if (Language !== '' && Language !== null && Language !== undefined) {
+    //   url = "v2/survey_report?id=" + this.state.missionId + '&language=' + Language + '&record=' + record + '&pagesize=' + pagesize;
+    // }
+    let apipagenumber = this.state.currentPage + 1
+    let url = "v2/survey_report?id=" + this.state.missionId + '&language=""&record=' + 0 + '&per_page=' + this.state.rowsPerPage + '&page=' + apipagenumber
     if (Language !== '' && Language !== null && Language !== undefined) {
-      url = "v2/survey_report?id=" + this.state.missionId + '&language=' + Language + '&record=' + record + '&pagesize=' + pagesize;
+      url = "v2/survey_report?id=" + this.state.missionId + '&language=' + Language + '&record=' + 0 + '&per_page=' + this.state.rowsPerPage + '&page=' + apipagenumber
     }
     api2
       .get(url)
       .then(resp => {
-        if (changerow !== undefined && changerow !== null && changerow === 'changerow') {
-          this.setState({ filteredMissions: [], missionResponses: [], listItems: [] })
-        }
-        // let filteredMissions = this.state.filteredMissions.concat(resp.data.list);
-        let filteredMissions = resp.data.list.concat(this.state.filteredMissions);
+        let filteredMissions = this.state.filteredMissions.concat(resp.data.list);
+        //let filteredMissions = resp.data.list.concat(this.state.filteredMissions);
         let temp_missionResponses = resp.data.list.filter(x => {
           return x.responses.length >= 0;
         })
-        // let missionResponses = this.state.missionResponses.concat(temp_missionResponses)
-        let missionResponses = temp_missionResponses.concat(this.state.missionResponses)
+        let missionResponses = this.state.missionResponses.concat(temp_missionResponses)
+        //let missionResponses = temp_missionResponses.concat(this.state.missionResponses)
         self.setState({
           filteredMissions: filteredMissions,
           missionResponses: missionResponses,
@@ -2027,13 +2029,13 @@ class AgMissionResponse extends React.Component {
             return x.responses.length >= 0;
           }),
           response: true,
-          datapagecount: resp.data.total,
-          exportCsv: false
+          datapagecount: resp.data.total_count,
+          currentPage: apipagenumber
         }, () => {
           if (Language !== '' && Language !== null && Language !== undefined) {
-            this.convert_language_code_page(Language, page, exportCsv)
+            this.convert_language_code_page(Language, page)
           } else {
-            this.doTheThingpage(page, exportCsv);
+            this.doTheThingpage(page);
             this.stopLoading();
           }
         });
@@ -2052,6 +2054,68 @@ class AgMissionResponse extends React.Component {
         // });
       });
   };
+
+  /** refresh button action */
+  onrefresh = () => {
+    this.setState({
+      page: 0,
+      currentPage: 1,
+      pagecount: this.state.datapagecount,
+      rowsPerPage: this.state.rowsPerPage,
+      loadpage: [0]
+    }, () => {
+      this.getMissionResponse(this.state.selectedlanguage.value)
+    })
+  }
+
+  /** Refresh particular page only while edit any row answer */
+  onEditAnswerRefresh = (Language) => {
+    this.openLoading();
+    var self = this;
+    let language = ''
+    if (Language !== '' && Language !== null && Language !== undefined) {
+      language = Language
+    }
+    let apipagenumber = this.api.paginationGetCurrentPage() + 1
+    let url = "v2/survey_report?id=" + this.state.missionId + '&language=' + language + '&record=' + 0 + '&per_page=' + this.state.rowsPerPage + '&page=' + apipagenumber;
+    api2
+      .get(url)
+      .then(resp => {
+        const startIndex = (apipagenumber - 1) * this.state.rowsPerPage;
+
+        // Replace the data in the original array
+        const tempFilterMissions = [...this.state.filteredMissions]; // Copy original array to avoid mutation
+        tempFilterMissions.splice(startIndex, this.state.rowsPerPage, ...resp.data.list);
+
+        const tempMissionResponses = [...this.state.missionResponses]; // Copy original array to avoid mutation
+        tempMissionResponses.splice(startIndex, this.state.rowsPerPage, ...resp.data.list);
+
+        self.setState({
+          filteredMissions: tempFilterMissions,
+          missionResponses: tempMissionResponses,
+          response: true,
+          loading: false
+        }, () => {
+          if (Language !== '' && Language !== null && Language !== undefined) {
+          } else {
+            this.doTheThing(undefined, true);
+          }
+          if (this.state.editView == true) {
+            setTimeout(() => {
+              this.reloadEditMissionPreview()
+            }, 100);
+          }
+        });
+      })
+      .catch(error => {
+        console.error(error);
+        this.stopLoading();
+        self.setState({
+          response: true
+        });
+      });
+  }
+
   /* Handles the api to fetch the config and update the response respectively. */
   getClientresponseconfig = () => {
 
@@ -2099,16 +2163,18 @@ class AgMissionResponse extends React.Component {
   /* Handles the event to update the language. */
   handleLanguageChange = e => {
     if (this.state.languagecode.length > 0) {
-      if (e.label !== this.state.selectedlanguage.label) {
-        // loadedlistItems = [];
-        this.getMissionResponse(e.value, defaultApirecordId, defaultApiPage)
-      }
       this.setState({
         selectedlanguage: { label: e.label, value: e.value },
         page: 0,
+        currentPage: 1,
         pagecount: this.state.datapagecount,
         rowsPerPage: this.state.rowsPerPage,
         loadpage: [0]
+      }, () => {
+        if (e.label !== this.state.selectedlanguage.label) {
+          // loadedlistItems = [];
+          this.getMissionResponse(e.value)
+        }
       })
     } else {
       this.getlanguagelist();
@@ -2116,7 +2182,7 @@ class AgMissionResponse extends React.Component {
     }
   };
   /*  Handles the function to validate the language code.*/
-  convert_language_code(Language, page, exportCsv) {
+  convert_language_code(Language, page) {
     let language_code;
     this.state.languagecode.forEach(c => {
       if (c.name === Language) {
@@ -2125,10 +2191,10 @@ class AgMissionResponse extends React.Component {
     })
     // let language_code = Constants.Language_Code[Language];
     // let source = this.state.selectedlanguage.label !== 'English' ? 'en' : ''
-    this.translate_mission(language_code, page, exportCsv)
+    this.translate_mission(language_code, page)
   }
   /*  Handles the function to validate the language code.*/
-  convert_language_code_page(Language, page, exportCsv) {
+  convert_language_code_page(Language, page) {
     let language_code;
     this.state.languagecode.forEach(c => {
       if (c.name === Language) {
@@ -2137,7 +2203,7 @@ class AgMissionResponse extends React.Component {
     })
     // let language_code = Constants.Language_Code[Language]
     // let source = this.state.selectedlanguage.label !== 'English' ? 'en' : ''
-    this.translate_mission_page(language_code, page, exportCsv)
+    this.translate_mission_page(language_code, page)
   }
   /* Unused function.*/
   decodeStr(str) {
@@ -2146,7 +2212,7 @@ class AgMissionResponse extends React.Component {
     });
   }
   /*  Handles the function to fetch the initial missions.*/
-  translate_mission = async (language_code, page, exportCsv) => {
+  translate_mission = async (language_code, page) => {
     let missionResponses = this.state.missionResponses
     for (let i = 0; i < missionResponses.length; i++) {
       let r = missionResponses[i];
@@ -2193,7 +2259,7 @@ class AgMissionResponse extends React.Component {
       }
       if (this.state.missionResponses.length > 0 && i === (this.state.missionResponses.length - 1)) {
         if (page !== '' && page !== null && page !== undefined) {
-          this.doTheThingpage(page, exportCsv);
+          this.doTheThingpage(page);
         }
         else {
           this.doTheThing();
@@ -2204,7 +2270,7 @@ class AgMissionResponse extends React.Component {
 
   }
   /*  Handles the function to fetch all the missions.*/
-  translate_mission_page = async (language_code, page, exportCsv) => {
+  translate_mission_page = async (language_code, page) => {
     let missionResponses = this.state.missionResponses_temp
     for (let i = 0; i < missionResponses.length; i++) {
       let r = missionResponses[i];
@@ -2250,13 +2316,13 @@ class AgMissionResponse extends React.Component {
         }
       }
       if (this.state.missionResponses_temp.length > 0 && i === (this.state.missionResponses_temp.length - 1)) {
-        this.doTheThingpage(page, exportCsv);
+        this.doTheThingpage(page);
       }
     }
 
   }
   /*  Handles the function to design the column header and column definition for initial mission data.*/
-  doTheThing = async (page) => {
+  doTheThing = async (page, isFromEdit) => {
     this.setState({
       rowClassRules: {
         'status-New': function (params) { return params.node.data.status === 'New' },
@@ -2611,10 +2677,10 @@ class AgMissionResponse extends React.Component {
       }
     });
     this.setState({ metrics_data: metrics_data })
-    this.doTableData(sepMission, page);
+    this.doTableData(sepMission, page, isFromEdit);
   };
   /*  Handles the function to match initial mission data with column definition.*/
-  doTableData = (sepMission, page) => {
+  doTableData = (sepMission, page, isFromEdit) => {
     let listItems = [];
     sepMission.forEach((missionResponse, index) => {
       let temp = this.formatData(missionResponse)
@@ -2626,9 +2692,9 @@ class AgMissionResponse extends React.Component {
       listItems: listItems,
       sepMission: sepMission
     })
-    if (this.state.datapagecount > listItems.length && sepMission.length > 0) {
+    if (this.state.datapagecount > listItems.length && sepMission.length > 0 && !isFromEdit) {
       let id = sepMission[0].survey_tag_id
-      this.getMissionResponsepage(this.state.selectedlanguage.value, id, defaultApiPage, page)
+      this.getMissionResponsepage(this.state.selectedlanguage.value, page)
     }
 
     /** set stored filter state again to be persistence */
@@ -2639,7 +2705,7 @@ class AgMissionResponse extends React.Component {
 
   };
   /*  Handles the function to design the column header and column definition.*/
-  doTheThingpage = (page, exportCsv) => {
+  doTheThingpage = (page) => {
     let sepMission = [];
     let survey_tag_id = Number;
     this.state.missionResponses_temp.forEach(missResp => {
@@ -2710,22 +2776,22 @@ class AgMissionResponse extends React.Component {
       }
     });
     // this.state.metrics_data = metrics_data
-    this.doTableDatapage(sepMission, page, exportCsv);
+    this.doTableDatapage(sepMission, page);
   }
   /*  Handles the function to match formated mission data with column definition and return the data in expected format of aggrid.*/
-  doTableDatapage = (sepMission, page, exportCsv) => {
+  doTableDatapage = (sepMission, page) => {
     let listItems = [];
     sepMission.forEach((missionResponse, index) => {
       let temp = this.formatData(missionResponse)
       temp.column_index = index;
       listItems.push(temp);
     });
-    // let loadlistItems = loadedlistItems.concat(listItems);
-    let loadlistItems = listItems.concat(loadedlistItems);
+    let loadlistItems = loadedlistItems.concat(listItems);
+    //let loadlistItems = listItems.concat(loadedlistItems);
     loadedlistItems = loadlistItems;
     if (this.state.datapagecount > loadedlistItems.length && sepMission.length > 0) {
       let id = sepMission[0].survey_tag_id
-      this.getMissionResponsepage(this.state.selectedlanguage.value, id, defaultApiPage, null)
+      this.getMissionResponsepage(this.state.selectedlanguage.value, page)
     } else {
       this.setState({
         listItems: loadedlistItems,
@@ -3512,6 +3578,7 @@ class AgMissionResponse extends React.Component {
       preview: false,
       editView: false,
       page: 0,
+      currentPage: 1,
       pagecount: this.state.datapagecount,
       rowsPerPage: this.state.rowsPerPage,
     });
@@ -3559,7 +3626,7 @@ class AgMissionResponse extends React.Component {
   /* Handles the event to close the photoeditor popup. */
   closeLightbox = () => {
     this.setState({
-
+      openModal: false,
       openPopup: false,
       titles: []
     });
@@ -3579,6 +3646,7 @@ class AgMissionResponse extends React.Component {
       editView: false,
       editMission: {},
       page: 0,
+      currentPage: 1,
       pagecount: this.state.datapagecount,
       rowsPerPage: this.state.rowsPerPage,
     });
@@ -3593,6 +3661,7 @@ class AgMissionResponse extends React.Component {
       clickedCellEdit: cell,
       previewMission: cell.data,
       page: 0,
+      currentPage: 1,
       pagecount: this.state.datapagecount,
       rowsPerPage: this.state.rowsPerPage,
     });
@@ -3674,6 +3743,7 @@ class AgMissionResponse extends React.Component {
       this.api.paginationGoToPage(0)
       this.setState({
         page: 0,
+        currentPage: 1,
         pagecount: this.state.datapagecount,
         // rowsPerPage: rowsPerPage,
       })
@@ -3755,6 +3825,7 @@ class AgMissionResponse extends React.Component {
 
       this.setState({
         page: 0,
+        currentPage: 1,
         pagecount: this.state.datapagecount,
         rowsPerPage: rowsPerPage,
       })
@@ -3825,7 +3896,7 @@ class AgMissionResponse extends React.Component {
                   <GridItem>
                     <Select
                       placeholder="Language"
-                      isDisabled={this.state.missionResponses.length < 1}
+                      isDisabled={this.state.missionResponses.length < 1 || this.state.listItems.length < this.state.totalrecords}
                       style={{ fontSize: "12px" }}
                       options={this.state.languagelist}
                       value={this.state.selectedlanguage}
@@ -3843,7 +3914,7 @@ class AgMissionResponse extends React.Component {
                       variant="contained"
                       color="primary"
                       onClick={this.exportCsv}
-                      disabled={this.state.missionResponses.length === 0 || this.state.listItems.length < loadedlistItems.length}
+                      disabled={this.state.missionResponses.length === 0 || this.state.listItems.length < this.state.totalrecords}
                     >
                       Export
                     </Button>
@@ -3868,7 +3939,7 @@ class AgMissionResponse extends React.Component {
                       paddingRight: 10
                     }}
                     variant="contained"
-                    disabled={this.state.selectedMission === "" ? true : false}
+                    disabled={this.state.selectedMission === "" ? true : false || this.state.listItems.length < this.state.totalrecords}
                     onClick={() => { this.setState({ Createclientscreen: true }) }}
                   >
                     {this.state.client_response === false ? "Create Client View" : "View Client View"}
@@ -3880,8 +3951,8 @@ class AgMissionResponse extends React.Component {
                     }}
                     variant="contained"
                     color="primary"
-                    onClick={() => this.getMissionResponse(this.state.selectedlanguage.value, defaultApirecordId, defaultApiPage)}
-                    disabled={this.state.missionResponses.length === 0}
+                    onClick={this.onrefresh}
+                    disabled={this.state.missionResponses.length === 0 || this.state.listItems.length < this.state.totalrecords}
                   >
                     Refresh
                   </Button>
@@ -3894,7 +3965,7 @@ class AgMissionResponse extends React.Component {
                     variant="contained"
                     color="primary"
                     onClick={this.clearFilter}
-                    disabled={this.state.missionResponses.length === 0}
+                    disabled={this.state.missionResponses.length === 0 || this.state.listItems.length < this.state.totalrecords}
                   >
                     Reset Filters
                   </Button>
@@ -3908,7 +3979,7 @@ class AgMissionResponse extends React.Component {
                     onClick={() => {
                       this.setState({ openrestore: true });
                     }}
-                    disabled={this.state.missionResponses.length === 0}
+                    disabled={this.state.missionResponses.length === 0 || this.state.listItems.length < this.state.totalrecords}
                   >
                     Reset Columns
                   </Button>
@@ -3920,7 +3991,7 @@ class AgMissionResponse extends React.Component {
                     variant="contained"
                     color="primary"
                     onClick={() => this.setState({ isAddColumnPopupOpen: true })}
-                    disabled={this.state.missionResponses.length === 0}
+                    disabled={this.state.missionResponses.length === 0 || this.state.listItems.length < this.state.totalrecords}
                   >Add Columns</Button>
                   <Button
                     style={{
@@ -3933,7 +4004,7 @@ class AgMissionResponse extends React.Component {
                     variant="contained"
                     color="primary"
                     onClick={this.backupphotos.bind(this)}
-                    disabled={this.state.missionResponses.length === 0}
+                    disabled={this.state.missionResponses.length === 0 || this.state.listItems.length < this.state.totalrecords}
                   ><img src={noun_DuplicateImage} style={{ width: '45px', height: '36px' }} alt="expandArrow" />
                   </Button>
                   <div style={{ width: '150px', margin: "0 55px 0 auto", display: "inline-block" }}>
@@ -3959,7 +4030,7 @@ class AgMissionResponse extends React.Component {
                 marginRight: "15px",
                 lineHeight: "42px"
               }}
-            >Survey Responses ({this.state.sepMission.length})</Typography>
+            >Survey Responses ({this.state.totalrecords})</Typography>
           </div>
           <Fragment>
             <div className="response-box"
@@ -4059,7 +4130,7 @@ class AgMissionResponse extends React.Component {
                         </div>
                         <div style={{ display: 'flex', float: 'right', }}>
                           <div style={{ alignSelf: "center" }}>
-                            <b>
+                            <b style={this.state.listItems.length < this.state.totalrecords ? disabledive : {}}>
                               <label style={{ fontSize: 11, }}>Show Rows</label>
                               <label style={{ marginLeft: 5, fontSize: 11 }}>|</label>
                               <label onClick={() => this.handleChangeRowsPerPage(50)} style={rowsPerPage === 50 ? { marginLeft: 5, fontSize: 11, borderBottom: '1.5px solid grey', cursor: 'pointer' } : { marginLeft: 5, fontSize: 11, cursor: 'pointer' }}>50</label>
@@ -4069,7 +4140,7 @@ class AgMissionResponse extends React.Component {
                               <label onClick={() => this.handleChangeRowsPerPage(500)} style={rowsPerPage === 500 ? { marginLeft: 5, fontSize: 11, borderBottom: '1.5px solid grey', cursor: 'pointer' } : { marginLeft: 5, fontSize: 11, cursor: 'pointer' }}>500</label>
                               <label style={{ marginLeft: 5, fontSize: 11 }}>|</label>
                             </b></div>
-                          <div>
+                          <div style={this.state.listItems.length < this.state.totalrecords ? disabledive : {}}>
                             <TablePagination
                               component="div"
                               style={{ padding: 0 }}
@@ -4176,7 +4247,7 @@ class AgMissionResponse extends React.Component {
                     </div>
                     <div style={{ display: 'flex', float: 'right', }}>
                       <div style={{ alignSelf: "center" }}>
-                        <b>
+                        <b style={this.state.listItems.length < this.state.totalrecords ? disabledive : {}}>
                           <label style={{ fontSize: 11, }}>Show Rows</label>
                           <label style={{ marginLeft: 5, fontSize: 11 }}>|</label>
                           <label onClick={() => this.handleChangeRowsPerPage(50)} style={rowsPerPage === 50 ? { marginLeft: 5, fontSize: 11, borderBottom: '1.5px solid grey', cursor: 'pointer' } : { marginLeft: 5, fontSize: 11, cursor: 'pointer' }}>50</label>
@@ -4186,7 +4257,7 @@ class AgMissionResponse extends React.Component {
                           <label onClick={() => this.handleChangeRowsPerPage(500)} style={rowsPerPage === 500 ? { marginLeft: 5, fontSize: 11, borderBottom: '1.5px solid grey', cursor: 'pointer' } : { marginLeft: 5, fontSize: 11, cursor: 'pointer' }}>500</label>
                           <label style={{ marginLeft: 5, fontSize: 11 }}>|</label>
                         </b> </div>
-                      <div>
+                      <div style={this.state.listItems.length < this.state.totalrecords ? disabledive : {}}>
                         <TablePagination
                           component="div"
                           style={{ padding: 0 }}
@@ -4217,6 +4288,7 @@ class AgMissionResponse extends React.Component {
                             input: classes.input,
                             actions: classes.actions,
                           }}
+                          disabled={this.state.listItems.length < loadedlistItems.length}
                         />
                       </div>
                     </div>
