@@ -1,5 +1,3 @@
-
-
 /* Styles used in ProjectList.jsx */
 
 
@@ -18,6 +16,15 @@
 
 .cgrid {
     padding: 0px !important;
+}
+
+.search-input {
+    border-radius: 20px;
+    border: 1px solid #ced4da;
+    padding: .375rem .75rem;
+    height: 33px;
+    font-size: 14px;
+    margin-right: 5px;
 }
 
 h6 {

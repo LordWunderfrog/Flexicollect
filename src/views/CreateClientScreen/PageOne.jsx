@@ -40,25 +40,7 @@ import PhotoEditor from "../../components/PhotoEditor/Imageeditor"
 /* API. */
 import api2 from "../../helpers/api2";
 
-/* Handles the snackbar message notification. */
-function showNotification(msg, color) {
-  this.setState({
-    message: msg,
-    msgColor: color
-  });
 
-  let place = "br";
-  var x = [];
-  x[place] = true;
-  this.setState(x);
-  this.alertTimeout = setTimeout(
-    function () {
-      x[place] = false;
-      this.setState(x);
-    }.bind(this),
-    3000
-  );
-}
 
 const theme = createMuiTheme({
   typography: {
@@ -218,6 +200,26 @@ class PageOne extends Component {
   componentDidMount() {
     this.getMissionResponse()
 
+  }
+
+  /* Handles the snackbar message notification. */
+  showNotification(msg, color) {
+    this.setState({
+      message: msg,
+      msgColor: color
+    });
+
+    let place = "br";
+    var x = [];
+    x[place] = true;
+    this.setState(x);
+    this.alertTimeout = setTimeout(
+      function () {
+        x[place] = false;
+        this.setState(x);
+      }.bind(this),
+      3000
+    );
   }
 
   /* Handles the api to filter the metric data. */
@@ -1405,7 +1407,7 @@ class PageOne extends Component {
   /*  Handles the event to add new column. */
   addColumn = () => {
     if (this.state.tableFields.indexOf(this.state.addColName.toLowerCase()) >= 0) {
-      showNotification("Duplicate Column Name", "danger");
+      this.showNotification("Duplicate Column Name", "danger");
     } else {
       api2
         .post("v1/survey_report/metrics", {
@@ -1416,7 +1418,7 @@ class PageOne extends Component {
 
           if (resp.status === 200) {
             this.state.tableFields.push(this.state.addColName);
-            showNotification("New Column Added", "success");
+            this.showNotification("New Column Added", "success");
 
             let metrics_row = [...this.state.metrics_row];
 
@@ -1504,7 +1506,7 @@ class PageOne extends Component {
               column_order: set_column_order
             });
 
-          showNotification("Column Deleted Successfully", "success");
+          this.showNotification("Column Deleted Successfully", "success");
         }
       })
       .catch(error => {

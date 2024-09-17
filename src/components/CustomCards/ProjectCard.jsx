@@ -136,7 +136,12 @@ class ProjectCard extends React.Component {
               <Typography
                 variant="body2"
                 className={(classes.title, classes.white)}
-                style={{ padding: "5px 0px" }}
+                style={{
+                  padding: "5px 0px",
+                  overflow: "hidden",
+                  whiteSpace: "nowrap",
+                  textOverflow: "ellipsis"
+                }}
               >
                 Country/Location: {project.country}/ {project.location}
               </Typography>
@@ -151,6 +156,11 @@ class ProjectCard extends React.Component {
               <Typography
                 variant="body2"
                 className={(classes.title, classes.white)}
+                style={{
+                  overflow: "hidden",
+                  whiteSpace: "nowrap",
+                  textOverflow: "ellipsis"
+                }}
               >
                 Products Purchased: {project.products_purchased}
               </Typography>
