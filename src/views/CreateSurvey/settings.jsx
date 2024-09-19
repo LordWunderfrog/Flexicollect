@@ -108,11 +108,11 @@ class Settings extends React.Component {
             .get("projects")
             .then(resp => {
                 let proj = [];
-                resp.data.forEach((x, i) => {
+                resp.data.projects.forEach((x, i) => {
                     proj.push({ value: x.id, label: x.project_name });
                 });
                 self.setState({
-                    projectSource: resp.data,
+                    projectSource: resp.data.projects,
                     projects: proj
                 });
             })
