@@ -119,8 +119,7 @@ class CreateSurvey extends React.Component {
             draftid: 0,
             updatedate: "",
             platformType: "",
-            selectedProfile: "",
-            mappingProfileEnable: false,
+            selectedProfile: {id:null , value:"" , label : ""},
             isAssigned: "",
             refcode: "",
             duplicatemissionRefCode: false,
@@ -140,7 +139,8 @@ class CreateSurvey extends React.Component {
             dropcurrentlanguage: { label: "English", value: 'English' },
             concurrentlanguage: { label: "English", value: 'English' },
             deletelanguage: [],
-            load: false
+            mappingProfileEnable: false,
+            load: false 
         };
         this.props.handleCollapseScreen(false);
         this.elementsbar = this.showAddElements.bind(this);
@@ -149,17 +149,12 @@ class CreateSurvey extends React.Component {
         this.ShowNotification = this.ShowNotification.bind(this);
     }
 
-
-    /**
-     * Handles on clearing set interval.
-     */
+    /* Handles on clearing set interval. */
     componentWillUnmount() {
         clearInterval(this.interval);
     }
 
-    /**
-     * Handles on loading data from api.
-     */
+    /* Handles on loading data from api. */
     componentDidMount() {
         localStorage.removeItem('updateProperties');
         //this.interval = setInterval(() => this.handleOnClick2("draft", "auto"), 20000)
@@ -192,7 +187,6 @@ class CreateSurvey extends React.Component {
                             }
                         }
                     })
-                    // this.state.selectedlanguage = selectedlanguage
                     this.setState({
                         name: resp.data.title,
                         tags: resp.data.tags,
@@ -210,6 +204,8 @@ class CreateSurvey extends React.Component {
                         isAssigned: resp.data.isAssigned ? resp.data.isAssigned : "",
                         oldrefcode: resp.data.refcode,
                         selectedlanguage: selectedlanguage,
+                        mappingProfileEnable : resp.data.question_mapping,
+                        selectedProfile : {id:resp.data.client_id || null , value : resp.data.client_name || "" , label : resp.data.client_name || ""},
                         languages_drop: languages_drop
                     }, () => {
                         this.getlanguagedetails()
@@ -217,15 +213,7 @@ class CreateSurvey extends React.Component {
 
                 })
                 .catch(error => {
-                    if (error.response) {
-                        //console.log(error.response.status);
-                        //console.log(error.response.headers);
-                    } else if (error.request) {
-                        //console.log(error.request);
-                    } else {
-                        //console.log("Error", error.message);
-                    }
-                    //console.log(error.config);
+                    console.log(error);
                 });
         } else {
             this.generaterefcode('create');
@@ -323,13 +311,11 @@ class CreateSurvey extends React.Component {
             .then(resp => {
                 let proj = [];
                 resp.data.data.forEach((x, i) => {
-                    ////console.log(i);
                     proj.push({ value: x, label: x });
                 });
                 this.setState({ languagelist: proj });
             })
             .catch((error) => {
-                //console.log(error)
             });
     }
     // (languages_drop[L.value] && languages_drop[L.value].language && languages_drop[L.value].language !== L.value)
@@ -444,11 +430,8 @@ class CreateSurvey extends React.Component {
     deletelanguagetoapi = (url) => {
         api2.delete(url)
             .then(resp => {
-                //console.log('delete ok',resp)
             })
             .catch(error => {
-                //console.log('delete error')
-
             });
     }
 
@@ -461,7 +444,6 @@ class CreateSurvey extends React.Component {
             value.forEach((l, i) => {
                 if (l.label !== 'English') {
                     //  if (languages_drop[l.value]&& languages_drop[l.value].id && languages_drop[l.value].id === null){
-                    // console.log('22222',languages_drop[l.value].content.length)
                     // if (apicall) {
                     this.setState({ load: true })
                     // if (id !== "") {
@@ -517,18 +499,15 @@ class CreateSurvey extends React.Component {
 
     /* Handles the api to form the initial data format for seleceted languages except default lang. */
     AddLanuageToApi = (data) => {
-        //console.log('lan data')
         api2.post("survey_language", data)
             .then(resp => {
-                //console.log('lan added')
             })
             .catch(error => {
-                //console.log('lan error')
 
             });
     }
 
-    /* Unused function. */
+    /* used at next button clicked */
     OtherLancongenerate = (dname) => {
 
         if (this.state.dropcurrentlanguage.value === "English") {
@@ -769,11 +748,8 @@ class CreateSurvey extends React.Component {
         let url = "survey_language";
         api2.patch(url, data)
             .then(resp => {
-                //console.log('lan added')
             })
             .catch(error => {
-                //console.log('lan error')
-
             });
     }
 
@@ -859,7 +835,6 @@ class CreateSurvey extends React.Component {
             })
         }
 
-        //console.log('languages_drop', this.state.languages_drop)
     }
 
     /* Validates the language in selected language list and updates the content respectively */
@@ -911,7 +886,6 @@ class CreateSurvey extends React.Component {
         this.setState({
             languages_drop: language
         })
-        //console.log('other_language', language)
     }
 
     /* Handles the event in updating the language in the property window. */
@@ -941,7 +915,6 @@ class CreateSurvey extends React.Component {
             })
         }
 
-        //console.log('languages_drop', this.state.languages_drop)
     }
 
     /* Unused function */
@@ -1018,7 +991,6 @@ class CreateSurvey extends React.Component {
                 dropcurrentlanguage: { label: value, value: value }
             })
         } else {
-            //console.log('check',this.state.languages_drop[value].conditions)
             this.setState({
                 conditions: this.state.languages_drop[value].conditions,
                 drops: this.state.languages_drop[value].content,
@@ -1027,7 +999,6 @@ class CreateSurvey extends React.Component {
             })
         }
 
-        //console.log('languages_drop', this.state.languages_drop)
     }
 
     /* Handles the event to swap the questions for other languages when swap occur in default language. */
@@ -1107,7 +1078,6 @@ class CreateSurvey extends React.Component {
             languages_drop: languages_drop
         }, this.autoSave);
     };
-
 
     /* Handles this function to update the properties in other languages when changes occur in default language except label. */
     updatelanguageproperties = (index, properties, check, e) => {
@@ -1347,7 +1317,6 @@ class CreateSurvey extends React.Component {
         return options
     }
 
-
     /* Handles the event to update the platform type. */
     handlePlatformType = event => {
 
@@ -1358,12 +1327,14 @@ class CreateSurvey extends React.Component {
 
     };
 
-    /** Handle mapping profile change */
+    /* Handle mapping profile change */
     handleProfileChange = event => {
         this.setState({
             selectedProfile: event
         });
     }
+
+    /* Handle mapping enabled switch change */
     handleMappingProfileChange = event => {
         this.setState({
             mappingProfileEnable: event
@@ -1414,10 +1385,7 @@ class CreateSurvey extends React.Component {
         // );
     }
 
-    /**
-     * Sets the input element.
-     *
-     */
+    /* Sets the input element. */
     settingsOptions(e) {
         if (e === "open2") {
             this.setState({
@@ -1430,19 +1398,14 @@ class CreateSurvey extends React.Component {
         }
     }
 
-    /**
-     * Handle property bar.
-     *
-     */
+    /* Handle property bar. */
     showAddElements() {
         this.setState({
             lopen: !this.state.lopen
         });
     }
 
-    /**
-     * Listen to changes on drop.
-     */
+    /* Listen to changes on drop. */
     dropChange = (i, pos) => {
         this.setState({
             drops: i,
@@ -1604,21 +1567,19 @@ class CreateSurvey extends React.Component {
                     } else if (q.properties && !q.properties.hasOwnProperty("currentQuestionGroup")) {
                         mapProfileCheck = false;
                         break;
-                    } else if (q.properties && !q.properties.hasOwnProperty("currentQuestionSubGroup1")) {
+                    } else if (q.properties && !q.properties.hasOwnProperty("currentQuestionSubGroup1")
+                        || (q.properties.currentQuestionSubGroup1=="" || q.properties.currentQuestionSubGroup1==null || q.properties.currentQuestionSubGroup1.value=="")) {
                         mapProfileCheck = false;
                         break;
                     }
-                    else if (q.properties && !q.properties.hasOwnProperty("currentQuestionSubGroup2")) {
-                        mapProfileCheck = false;
-                        break;
-                    }
-                    else if (q.properties && !q.properties.hasOwnProperty("currentQuestionSubGroup3")) {
+                    else if (q.properties && !q.properties.hasOwnProperty("currentQuestionSubGroup2")
+                        || (q.properties.currentQuestionSubGroup2=="" || q.properties.currentQuestionSubGroup2==null || q.properties.currentQuestionSubGroup2.value=="")) {
                         mapProfileCheck = false;
                         break;
                     }
                 }
             }
-            if (!mapProfileCheck) { this.ShowNotification("Profile mapping is enabled. Please select product number, question group and sub group in all element", "danger", 5000); }
+            if (!mapProfileCheck) { this.ShowNotification("Profile mapping is enabled. Please select product number, question group and sub group in all element", "danger", 3000); }
             return mapProfileCheck;
         }
         else {
@@ -1632,10 +1593,7 @@ class CreateSurvey extends React.Component {
         }
         return value;
     }
-    /**
-     * Handle next button.
-     *
-     */
+    /* Handle next button. */
     handleNextProps = () => {
         this.setState({ br: false });
         $('div').removeClass('disabledContent');
@@ -1658,8 +1616,12 @@ class CreateSurvey extends React.Component {
             let next = true;
             const { activeStep } = this.state;
             if (activeStep === 0) {
-                this.state.draftid ? this.updateSurvey("draft", "auto", true) : this.addSurvey("draft", "auto", true);
-                this.OtherLanguagegenerate()
+             if(this.state.mappingProfileEnable==true && this.state.selectedProfile.value == ""){
+                this.ShowNotification("Profile mapping is enabled. Please select client", "danger", 5000); 
+             }else{
+                 this.state.draftid ? this.updateSurvey("draft", "auto", true) : this.addSurvey("draft", "auto", true);
+                 this.OtherLanguagegenerate()
+                }
             } else {
                 if (activeStep === 1) {
                     next = this.CheckScale() && this.CheckChoice() && this.checkMappingProfile();
@@ -1679,9 +1641,7 @@ class CreateSurvey extends React.Component {
         }
     };
 
-    /**
-     * Handle next button of condition page.
-     */
+    /* Handle next button of condition page. */
     handleNext2 = (dname) => {
         if (localStorage.getItem('updateProperties')) {
             $(".App-body").addClass("disabledContent");
@@ -1693,7 +1653,6 @@ class CreateSurvey extends React.Component {
             if (conditions.length > 0) {
 
                 let lastcondition = conditions[conditions.length - 1]
-
 
                 for (var j = 0; j < lastcondition.source.length; j++) {
                     if (lastcondition.source[j].handler === "" || lastcondition.source[j].state === "" || lastcondition.target.do === "" || lastcondition.target.handler === "") {
@@ -1739,7 +1698,6 @@ class CreateSurvey extends React.Component {
                     validatecheck.push(validatecheck.length)
                 }
             }
-
 
             if (validatecheck.length > 0) {
                 this.setState({
@@ -1800,12 +1758,7 @@ class CreateSurvey extends React.Component {
         this.editlanguageupdate(true)
     }
 
-    /**
-     * Handle the event of back button.
-     *
-     */
-
-
+    /* Handle the event of back button. */
     handleBack = () => {
         if (localStorage.getItem('updateProperties')) {
             handleClick = 'Back';
@@ -1841,10 +1794,7 @@ class CreateSurvey extends React.Component {
         }
     };
 
-    /**
-     * Handle back button on conditions page.
-     *
-     */
+    /* Handle back button on conditions page. */
     handleBack2 = () => {
         const { activeStep } = this.state;
         const { conditions, drops } = this.state;
@@ -1874,11 +1824,7 @@ class CreateSurvey extends React.Component {
         }
     };
 
-    /**
-     * Handle the events to when input value changes.
-     * 
-     *
-     */
+    /* Handle the events to when input value changes. */
     handleInputChange = event => {
         const target = event.target;
         let value = target.value;
@@ -1891,19 +1837,14 @@ class CreateSurvey extends React.Component {
         });
     };
 
-    /**
-     * Handle the events to update the project change.
-     *
-     */
+    /* Handle the events to update the project change. */
     handleProjectChange = (name, value) => {
         this.setState({
             [name]: value
         });
     };
 
-
     /* Handles the events to set selected value. */
-
     handleqtypeChange = event => {
         const value = event.target.value;
         this.setState({
@@ -1928,19 +1869,12 @@ class CreateSurvey extends React.Component {
         })
     };
 
-    /**
-     * Handles the events to check the survey existance.
-     *
-     */
+    /* Handles the events to check the survey existance. */
     handleOnClick = (dname) => {
         this.handleNext2(dname);
     };
 
-
-    /**
-     * Handles the events to check the survey existance with autosave.
-     *
-     */
+    /* Handles the events to check the survey existance with autosave. */
     handleOnClick2 = (dname, dauto, check) => {
         if (this.state.dropcurrentlanguage.value === "English") {
             this.state.draftid ? this.updateSurvey(dname, dauto) : this.addSurvey(dname, dauto);
@@ -1956,7 +1890,6 @@ class CreateSurvey extends React.Component {
         this.editlanguageupdate(false)
     }
 
-
     /* Handles the events to add conditions. */
     addCondtions(event) {
 
@@ -1965,7 +1898,6 @@ class CreateSurvey extends React.Component {
             // languages_drop:languages_drop
         });
     }
-
 
     /* Handles the events to add new survey. */
     addSurvey(dname, dauto, check) {
@@ -1976,7 +1908,7 @@ class CreateSurvey extends React.Component {
         const time = mydate.toTimeString();
         const timer = time.split(" ");
         const PubDate = `${yyyy}-${mm}-${dd} ${timer[0]}`;
-        const data = {
+        let data = {
             survey_name: this.state.name,
             survey_tags: this.state.tags,
             status: (dname === "draft") ? "draft" : "published",
@@ -1992,9 +1924,15 @@ class CreateSurvey extends React.Component {
             published: PubDate,
             platform_type: this.state.platformType && this.state.platformType !== "" ? this.state.platformType : "App Only",
             refcode: this.state.refcode,
-            mappingProfileEnable: this.state.mappingProfileEnable,
-            selectedProfile: this.state.selectedProfile
         };
+        this.state.mappingProfileEnable == true ?
+        data = {
+            ...data , 
+            question_mapping : this.state.mappingProfileEnable,
+            client_name: this.state.selectedProfile.value !== "" ? this.state.selectedProfile.value : null,
+            client_id : this.state.selectedProfile.id ? this.state.selectedProfile.id :  null
+        }
+        : data = data
 
         const self = this;
         if (dauto !== "auto") {
@@ -2066,7 +2004,6 @@ class CreateSurvey extends React.Component {
             });
     }
 
-
     /* Handles the events to update the survey. */
     updateSurvey(dname, dauto, check) {
         if (this.state.refcodedit) { this.saverefcode(this.state.refcode) }
@@ -2084,7 +2021,7 @@ class CreateSurvey extends React.Component {
         //         question.properties.question_text==="<p>Type a question</p>"
         //     }
         // })
-        const data = {
+        let data = {
             id: this.state.id,
             survey_name: this.state.name,
             survey_tags: this.state.tags,
@@ -2095,7 +2032,6 @@ class CreateSurvey extends React.Component {
             project_id: this.state.project_id,
             mission_id: this.state.mission_id,
             author: localStorage.getItem("username"),
-            // questions: this.state.drops,
             questions: this.state.defaultdrops,
             conditions: this.state.conditions,
             responses: 0,
@@ -2103,9 +2039,17 @@ class CreateSurvey extends React.Component {
             platform_type: this.state.platformType && this.state.platformType !== "" ? this.state.platformType : "App Only",
             refcode: this.state.refcode,
             positionChanged: this.state.positionChanged === true ? 1 : 0,
-            mappingProfileEnable: this.state.mappingProfileEnable,
-            selectedProfile: this.state.selectedProfile
         };
+
+        if(this.state.mappingProfileEnable == true){ 
+            data = { 
+                ...data , 
+                question_mapping : this.state.mappingProfileEnable,
+                client_name: this.state.selectedProfile.value || null,
+                client_id : this.state.selectedProfile.id ||  null
+            }
+        }
+
         if (this.state.dropcurrentlanguage.value !== "English") {
             data.questions = this.state.defaultdrops
             data.conditions = this.state.defaultconditions
@@ -2191,18 +2135,19 @@ class CreateSurvey extends React.Component {
         const points = this.state.points;
         const previewdrops = this.state.drops;
         const previewconditions = this.state.conditions;
-        const validate = this.state.validate
-        const minutes = this.state.minutes
-        const isAssigned = this.state.isAssigned
-        const mappingProfileEnable = this.state.mappingProfileEnable
-        let refcode = this.state.refcode
+        const validate = this.state.validate;
+        const minutes = this.state.minutes;
+        const isAssigned = this.state.isAssigned;
+        const mappingProfileEnable = this.state.mappingProfileEnable;
+        const selectedProfile = this.state.selectedProfile;
+        let refcode = this.state.refcode;
         let oldrefcode = this.state.oldrefcode;
         let languagelist = this.state.languagelist;
         let selectedlanguage = this.state.selectedlanguage;
         let dropcurrentlanguage = this.state.dropcurrentlanguage;
         let defaultdrops = this.state.defaultdrops;
         let languages_drop = this.state.languages_drop;
-        let concurrentlanguage = this.state.concurrentlanguage
+        let concurrentlanguage = this.state.concurrentlanguage;
 
         /**
          * gets the step contents to perform next and previous actions.
@@ -2269,6 +2214,9 @@ class CreateSurvey extends React.Component {
                             handleselectedlanguage={handleselectedlanguage}
                             selectedlanguage={selectedlanguage}
                             handledeletelanguage={handledeletelanguage}
+                            mappingProfileEnable={mappingProfileEnable}
+                            selectedProfile={selectedProfile}
+                            id={id}
                         />
                     );
                 case 1:
@@ -2296,6 +2244,7 @@ class CreateSurvey extends React.Component {
                             languages_drop={languages_drop}
                             downArrowFuncLanguage={downArrowFuncLanguage}
                             upArrowFuncLanguage={upArrowFuncLanguage}
+                            selectedProfile={selectedProfile}
                         />
                     );
                 case 2:
@@ -2322,8 +2271,6 @@ class CreateSurvey extends React.Component {
         const fullwidth = this.state.activeStep !== 1 ? " fullwidth" : " shrink";
         const update = this.state.id ? "Update" : "Finish";
         const { msgColor, br, message, load, con } = this.state;
-
-
 
         return (
             <MuiThemeProvider theme={theme}>

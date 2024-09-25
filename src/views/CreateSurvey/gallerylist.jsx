@@ -19,8 +19,6 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 // Custom Components
 import Snackbar from "components/Snackbar/Snackbar.jsx";
 
-
-
 const styles = theme => ({
     root: {
         width: "100%"
@@ -74,9 +72,7 @@ class Gallerylist extends React.Component {
     }
 
     componentDidMount() {
-
         this.getimages()
-
     }
 
     /* Handles the api to fetch the images. */
@@ -181,9 +177,7 @@ class Gallerylist extends React.Component {
         this.props.step()
     }
 
-
     /* Handles the api to delete the images. */
-
     deleteFun = () => {
         const image = this.state.image
         console.log(image)
@@ -247,19 +241,12 @@ class Gallerylist extends React.Component {
         return (
             <div className="gallerydivwrap">
                 <span href="#" className="galleryback" onClick={this.backFunc}> <i className="fa fa-chevron-left"></i>  Back </span>
-
                 <div className="gallery gallerylistimages">
-
                     {gallery.map((image, index) => (
-
                         <div key={index} className="listofgallery listofgalleryalters"><img src={image.image} alt="gallery" />
-                            {/* {console.log("image")}
-                            {console.log(image)} */}
-
                             <div onClick={() => this.setState({ open: true, image: image })}><i className="fa fa-close"></i>
                             </div>
                         </div>
-
                     ))}
                     <StyledDropZone accept={"image/png, image/gif, image/jpeg, image/*"} onDrop={this.onDrop.bind(this)} />
                     <div className="dropsaveimage" style={{ textAlign: "center" }}>
@@ -273,11 +260,7 @@ class Gallerylist extends React.Component {
                     aria-labelledby="alert-dialog-title"
                     aria-describedby="alert-dialog-description"
                 >
-                    <DialogContent
-                        style={{
-                            padding: "25px 40px 16px"
-                        }}
-                    >
+                    <DialogContent style={{ padding: "25px 40px 16px" }}>
                         <DialogContentText id="alert-dialog-description"
                             style={{
                                 fontSize: 12,
@@ -314,9 +297,7 @@ class Gallerylist extends React.Component {
                                 }}>
                                 No
                             </Button>
-
                         </DialogActions>
-
                     </DialogContent>
                 </Dialog>
                 <Snackbar

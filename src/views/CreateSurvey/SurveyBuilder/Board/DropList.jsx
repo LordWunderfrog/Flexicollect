@@ -48,11 +48,7 @@ class DropList extends React.Component {
         this.handleBlur = this.handleBlur.bind(this);
     }
 
-
-    /**
-     * Pre mount of conditions and old elements.
-     *
-     */
+    /* Pre mount of conditions and old elements. */
     componentDidMount() {
         let fieldprops = this.props.oldprop;
         fieldprops.question_id = this.props.question_id;
@@ -92,7 +88,6 @@ class DropList extends React.Component {
         }
     }
 
-
     handleFocus(event) {
         let fieldprops = this.state.fieldprops;
         let fieldans = fieldprops.properties;
@@ -114,12 +109,8 @@ class DropList extends React.Component {
         }
     }
 
-    /**
-     * Handles element delete
-     *
-     */
+    /* Handles element delete*/
     handleReset = event => {
-
         let condtions = this.state.conditions;
         event.conditions.forEach((condition, index) => {
             condtions.map((original, i) => (original.condtion_id === condition.condtion_id ? (original.error = 1) : ""));
@@ -130,8 +121,7 @@ class DropList extends React.Component {
         this.props.deleteddrops(this.props.question_id);
     };
 
-
-    /* Handles the event to validate the value and return boolean value.   */
+    /* Handles the event to validate the value and return boolean value. */
     getMandatoryStyle(fieldprops) {
         let conditions = this.state.conditions;
         let style = false;
@@ -158,8 +148,7 @@ class DropList extends React.Component {
 
     }
 
-
-    /* Handles the open event of settings.   */
+    /* Handles the open event of settings. */
     handleClickOpen = e => {
         const { question_id } = this.props;
         let Mandatory_style = this.getMandatoryStyle(this.state.fieldprops)
@@ -189,15 +178,13 @@ class DropList extends React.Component {
         }
     };
 
-    /* Handles the clone click.   */
+    /* Handles the clone click. */
     handleClickOpen = e => {
         console.log(e)
     };
 
-
-    /* Handles the close event of settings.   */
+    /* Handles the close event of settings. */
     handleClose = e => {
-
         const { question_id } = this.props;
         if (this.state.duplicateRefCode) {
             let fieldprops = this.state.fieldprops
@@ -229,7 +216,6 @@ class DropList extends React.Component {
         }
     };
 
-
     /* Handles and return the element to move one step downward. */
     downArrow() {
         return (
@@ -253,7 +239,6 @@ class DropList extends React.Component {
 
     /* Handles and return the element to move one step upward. */
     upArrow() {
-
         return (
             this.state.currentlanguage.value === "English" && (
                 <span>
@@ -293,6 +278,7 @@ class DropList extends React.Component {
         this.handleClickOpen("open2")
         $('div').removeClass('disabledContent');
     }
+
     /* Handles the open event of settings.   */
     handleClickOpen = e => {
         if (localStorage.getItem('updateProperties')) {
@@ -329,7 +315,6 @@ class DropList extends React.Component {
 
     };
 
-
     /* Handle the event to update the props.    */
     updateprops(e, i, index, key) {
         const evalu = e.target.value;
@@ -356,7 +341,7 @@ class DropList extends React.Component {
             <span>
                 {conditions.length === 0 ?
                     <span>
-                        <i className="fa fa-trash" onClick={e => this.handleDelete()} />
+                        <i className="fa fa-trash" onClick={e => this.handleDelete(e)} />
                     </span>
                     :
                     <span>
@@ -368,7 +353,7 @@ class DropList extends React.Component {
                             </span>
                         ) : (
                             <span>
-                                <i className="fa fa-trash" onClick={e => this.handleDelete()} />
+                                <i className="fa fa-trash" onClick={e => this.handleDelete(e)} />
                             </span>
                         )}
                     </span>
@@ -380,7 +365,8 @@ class DropList extends React.Component {
     handleDelete(e) {
         this.props.deleteddrops(this.props.question_id);
     }
-    /** Handle the event to clone button */
+
+    /* Handle the event to clone button */
     cloneAction = (questionID, type) => {
         return this.state.currentlanguage.value === "English" &&
             <span onClick={() => this.handleCloneClick(questionID, type)}>
@@ -404,13 +390,10 @@ class DropList extends React.Component {
                                 <>  {React.createElement("div", { className: 'questionText', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.question_text ? this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question_text : "" } })}</>
                                 : <Textarea minRows={1} maxRows={10} value={this.state.fieldprops.properties.question ? this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question : ""} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth"
                                     style={{ resize: "none" }} onFocus={this.handleFocus} readOnly />}
-                            {/* <Textarea minRows={1} maxRows={10} value={this.state.fieldprops.properties.question} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth"
-                                style={{ resize: "none" }} onFocus={this.handleFocus} /> */}
 
                             {this.state.fieldprops.properties.subheading_text ?
                                 <>  {React.createElement("h6", { className: 'subheading', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.subheading_text } })}</>
                                 : this.state.fieldprops.properties.subheading ? <h6 className="subheading">{this.state.fieldprops.properties.subheading}</h6> : ""}
-                            {/* {this.state.fieldprops.properties.subheading ? <h6 className="subheading">{this.state.fieldprops.properties.subheading}</h6> : ""} */}
                             <div className="arrowstyl">
                                 {this.upArrow()}
                                 {this.downArrow()}
@@ -433,8 +416,6 @@ class DropList extends React.Component {
                             </div>
                         </div> : ""}</div>
                 </div>
-
-
             </div>
         )
 
@@ -448,15 +429,9 @@ class DropList extends React.Component {
                                 <>{React.createElement("div", { className: 'questionText', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.question_text ? this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question_text : "" } })}</>
                                 : <Textarea minRows={1} maxRows={10} value={this.state.fieldprops.properties.question ? this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question : ""} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth"
                                     style={{ resize: "none" }} onFocus={this.handleFocus} onBlur={this.handleBlur} readOnly />}
-                            {/* <Textarea minRows={1} maxRows={10} value={this.state.fieldprops.properties.question} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth"
-                                style={{ resize: "none" }} onFocus={this.handleFocus} onBlur={this.handleBlur} /> */}
                             {this.state.fieldprops.properties.subheading_text ?
                                 <>  {React.createElement("h6", { className: 'subheading', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.subheading_text } })}</>
                                 : this.state.fieldprops.properties.subheading ? <h6 className="subheading">{this.state.fieldprops.properties.subheading}</h6> : ""}
-                            {/* <h6 className="subheading">
-                                 {this.state.fieldprops.properties.subheading}
-                                 </h6> */}
-
                             <div className="arrowstyl">
                                 {this.upArrow()}
                                 {this.downArrow()}
@@ -475,13 +450,8 @@ class DropList extends React.Component {
                         {this.state.fieldprops.properties.sublabel_text ?
                             <> {React.createElement("p", { className: 'flabel', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.sublabel_text } })}</>
                             : this.state.fieldprops.properties.sublabel ? <p className="flabel">{this.state.fieldprops.properties.sublabel}</p> : ""}
-                        {/* <p className="flabel"> */}
-                        {/* {this.state.fieldprops.properties.sublabel} */}
-                        {/* </p> */}
                     </div>
-
                 </div>
-
             </div>
         )
 
@@ -495,11 +465,9 @@ class DropList extends React.Component {
                                 <>{React.createElement("div", { className: 'questionText', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.question_text ? this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question_text : "" } })}</>
                                 : <Textarea minRows={1} maxRows={10} onFocus={this.handleFocus} onBlur={this.handleBlur} value={this.state.fieldprops.properties.question ? this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question : ""} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} readOnly />}
 
-                            {/* <Textarea minRows={1} maxRows={10} onFocus={this.handleFocus} onBlur={this.handleBlur} value={this.state.fieldprops.properties.question} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} /> */}
                             {this.state.fieldprops.properties.subheading_text ?
                                 <>  {React.createElement("h6", { className: 'subheading', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.subheading_text } })}</>
                                 : this.state.fieldprops.properties.subheading ? <h6 className="subheading">{this.state.fieldprops.properties.subheading}</h6> : ""}
-                            {/* {this.state.fieldprops.properties.subheading ? <h6 className="subheading">{this.state.fieldprops.properties.subheading}</h6> : ""} */}
                             <div className="arrowstyl">
                                 {this.upArrow()}
                                 {this.downArrow()}
@@ -512,14 +480,12 @@ class DropList extends React.Component {
                             {this.cloneAction(this.state.fieldprops.question_id, 6)}
                             {this.deleteAlert()}
                         </div>
-
                     </div>
                     <div className="field">
                         <input type="file" name="name" disabled />
                         <p className="flabel">{this.state.fieldprops.properties.sublabel}</p>
                     </div>
                 </div>
-
             </div>
         )
 
@@ -532,11 +498,9 @@ class DropList extends React.Component {
                             {this.state.fieldprops.properties.question_text ?
                                 <>{React.createElement("div", { className: 'questionText', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.question_text ? this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question_text : "" } })}</>
                                 : <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question ? this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question : ""} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} readOnly />}
-                            {/* <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} /> */}
                             {this.state.fieldprops.properties.subheading_text ?
                                 <>  {React.createElement("h6", { className: 'subheading', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.subheading_text } })}</>
                                 : this.state.fieldprops.properties.subheading ? <h6 className="subheading">{this.state.fieldprops.properties.subheading}</h6> : ""}
-                            {/* {this.state.fieldprops.properties.subheading ? <h6 className="subheading">{this.state.fieldprops.properties.subheading}</h6> : ""} */}
                             <div className="arrowstyl">
                                 {this.upArrow()}
                                 {this.downArrow()}
@@ -568,11 +532,9 @@ class DropList extends React.Component {
                             {this.state.fieldprops.properties.question_text ?
                                 <>{React.createElement("div", { className: 'questionText', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.question_text ? this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question_text : "" } })}</>
                                 : <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question ? this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question : ""} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} readOnly />}
-                            {/* <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} /> */}
                             {this.state.fieldprops.properties.subheading_text ?
                                 <>  {React.createElement("h6", { className: 'subheading', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.subheading_text } })}</>
                                 : this.state.fieldprops.properties.subheading ? <h6 className="subheading">{this.state.fieldprops.properties.subheading}</h6> : ""}
-                            {/* {this.state.fieldprops.properties.subheading ? <h6 className="subheading">{this.state.fieldprops.properties.subheading}</h6> : ""} */}
                             <div className="arrowstyl">
                                 {this.upArrow()}
                                 {this.downArrow()}
@@ -604,11 +566,9 @@ class DropList extends React.Component {
                             {this.state.fieldprops.properties.question_text ?
                                 <>{React.createElement("div", { className: 'questionText', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.question_text ? this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question_text : "" } })}</>
                                 : <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question ? this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question : ""} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} readOnly />}
-                            {/* <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} /> */}
                             {this.state.fieldprops.properties.subheading_text ?
                                 <>  {React.createElement("h6", { className: 'subheading', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.subheading_text } })}</>
                                 : this.state.fieldprops.properties.subheading ? <h6 className="subheading">{this.state.fieldprops.properties.subheading}</h6> : ""}
-                            {/* {this.state.fieldprops.properties.subheading ? <h6 className="subheading">{this.state.fieldprops.properties.subheading}</h6> : ""} */}
                             <div className="arrowstyl">
                                 {this.upArrow()}
                                 {this.downArrow()}
@@ -621,7 +581,6 @@ class DropList extends React.Component {
                             {this.cloneAction(this.state.fieldprops.question_id, 8)}
                             {this.deleteAlert()}
                         </div>
-
                     </div>
                     <div className="field">
                         {this.state.fieldprops.properties.display_type === "dropdown" && this.state.fieldprops.properties.options ?
@@ -646,14 +605,12 @@ class DropList extends React.Component {
                             : <div className="option option-checkbox">
                                 {this.state.fieldprops.properties.options ? (
                                     <ul className="clear">
-                                        {" "}
                                         {this.state.fieldprops.properties.options.map(
                                             function (value, index) {
                                                 return (
                                                     <li key={index}>
                                                         {this.state.fieldprops.properties.choice_type === "multiple" ? <input type="checkbox" /> : <input name="choice" type="radio" />}{" "}
                                                         <img src={value.label_image} alt="label" />
-                                                        {/* {value.label} */}
                                                         {React.createElement("div", { className: 'choicelabel', dangerouslySetInnerHTML: { __html: value.label_text ? value.label_text : value.label } })}
 
                                                         <div className="parent-of-child-class clear">
@@ -665,7 +622,6 @@ class DropList extends React.Component {
                                                                                 {this.state.fieldprops.properties.choice_type === "multiple" ? <input type="checkbox" /> : <input name="choice" type="radio" />}{" "}
                                                                                 <img src={subval.label_image} alt="label" />
                                                                                 {React.createElement("div", { className: 'choicelabel', dangerouslySetInnerHTML: { __html: subval.sublabel_text ? subval.sublabel_text : subval.sublabel } })}
-                                                                                {/* {subval.sublabel} */}
                                                                             </div>
                                                                         );
                                                                     }.bind(this)
@@ -676,15 +632,10 @@ class DropList extends React.Component {
                                                 );
                                             }.bind(this)
                                         )}
-                                        { /* this.state.fieldprops.properties.other === 1 ? (
-                                        <li>
+                                        { /* this.state.fieldprops.properties.other === 1 ? (<li>
                                             {this.state.fieldprops.properties.choice_type === "single" ? <input name="choice" type="radio" /> : <input type="checkbox" />}
                                             Others
-                                        </li>
-                                    ) : (
-                                        ""
-                                    ) */}
-
+                                        </li>) : ("") */}
                                     </ul>
                                 ) : (
                                     ""
@@ -692,7 +643,6 @@ class DropList extends React.Component {
                             </div>}
                     </div>
                 </div>
-
             </div>
         )
 
@@ -705,12 +655,9 @@ class DropList extends React.Component {
                             {this.state.fieldprops.properties.question_text ?
                                 <>{React.createElement("div", { className: 'questionText', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.question_text ? this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question_text : "" } })}</>
                                 : <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question ? this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question : ""} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} readOnly />}
-
-                            {/* <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} /> */}
                             {this.state.fieldprops.properties.subheading_text ?
                                 <>{React.createElement("h6", { className: 'subheading', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.subheading_text } })}</>
                                 : this.state.fieldprops.properties.subheading ? <h6 className="subheading">{this.state.fieldprops.properties.subheading}</h6> : ""}
-                            {/* {this.state.fieldprops.properties.subheading ? <h6 className="subheading">{this.state.fieldprops.properties.subheading}</h6> : ""} */}
                             <div className="arrowstyl">
                                 {this.upArrow()}
                                 {this.downArrow()}
@@ -723,7 +670,6 @@ class DropList extends React.Component {
                             {this.cloneAction(this.state.fieldprops.question_id, 7)}
                             {this.deleteAlert()}
                         </div>
-
                     </div>
                     <div className="field">
                         <div className="text-center">
@@ -743,12 +689,9 @@ class DropList extends React.Component {
                             {this.state.fieldprops.properties.question_text ?
                                 <>{React.createElement("div", { className: 'questionText', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.question_text ? this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question_text : "" } })}</>
                                 : <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question ? this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question : ""} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} readOnly />}
-                            {/* <Textarea onFocus={this.handleFocus} onBlur={this.handleBlur} minRows={1} maxRows={10} value={this.state.fieldprops.properties.question} onChange={e => this.updateprops(e, "inputquestion")} className="fullwidth" style={{ resize: "none" }} /> */}
                             {this.state.fieldprops.properties.subheading_text ?
                                 <>{React.createElement("h6", { className: 'subheading', dangerouslySetInnerHTML: { __html: this.state.fieldprops.properties.subheading_text } })}</>
                                 : this.state.fieldprops.properties.subheading ? <h6 className="subheading">{this.state.fieldprops.properties.subheading}</h6> : ""}
-                            {/* {this.state.fieldprops.properties.subheading ? 
-                            <h6 className="subheading">{this.state.fieldprops.properties.subheading}</h6> : ""} */}
                             <div className="arrowstyl">
                                 {this.upArrow()}
                                 {this.downArrow()}
@@ -761,7 +704,6 @@ class DropList extends React.Component {
                             {this.cloneAction(this.state.fieldprops.question_id, 3)}
                             {this.deleteAlert()}
                         </div>
-
                     </div>
                     <div className="field">
                         <div className="text-center">
@@ -771,8 +713,6 @@ class DropList extends React.Component {
                 </div>
             </div>
         )
-
-
 
         const type = this.props.type;
         const { msgColor, br, message } = this.state;
@@ -813,10 +753,7 @@ class DropList extends React.Component {
                 </div>
             </>
         )
-
-
     }
-
 }
 
 

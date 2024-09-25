@@ -66,14 +66,11 @@ const styles = theme => ({
   checked: {}
 });
 
-
 const options = [
   { value: "App Only", label: "App Only" },
   { value: "App & Browser", label: "App & Browser" },
   { value: "Browser Only", label: "Browser Only" }
 ];
-
-
 
 class SurveyInfo extends React.Component {
   constructor(props) {
@@ -87,20 +84,22 @@ class SurveyInfo extends React.Component {
       projectSource: [],
       missions: [],
       projects: [],
-      profileList: [],
-      selectedProfile: "",
+      profileList:[],
+      selectedProfile: this.props.selectedProfile,
       platformType: {},
       isAssigned: "",
       refcode: "",
       oldrefcode: props.oldrefcode ? props.oldrefcode : "",
       languagelist: [],
-      selectedlanguage: { label: "English", value: 'English' }
+      selectedlanguage: { label: "English", value: 'English' },
+      mappingProfileEnable : this.props.mappingProfileEnable,
     };
   }
 
   componentDidMount() {
     localStorage.removeItem('updateProperties');
     this.getProjectList();
+    this.getClientlist();
     let option = {};
     for (var i = 0; i < options.length; i++) {
       if (options[i].value === this.props.platformType) {
@@ -118,9 +117,8 @@ class SurveyInfo extends React.Component {
       refcode: this.props.refcode,
       languagelist: this.props.languagelist,
       selectedlanguage: this.props.selectedlanguage,
-      profileList: [{ value: 1, label: 'User A' }, { value: 2, label: 'User B' }, { value: 3, label: 'User C' }, { value: 4, label: 'User D' }]
     })
-  }
+  };
 
   /* Handles the api to fetch the project list. */
   getProjectList() {
@@ -143,10 +141,28 @@ class SurveyInfo extends React.Component {
           response: true
         });
       });
+  };
+
+  /* Handles the api to fetch the profile list. */
+  getClientlist() {
+    var self = this;
+    api2
+      .get("client_names")
+      .then(resp => {
+        self.setState({
+          profileList: resp.data.clients,
+          // profileList: resp.data,
+        });
+      })
+      .catch(error => {
+        console.error(error);
+        self.setState({
+          response: true
+        });
+      });
   }
 
   componentWillReceiveProps(nextProps) {
-
     let option = {};
 
     for (var i = 0; i < options.length; i++) {
@@ -165,13 +181,10 @@ class SurveyInfo extends React.Component {
       refcode: nextProps.refcode,
       languagelist: nextProps.languagelist,
       selectedlanguage: nextProps.selectedlanguage
-
-
     })
   }
 
   /* Handles the events to filter the selected language from the list. */
-
   selectedlanguage(name, event) {
     let difference = this.state.selectedlanguage.filter(x => !event.includes(x)); // calculates diff
     if (difference.length > 0) {
@@ -190,8 +203,6 @@ class SurveyInfo extends React.Component {
 
     this.props.handlePlatformType(event);
   };
-
-
 
   /* Handles the event when the input value changes. */
   handleInputChange = event => {
@@ -302,7 +313,6 @@ class SurveyInfo extends React.Component {
       });
   };
 
-
   /* Handles the event to update the value. */
   handleChange = event => {
     this.setState({ selectedValue: event.target.value }, this.props.handleqtypeChange(event));
@@ -320,6 +330,8 @@ class SurveyInfo extends React.Component {
   handleMapProfileToggle = event => {
     event.preventDefault();
     this.props.handleMappingProfileChange(!this.state.mappingProfileEnable)
+    this.setState({mappingProfileEnable : !this.state.mappingProfileEnable})
+      this.state.mappingProfileEnable && this.props.handleProfileChange({value : null  , label : null , id:null});
   };
 
   render() {
@@ -341,6 +353,7 @@ class SurveyInfo extends React.Component {
             />
           </Col>
           <br />
+
           <Row className="padder">
             <Col md={4} className="survey-input2">
               <span style={{ marginLeft: "10px" }}>Tags</span>
@@ -366,9 +379,9 @@ class SurveyInfo extends React.Component {
 
               />
             </Col>
-
           </Row>
           <br />
+
           <Row className="padder">
             <Col md={3} className="survey-input2">
               <div>
@@ -385,10 +398,9 @@ class SurveyInfo extends React.Component {
                 />
               </div>
             </Col>
-
-
           </Row>
           <br />
+
           <Row className="padder">
             <Col md={3} className="survey-input2">
               <span style={{ marginLeft: "10px" }}>Survey Points</span>
@@ -414,6 +426,7 @@ class SurveyInfo extends React.Component {
             </Col>
           </Row>
           <br />
+
           <Row className="padder">
             <Col md={3} className="survey-input2">
               <div>
@@ -426,11 +439,8 @@ class SurveyInfo extends React.Component {
                 />
               </div>
             </Col>
-
             <Col md={3}>
-
               {this.props.isAssigned !== "" && this.props.isAssigned === "yes" &&
-
                 <div style={{ textAlign: "center", marginTop: "25px" }}>
                   <span>Platform type: </span><span style={{ fontWeight: 600 }}>{this.props.platformType}</span>
                 </div>
@@ -448,7 +458,6 @@ class SurveyInfo extends React.Component {
                 </div>
               }
             </Col>
-
             {(this.state.project_id) ?
               <Col md={3}>
                 <span style={{ marginLeft: "10px" }}>Missions</span>
@@ -464,28 +473,33 @@ class SurveyInfo extends React.Component {
           <br />
 
           <Row className="padder">
-            <Col md={3} className="survey-input2">
-              <div>
+            <Col md={3} className="survey-input2 d-flex flex-row justify-content-start align-items-center">
+              <div className="">
                 <span style={{ marginLeft: "10px" }}>Mapping Profile</span>
                 <Switch
                   checked={this.props.mappingProfileEnable}
                   color={'primary'}
                   onChange={this.handleMapProfileToggle}
+                  className="mappingSwitch"
+                  disabled={this.props.id}
                 />
               </div>
             </Col>
-
             <Col md={3}>
-              <div>
-                <span style={{ marginLeft: "10px" }}>Select Profile</span>
+             {this.props.id && this.props.mappingProfileEnable && this.props.selectedProfile && this.props.selectedProfile.value !== ""?
+                <div style={{ textAlign: "center", marginTop: "10px" }}>
+                  <span>Selected Client: </span><span style={{ fontWeight: 600 }}>{this.props.selectedProfile.label}</span>
+                </div>
+              :<div style={this.props.id || !this.props.mappingProfileEnable ? { 'pointerEvents': 'none', opacity: 0.4, 'cursor': "none" } : {}}>
+                <span style={{ marginLeft: "10px" }}>Select Client</span>
                 <Select
-                  options={this.state.profileList}
-                  value={this.state.selectedProfile}
-                  onChange={this.handleProfileSelection.bind(this, 'MappingProfile')}
+                  options={this.props.id ?  [] : this.state.profileList}
+                  value={this.props.selectedProfile}
+                  onChange={this.props.id ? ()=>{} : this.handleProfileSelection.bind(this, 'MappingProfile')}
                   name="MappingProfile"
-                  className="selectinfo"
-                />
-              </div>
+                  />
+                </div>
+              }
             </Col>
           </Row>
           <br />

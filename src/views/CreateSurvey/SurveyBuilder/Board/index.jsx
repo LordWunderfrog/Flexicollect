@@ -981,7 +981,6 @@
 
 //     return (
 //       <DragDropContext onDragEnd={this.onDragEnd}
-//       // onBeforeDragStart={(e)=>console.log(e)}
 //       >
 //         <div id="board" className={boardval} >
 //           <div className="new-btn pointer" onClick={() => this.openevent()}>
@@ -2294,7 +2293,6 @@ class Board extends Component {
 
     return (
       <DragDropContext onDragEnd={this.onDragEnd}
-      // onBeforeDragStart={(e)=>console.log(e)}
       >
         <div id="board" className={boardval} >
           <div className="new-btn pointer" onClick={() => this.openevent()}>
@@ -2360,11 +2358,7 @@ class Board extends Component {
             </div>
           </div>
 
-          <div
-
-            id="board__targets"
-          >
-
+          <div id="board__targets">
             <Droppable droppableId="droppable2">
               {(provided, snapshot) => (
                 <div
@@ -2415,7 +2409,6 @@ class Board extends Component {
                             downArrowFuncLanguage={this.props.downArrowFuncLanguage}
                             upArrowFuncLanguage={this.props.upArrowFuncLanguage}
                           />
-
                         </div>
                       )}
                     </Draggable>
@@ -2467,51 +2460,9 @@ class Board extends Component {
                   upArrowFuncLanguage={this.props.upArrowFuncLanguage}
                   updateProperties={() => this.updateProperties()}
                   mappingProfileEnable={this.props.mappingProfileEnable}
+                  selectedProfile={this.props.selectedProfile}
                 />
               </div> : ""}
-
-            {/* {this.state.drops.map((drop, index) => (drops[index] ? (
-              <div key={index}>
-                <Card
-                  index={index}
-                  color={drop.color}
-                  key={index}
-                  question_id={drop.question_id}
-                  id={drop.id}
-                  shape={drop.shape}
-                  text={drop.label}
-                  type={drop.type}
-                  attrib={() => this.updateattrib()}
-                  deleteddrops={(e) => this.deleteDrops(e)}
-                  dropstate={this.state.drops}
-                  rightStatus={drop.rightStatus}
-                  rightOpen={this.ropen}
-                  labelprop={drop}
-                  oldprop={drop}
-                  test={drop.question}
-                  oldconditions={this.props.oldconditions}
-                  autosave={() => this.autoSave()}
-                  upArrowFunc={e => this.upArrowFun(e)}
-                  downArrowFunc={e => this.downArrowFun(e)}
-                  scaleico={this.state.scaleico}
-                  infoico={this.state.infoico}
-                  emojis={this.state.emojis}
-                  gallery={this.state.gallery.images}
-                  refcode={this.props.refcode}
-                  selectedlanguage={this.props.selectedlanguage}
-                  changedroplanguage={this.props.changedroplanguage}
-                  dropcurrentlanguage={this.props.dropcurrentlanguage}
-                  defaultdrops={this.props.defaultdrops[index]}
-                  defaultdropsstatus={this.props.defaultdrops}
-                  updatelanguageproperties={this.props.updatelanguageproperties}
-                  languages_drop={this.props.languages_drop}
-                  downArrowFuncLanguage={this.props.downArrowFuncLanguage}
-                  upArrowFuncLanguage={this.props.upArrowFuncLanguage}
-                  updateProperties={() => this.updateProperties()}
-                />
-              </div>
-            ) : ""
-            ))} */}
 
           </div>
 

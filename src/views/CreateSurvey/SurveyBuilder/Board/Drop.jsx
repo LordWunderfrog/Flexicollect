@@ -52,41 +52,8 @@ class Card extends React.Component {
             conditions: [],
             selectedFile: null,
             loaded: 0,
-
-            productNumber: [
-                { label: "1", value: "1" },
-                { label: "2", value: "2" },
-                { label: "3", value: "3" }
-            ],
-            questionGroup: [
-                { label: "Ambient", value: "Ambient" },
-                { label: "Appearance", value: "Appearance" },
-                { label: "Chilled", value: "Chilled" },
-                { label: "Ease of Opening", value: "Ease of Opening" },
-                { label: "Frozen", value: "Frozen" },
-                { label: "General", value: "General" },
-                { label: "Ignore", value: "Ignore" },
-                { label: "Loose counter", value: "Loose counter" },
-                { label: "Pack", value: "Pack" },
-                { label: "ReSeal", value: "ReSeal" },
-                { label: "Shape", value: "Shape" },
-                { label: "Shelf", value: "Shelf" },
-                { label: "Store", value: "Store" }
-
-            ],
-            questionSubGroup: [
-                { label: "Action", value: "Action" },
-                { label: "AnotherBrand", value: "AnotherBrand" },
-                { label: "Availability", value: "Availability" },
-                { label: "BackPackPic", value: "BackPackPic" },
-                { label: "BarCode", value: "BarCode" },
-                { label: "Batch", value: "Batch" },
-                { label: "Comparison", value: "Comparison" },
-                { label: "DefectPhoto", value: "DefectPhoto" },
-                { label: "DifficultyOpening", value: "DifficultyOpening" },
-                { label: "OverallExperience", value: "OverallExperience" },
-                { label: "PurchaseLikelyHood", value: "PurchaseLikelyHood" },
-                { label: "ReasonRating", value: "ReasonRating" }],
+            productNumber: [],
+            questionGroup: [],
             fieldprops: {
                 label: "",
                 properties: {
@@ -97,10 +64,10 @@ class Card extends React.Component {
                     productNumber: 0,
                     ReportTag: '',
                     currentQuestionGroup: '',
-                    currentQuestionSubGroup1: '',
-                    currentQuestionSubGroup2: '',
-                    currentQuestionSubGroup3: '',
-                    currentProductNumber: ''
+                    currentQuestionSubGroup1: {value : "" , label : ""},
+                    currentQuestionSubGroup2: {value : "" , label : ""},
+                    currentQuestionSubGroup3: {value : "" , label : ""},
+                    currentProductNumber: {value : "" , label : ""}
                 }
             },
             updatedInfoVal: "",
@@ -120,16 +87,15 @@ class Card extends React.Component {
             show: [false, false, false, false],
             maximumAttribute: [],
             attributePerTask: [],
-            repeatAttribute: []
+            repeatAttribute: [],
+            allQuestionGroupArray : [],
+            selectedGroupData : {},
         };
         this.handleFocus = this.handleFocus.bind(this);
         this.handleBlur = this.handleBlur.bind(this);
     }
 
-    /**
-     * Rich text editor Toolbar control.
-     *
-     */
+    /** Rich text editor Toolbar control. */
     modules = {
         toolbar: [
             [{ header: [1, 2, false] }],
@@ -149,10 +115,7 @@ class Card extends React.Component {
         ]
     };
 
-    /**
-     * Rich text editor formats control.
-     *
-     */
+    /* Rich text editor formats control. */
     formats = [
         "header",
         "bold",
@@ -173,10 +136,7 @@ class Card extends React.Component {
         "right"
     ];
 
-    /**
-     * Rich text editor submit function.
-     *
-     */
+    /* Rich text editor submit function. */
     richText = value => {
         let match = false;
         this.setState({ updatedInfoVal: value })
@@ -197,6 +157,7 @@ class Card extends React.Component {
         }
         //this.props.autosave()
     };
+
     /* Unused function.Kept this code for reference. */
     completedvaluecheck(fieldprops) {
         if (fieldprops.type === 'info') {
@@ -294,14 +255,17 @@ class Card extends React.Component {
             selectedlanguage: nextProps.selectedlanguage,
             currentlanguage: nextProps.dropcurrentlanguage,
             defaultdrops: nextProps.defaultdrops
-
         });
     }
 
     /* One time functions which call after mounting. */
     componentDidMount() {
+        const selectedProfile = this.props.selectedProfile && this.props.selectedProfile.value !== "";
+        const mappingProfileEnable = this.props.mappingProfileEnable;
+        if(mappingProfileEnable && selectedProfile){
+            this.fetchClientesQuestion(this.props.selectedProfile);
+        }
         let fieldprops = this.props.oldprop;
-
         if (fieldprops.type === "choice") {
             if (fieldprops.properties.options) {
                 fieldprops.properties.options.map((option) => {
@@ -317,10 +281,6 @@ class Card extends React.Component {
                     }
                 })
             }
-
-            // if(!fieldprops.properties.options.label_text && fieldprops.properties.options.label){
-            //     fieldprops.properties.options.label=fieldprops.properties.options.label_text;
-            // }
         }
         fieldprops.question_id = this.props.question_id;
         this.setState({
@@ -335,10 +295,29 @@ class Card extends React.Component {
         });
     }
 
-    /* Handles the event to update the question props. */
+    /* Fetch question of client's */
+    fetchClientesQuestion = (selectedProfile) =>{
+        if(this.state.allQuestionGroupArray.length>0){
+            this.setGroupQuestionAnswers(this.state.allQuestionGroupArray);
+        }else{
+            api2
+            .get("questions_of_client?id=" + (selectedProfile.id || 1))
+            .then(resp => {
+                if (resp.status === 200) {
+                    this.setState({
+                        allQuestionGroupArray : resp.data.Group,
+                        productNumber : resp.data.Product
+                    })
+                    this.setGroupQuestionAnswers(resp.data.Group);
+                }})
+                .catch(error => {
+                    console.error(error);
+                }); 
+        }
+    };
 
+    /* Handles the event to update the question props. */
     handleFocus = (e) => {
-        console.log('Handle focus on Drop file')
         let fieldprops = this.state.fieldprops;
         let fieldans = fieldprops.properties;
         if (fieldans.question === "Type a question" || fieldans.question === "Type the message" || fieldans.question === "Type Information") {
@@ -403,7 +382,6 @@ class Card extends React.Component {
         this.setState({ fieldprops: fieldprops });
     }
     handlePaste = (e) => {
-        console.log('Handle paste', e)
         e.preventDefault();
         let text = e.clipboardData.getData('text/plain');
         // You can perform further cleaning on the pasted text here if needed
@@ -509,9 +487,6 @@ class Card extends React.Component {
         this.props.upArrowFunc(this.props.question_id);
         this.props.upArrowFuncLanguage(this.props.question_id);
     }
-
-
-
 
     /* Formation of data in base64 format. */
     getBase64(file) {
@@ -1428,8 +1403,6 @@ class Card extends React.Component {
         // this.props.autosave()
     }
 
-
-
     checkValue = (e) => {
         if (e.target) {
             evalue = e.target.value;
@@ -1603,7 +1576,7 @@ class Card extends React.Component {
         // this.props.updateProperties(this.state.fieldprops)
     }
 
-    /** handle Attribute selection  */
+    /* handle Attribute selection  */
     handleAttribute = (e, attributename) => {
         let fieldprops = this.state.fieldprops;
         let selectedlanguage = this.props.selectedlanguage
@@ -1824,7 +1797,6 @@ class Card extends React.Component {
     //         }
     //     }
 
-    //     console.log('final set is', setOfAttribute)
     //     fieldprops.properties['attribute_Set'] = setOfAttribute
     //     this.setState({
     //         fieldprops
@@ -1845,16 +1817,10 @@ class Card extends React.Component {
         return false;
     }
 
-    /*handleQuestionGroupChange(name, event) {
-        console.log('hi')
+    /* handleQuestionGroupChange(name, event) {
         //this.checkValue(e);
-        console.log('event');
         let fieldprops = this.state.fieldprops;
         fieldprops.properties.currentQuestionGroup = event
-        //console.log(event.target.value);
-        console.log(event.label);
-        console.log(event);
-        console.log('here');
         this.setState({
             fieldprops
         });
@@ -1893,7 +1859,7 @@ class Card extends React.Component {
         }
     }
 
-    /** Map profile dropdon selection */
+    /* Map profile dropdon selection */
     handleProductNumberChange = (e, i, index, key) => {
         let fieldprops = this.state.fieldprops;
         fieldprops.properties.currentProductNumber = e
@@ -1902,32 +1868,37 @@ class Card extends React.Component {
         });
         this.props.autosave()
     }
+    
+    handleSetQuestionGroupData = (e,index) =>{
+        let groupArray = this.state.allQuestionGroupArray.length>0 && this.state.allQuestionGroupArray.find((item , id)=>{return item.group.value == e.value});
+        this.setState({
+            selectedGroupData : groupArray
+        });
+    };
+
     handleQuestionGroupChange = (e, i, index, key) => {
         let fieldprops = this.state.fieldprops;
         fieldprops.properties.currentQuestionGroup = e
+        fieldprops.properties.currentQuestionSubGroup1 = {value : "" , label : ""}
+        fieldprops.properties.currentQuestionSubGroup2 = {value : "" , label : ""}
         this.setState({
-            fieldprops
+             fieldprops
         });
-        this.props.autosave()
+        // this.props.autosave();
+        this.handleSetQuestionGroupData(e , index)
     }
     handleQuestionSubGroupChange = (e, i, index, key) => {
         let fieldprops = this.state.fieldprops;
-        fieldprops.properties[i] = e
+        const val = { value : e.value , label : e.label}
+        if( i == 'currentQuestionSubGroup1'){
+            fieldprops.properties.currentQuestionSubGroup2 = {value : "" , label : ""}
+        }
+        fieldprops.properties[i] = val
         this.setState({
             fieldprops
         });
         this.props.autosave()
     }
-    // handleOtherGroupChange = (e, i, index, key) => {
-    //     console.log(e)
-    //     let fieldprops = this.state.fieldprops;
-    //     fieldprops.properties.currentOtherGroup = e
-    //     this.setState({
-    //         fieldprops
-    //     });
-    //     this.props.autosave()
-    // }
-
 
     inputtypeProductNum = (e, i, index, key) => {
         this.checkValue(e);
@@ -1960,7 +1931,7 @@ class Card extends React.Component {
             fieldprops
         });
         // this.props.updateProperties(this.state.fieldprops)this.props.updateProperties(this.state.fieldprops)
-    }//inputtypeOther
+    }
     inputtypeOther = (e, i, index, key) => {
         this.checkValue(e);
         let fieldprops = this.state.fieldprops;
@@ -2433,10 +2404,6 @@ class Card extends React.Component {
         // this.props.updateProperties(this.state.fieldprops)
     }
 
-
-
-
-
     /* Handles gallery popup function.     */
     localGallery(i, y, x) {
 
@@ -2882,12 +2849,10 @@ class Card extends React.Component {
         );
     };
 
-
     /* Handles the callback function.   */
     testfun() {
         this.props.attrib(this.state.fieldlabel, this.props.vid);
     }
-
 
     /* Handles the callback function to update fieldprops.   */
     handleClick() {
@@ -2906,7 +2871,6 @@ class Card extends React.Component {
 
 
     };
-
 
     /*inputtypeProductNum = (e, i, index, key) => {
         this.checkValue(e);
@@ -3013,7 +2977,6 @@ class Card extends React.Component {
             })
         }
     };
-
 
     /* Handles the close event of settings.   */
     handleClose = e => {
@@ -4466,17 +4429,7 @@ class Card extends React.Component {
                 );
             })
             .catch(error => {
-
-                if (error.response) {
-                    console.log(error.response.data);
-                    console.log(error.response.status);
-                    console.log(error.response.headers);
-                } else if (error.request) {
-                    console.log(error.request);
-                } else {
-                    console.log("Error", error.message);
-                }
-                console.log(error.config);
+                    console.log("Error", error);
             });
     };
 
@@ -4515,8 +4468,47 @@ class Card extends React.Component {
         $(`#sublabelid${num}`).addClass("d-none")
 
     }
+
+    /* Fetch questions after client is selected */
+    setGroupQuestionAnswers = (data) => {
+        this.setState({allQuestionGroupArray : data})
+            let groupArray = [];
+            const selectedGroupAnswers = this.props.oldprop.properties;                                                 // selected question's properties
+            const _allQuestionGroupArray = data;
+            if(selectedGroupAnswers){
+                const isGroupSelected = selectedGroupAnswers.hasOwnProperty('currentQuestionGroup') &&                  // is Group selected
+                    selectedGroupAnswers.currentQuestionGroup.hasOwnProperty("value");
+                      
+                const tempGroupArray =_allQuestionGroupArray.map((item , index)=>{                                      // all groups list array
+                    if(isGroupSelected && item.group.value == selectedGroupAnswers.currentQuestionGroup.value){
+                        groupArray = item
+                    }
+                    return item.group
+                }) || [];
+
+                this.setState({
+                    questionGroup:tempGroupArray,
+                    selectedGroupData : groupArray
+                })
+        }
+    }
+
+    getSubGroupArray = (type) => {
+        const selectedGroup = this.state.selectedGroupData;
+        const subGroup = selectedGroup && selectedGroup.Subgroups
+        if(type == 1 && selectedGroup && subGroup){
+            return selectedGroup && selectedGroup.Subgroups && selectedGroup.Subgroups.map((item =>item.Subgroup1))
+        }
+        else if(type == 2 && selectedGroup && subGroup){
+            const val1 = this.state.fieldprops.properties.currentQuestionSubGroup1 && this.state.fieldprops.properties.currentQuestionSubGroup1.value || "";
+            const temparray = selectedGroup && selectedGroup.Subgroups && selectedGroup.Subgroups.find((item)=> item.Subgroup1.value == val1 );
+            if(temparray &&  temparray.Subgroup1 && temparray.Subgroup1.Subgroup2){
+                return temparray.Subgroup1.Subgroup2
+            }else return []
+        }else return []
+    }
+
     render() {
-        // console.log(this.state)
         const gallery = this.props.gallery;
         const infoico = this.props.infoico;
         const scaleico = this.props.scaleico;
@@ -4524,7 +4516,6 @@ class Card extends React.Component {
         const scaleicon = gallery.concat(scaleico)
         const mappingProfileEnable = this.props.mappingProfileEnable
         const { open } = this.state;
-        // const marker = this.state.fieldprops.properties.marker;
         const scale_images = this.state.fieldprops && this.state.fieldprops.properties ? this.state.fieldprops.properties.scale_images : undefined;
         const scale_content = this.state.fieldprops && this.state.fieldprops.properties ? this.state.fieldprops.properties.scale_content : undefined;
         const table_content = this.state.fieldprops && this.state.fieldprops.properties ? this.state.fieldprops.properties.table_content : undefined;
@@ -5049,36 +5040,33 @@ class Card extends React.Component {
                                     name="questionGroup"
                                     className="language_list"
                                 />
-                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Sub Group 1</h3>
-                                <Select
-                                    placeholder={'select Question Sub Group1'}
-                                    value={this.state.fieldprops.properties.currentQuestionSubGroup1}
-                                    options={this.state.questionSubGroup}
-                                    onChange={e => this.handleQuestionSubGroupChange(e, "currentQuestionSubGroup1")}
-                                    name="subGroup1"
-                                    className="language_list"
-                                />
-                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Sub Group 2</h3>
-                                <Select
-                                    placeholder={'select Question Sub Group2'}
-                                    value={this.state.fieldprops.properties.currentQuestionSubGroup2}
-                                    options={this.state.questionSubGroup}
-                                    onChange={e => this.handleQuestionSubGroupChange(e, "currentQuestionSubGroup2")}
-                                    name="subGroup2"
-                                    className="language_list"
-                                />
-                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Sub Group 3</h3>
-                                <Select
-                                    placeholder={'select Question Sub Group3'}
-                                    value={this.state.fieldprops.properties.currentQuestionSubGroup3}
-                                    options={this.state.questionSubGroup}
-                                    onChange={e => this.handleQuestionSubGroupChange(e, "currentQuestionSubGroup3")}
-                                    name="subGroup3"
-                                    className="language_list"
-                                />
+                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>{`Sub Group 1`}</h3>
+                                    <Select
+                                        placeholder={`select Question Sub Group 1`}
+                                        value={this.state.fieldprops.properties.currentQuestionSubGroup1}
+                                        options={this.getSubGroupArray(1)}
+                                        onChange={e => this.handleQuestionSubGroupChange(e, `currentQuestionSubGroup1`)}
+                                        name="currentQuestionSubGroup"
+                                        className="language_list"
+                                /> 
+                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>{`Sub Group 2`}</h3>
+                                    <Select
+                                        placeholder={`select Question Sub Group 2`}
+                                        value={this.state.fieldprops.properties.currentQuestionSubGroup2}
+                                        options={this.getSubGroupArray(2)}
+                                        onChange={e => this.handleQuestionSubGroupChange(e, `currentQuestionSubGroup2`)}
+                                        name="currentQuestionSubGroup"
+                                        className="language_list"
+                               /> 
                                 <h3>Comments</h3>
                                 <div className="below-lanbel-body" style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
-                                    <input type="text" name="productNum" className="mediumfm" value={this.state.fieldprops.properties.productNumber ? this.state.fieldprops.properties.productNumber : ""} onChange={e => this.inputtypeProductNum(e, "inputtypeProductNum")} />
+                                    <input 
+                                        type="text" 
+                                        name="productNum" 
+                                        className="mediumfm" 
+                                        value={this.state.fieldprops.properties.productNumber ? this.state.fieldprops.properties.productNumber : ""} 
+                                        onChange={e => this.inputtypeProductNum(e, "inputtypeProductNum")} 
+                                    />
                                 </div>
                             </div>
                         </li>
@@ -5358,7 +5346,7 @@ class Card extends React.Component {
                                     name="productNumber"
                                     className="language_list"
                                 />
-                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Question Group</h3>
+                                  <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Question Group</h3>
                                 <Select
                                     placeholder={'select Question Group'}
                                     value={this.state.fieldprops.properties.currentQuestionGroup}
@@ -5367,33 +5355,24 @@ class Card extends React.Component {
                                     name="questionGroup"
                                     className="language_list"
                                 />
-                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Sub Group 1</h3>
-                                <Select
-                                    placeholder={'select Question Sub Group1'}
-                                    value={this.state.fieldprops.properties.currentQuestionSubGroup1}
-                                    options={this.state.questionSubGroup}
-                                    onChange={e => this.handleQuestionSubGroupChange(e, "currentQuestionSubGroup1")}
-                                    name="subGroup1"
-                                    className="language_list"
-                                />
-                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Sub Group 2</h3>
-                                <Select
-                                    placeholder={'select Question Sub Group2'}
-                                    value={this.state.fieldprops.properties.currentQuestionSubGroup2}
-                                    options={this.state.questionSubGroup}
-                                    onChange={e => this.handleQuestionSubGroupChange(e, "currentQuestionSubGroup2")}
-                                    name="subGroup2"
-                                    className="language_list"
-                                />
-                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Sub Group 3</h3>
-                                <Select
-                                    placeholder={'select Question Sub Group3'}
-                                    value={this.state.fieldprops.properties.currentQuestionSubGroup3}
-                                    options={this.state.questionSubGroup}
-                                    onChange={e => this.handleQuestionSubGroupChange(e, "currentQuestionSubGroup3")}
-                                    name="subGroup3"
-                                    className="language_list"
-                                />
+                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>{`Sub Group 1`}</h3>
+                                    <Select
+                                        placeholder={`select Question Sub Group 1`}
+                                        value={this.state.fieldprops.properties.currentQuestionSubGroup1}
+                                        options={this.getSubGroupArray(1)}
+                                        onChange={e => this.handleQuestionSubGroupChange(e, `currentQuestionSubGroup1`)}
+                                        name="currentQuestionSubGroup"
+                                        className="language_list"
+                                /> 
+                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>{`Sub Group 2`}</h3>
+                                    <Select
+                                        placeholder={`select Question Sub Group 2`}
+                                        value={this.state.fieldprops.properties.currentQuestionSubGroup2}
+                                        options={this.getSubGroupArray(2)}
+                                        onChange={e => this.handleQuestionSubGroupChange(e, `currentQuestionSubGroup2`)}
+                                        name="currentQuestionSubGroup"
+                                        className="language_list"
+                               /> 
                                 <h3>Comments</h3>
                                 <div className="below-lanbel-body" style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
                                     <input type="text" name="productNum" className="mediumfm" value={this.state.fieldprops.properties.productNumber ? this.state.fieldprops.properties.productNumber : ""} onChange={e => this.inputtypeProductNum(e, "inputtypeProductNum")} />
@@ -5740,7 +5719,7 @@ class Card extends React.Component {
                                     name="productNumber"
                                     className="language_list"
                                 />
-                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Question Group</h3>
+                          <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Question Group</h3>
                                 <Select
                                     placeholder={'select Question Group'}
                                     value={this.state.fieldprops.properties.currentQuestionGroup}
@@ -5749,33 +5728,24 @@ class Card extends React.Component {
                                     name="questionGroup"
                                     className="language_list"
                                 />
-                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Sub Group 1</h3>
-                                <Select
-                                    placeholder={'select Question Sub Group1'}
-                                    value={this.state.fieldprops.properties.currentQuestionSubGroup1}
-                                    options={this.state.questionSubGroup}
-                                    onChange={e => this.handleQuestionSubGroupChange(e, "currentQuestionSubGroup1")}
-                                    name="subGroup1"
-                                    className="language_list"
-                                />
-                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Sub Group 2</h3>
-                                <Select
-                                    placeholder={'select Question Sub Group2'}
-                                    value={this.state.fieldprops.properties.currentQuestionSubGroup2}
-                                    options={this.state.questionSubGroup}
-                                    onChange={e => this.handleQuestionSubGroupChange(e, "currentQuestionSubGroup2")}
-                                    name="subGroup2"
-                                    className="language_list"
-                                />
-                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Sub Group 3</h3>
-                                <Select
-                                    placeholder={'select Question Sub Group3'}
-                                    value={this.state.fieldprops.properties.currentQuestionSubGroup3}
-                                    options={this.state.questionSubGroup}
-                                    onChange={e => this.handleQuestionSubGroupChange(e, "currentQuestionSubGroup3")}
-                                    name="subGroup3"
-                                    className="language_list"
-                                />
+                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>{`Sub Group 1`}</h3>
+                                    <Select
+                                        placeholder={`select Question Sub Group 1`}
+                                        value={this.state.fieldprops.properties.currentQuestionSubGroup1}
+                                        options={this.getSubGroupArray(1)}
+                                        onChange={e => this.handleQuestionSubGroupChange(e, `currentQuestionSubGroup1`)}
+                                        name="currentQuestionSubGroup"
+                                        className="language_list"
+                                /> 
+                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>{`Sub Group 2`}</h3>
+                                    <Select
+                                        placeholder={`select Question Sub Group 2`}
+                                        value={this.state.fieldprops.properties.currentQuestionSubGroup2}
+                                        options={this.getSubGroupArray(2)}
+                                        onChange={e => this.handleQuestionSubGroupChange(e, `currentQuestionSubGroup2`)}
+                                        name="currentQuestionSubGroup"
+                                        className="language_list"
+                               /> 
                                 <h3>Comments</h3>
                                 <div className="below-lanbel-body" style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
                                     <input type="text" name="productNum" className="mediumfm" value={this.state.fieldprops.properties.productNumber ? this.state.fieldprops.properties.productNumber : ""} onChange={e => this.inputtypeProductNum(e, "inputtypeProductNum")} />
@@ -5895,11 +5865,9 @@ class Card extends React.Component {
                                     )}
                                 </div>
                             </li>
-                        ) : (
-                            ""
-                        )}
-                        <li
-                        >
+                        ) : ("")}
+
+                        <li>
                             <div className="below-lanbel-body">
                                 <div className="switch-text-boxes switch-text-boxes-mandatory clear"
                                     style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
@@ -6107,7 +6075,7 @@ class Card extends React.Component {
                                     name="productNumber"
                                     className="language_list"
                                 />
-                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Question Group</h3>
+                  <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Question Group</h3>
                                 <Select
                                     placeholder={'select Question Group'}
                                     value={this.state.fieldprops.properties.currentQuestionGroup}
@@ -6116,33 +6084,24 @@ class Card extends React.Component {
                                     name="questionGroup"
                                     className="language_list"
                                 />
-                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Sub Group 1</h3>
-                                <Select
-                                    placeholder={'select Question Sub Group1'}
-                                    value={this.state.fieldprops.properties.currentQuestionSubGroup1}
-                                    options={this.state.questionSubGroup}
-                                    onChange={e => this.handleQuestionSubGroupChange(e, "currentQuestionSubGroup1")}
-                                    name="subGroup1"
-                                    className="language_list"
-                                />
-                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Sub Group 2</h3>
-                                <Select
-                                    placeholder={'select Question Sub Group2'}
-                                    value={this.state.fieldprops.properties.currentQuestionSubGroup2}
-                                    options={this.state.questionSubGroup}
-                                    onChange={e => this.handleQuestionSubGroupChange(e, "currentQuestionSubGroup2")}
-                                    name="subGroup2"
-                                    className="language_list"
-                                />
-                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Sub Group 3</h3>
-                                <Select
-                                    placeholder={'select Question Sub Group3'}
-                                    value={this.state.fieldprops.properties.currentQuestionSubGroup3}
-                                    options={this.state.questionSubGroup}
-                                    onChange={e => this.handleQuestionSubGroupChange(e, "currentQuestionSubGroup3")}
-                                    name="subGroup3"
-                                    className="language_list"
-                                />
+                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>{`Sub Group 1`}</h3>
+                                    <Select
+                                        placeholder={`select Question Sub Group 1`}
+                                        value={this.state.fieldprops.properties.currentQuestionSubGroup1}
+                                        options={this.getSubGroupArray(1)}
+                                        onChange={e => this.handleQuestionSubGroupChange(e, `currentQuestionSubGroup1`)}
+                                        name="currentQuestionSubGroup"
+                                        className="language_list"
+                                /> 
+                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>{`Sub Group 2`}</h3>
+                                    <Select
+                                        placeholder={`select Question Sub Group 2`}
+                                        value={this.state.fieldprops.properties.currentQuestionSubGroup2}
+                                        options={this.getSubGroupArray(2)}
+                                        onChange={e => this.handleQuestionSubGroupChange(e, `currentQuestionSubGroup2`)}
+                                        name="currentQuestionSubGroup"
+                                        className="language_list"
+                               /> 
                                 <h3>Comments</h3>
                                 <div className="below-lanbel-body" style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
                                     <input type="text" name="productNum" className="mediumfm" value={this.state.fieldprops.properties.productNumber ? this.state.fieldprops.properties.productNumber : ""} onChange={e => this.inputtypeProductNum(e, "inputtypeProductNum")} />
@@ -6829,42 +6788,33 @@ class Card extends React.Component {
                                         name="productNumber"
                                         className="language_list"
                                     />
-                                    <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Question Group</h3>
+                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Question Group</h3>
+                                <Select
+                                    placeholder={'select Question Group'}
+                                    value={this.state.fieldprops.properties.currentQuestionGroup}
+                                    options={this.state.questionGroup}
+                                    onChange={e => this.handleQuestionGroupChange(e, "questionGroup")}
+                                    name="questionGroup"
+                                    className="language_list"
+                                />
+                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>{`Sub Group 1`}</h3>
                                     <Select
-                                        placeholder={'select Question Group'}
-                                        value={this.state.fieldprops.properties.currentQuestionGroup}
-                                        options={this.state.questionGroup}
-                                        onChange={e => this.handleQuestionGroupChange(e, "questionGroup")}
-                                        name="questionGroup"
-                                        className="language_list"
-                                    />
-                                    <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Sub Group 1</h3>
-                                    <Select
-                                        placeholder={'select Question Sub Group1'}
+                                        placeholder={`select Question Sub Group 1`}
                                         value={this.state.fieldprops.properties.currentQuestionSubGroup1}
-                                        options={this.state.questionSubGroup}
-                                        onChange={e => this.handleQuestionSubGroupChange(e, "currentQuestionSubGroup1")}
-                                        name="subGroup1"
+                                        options={this.getSubGroupArray(1)}
+                                        onChange={e => this.handleQuestionSubGroupChange(e, `currentQuestionSubGroup1`)}
+                                        name="currentQuestionSubGroup"
                                         className="language_list"
-                                    />
-                                    <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Sub Group 2</h3>
+                                /> 
+                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>{`Sub Group 2`}</h3>
                                     <Select
-                                        placeholder={'select Question Sub Group2'}
+                                        placeholder={`select Question Sub Group 2`}
                                         value={this.state.fieldprops.properties.currentQuestionSubGroup2}
-                                        options={this.state.questionSubGroup}
-                                        onChange={e => this.handleQuestionSubGroupChange(e, "currentQuestionSubGroup2")}
-                                        name="subGroup2"
+                                        options={this.getSubGroupArray(2)}
+                                        onChange={e => this.handleQuestionSubGroupChange(e, `currentQuestionSubGroup2`)}
+                                        name="currentQuestionSubGroup"
                                         className="language_list"
-                                    />
-                                    <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Sub Group 3</h3>
-                                    <Select
-                                        placeholder={'select Question Sub Group3'}
-                                        value={this.state.fieldprops.properties.currentQuestionSubGroup3}
-                                        options={this.state.questionSubGroup}
-                                        onChange={e => this.handleQuestionSubGroupChange(e, "currentQuestionSubGroup3")}
-                                        name="subGroup3"
-                                        className="language_list"
-                                    />
+                               /> 
                                     <h3>Comments</h3>
                                     <div className="below-lanbel-body" style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
                                         <input type="text" name="productNum" className="mediumfm" value={this.state.fieldprops.properties.productNumber ? this.state.fieldprops.properties.productNumber : ""} onChange={e => this.inputtypeProductNum(e, "inputtypeProductNum")} />
@@ -6945,11 +6895,7 @@ class Card extends React.Component {
                                     </div>
                                 </div>
                             </li>
-
-
-                            <li
-                                style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
-                            >
+                            <li style={this.state.currentlanguage.value !== "English" ? disabledive : {}} >
                                 <div className="below-lanbel-body">
                                     <div className="switch-text-boxes switch-text-boxes-mandatory clear">
                                         <h3>Choice Type</h3>
@@ -7032,7 +6978,7 @@ class Card extends React.Component {
                                                                     value={this.state.fieldprops.properties.minlimit}
                                                                     name="setlimitmin"
                                                                     onChange={e => this.setMinLimitOption(e)}
-                                                                />{" "}
+                                                                />
                                                             </p>
                                                             <p className="newtxt">
                                                                 <span style={(this.state.fieldprops.properties.choice_type == "single" || this.state.fieldprops.properties.multilevel == 1) ? disabledive : {}}>MAX</span>
@@ -7043,7 +6989,7 @@ class Card extends React.Component {
                                                                     value={this.state.fieldprops.properties.maxlimit}
                                                                     name="setlimitmax"
                                                                     onChange={e => this.setMaxLimitOption(e)}
-                                                                />{" "}
+                                                                />
                                                             </p>
                                                         </div>
                                                     </div>
@@ -7183,7 +7129,6 @@ class Card extends React.Component {
                                                                         >
                                                                             {(value.id !== 'other' && value.id !== 'noneofabove') ? <i className="fa fa-trash" onClick={() => this.deletefun(index, "parentlabel")} /> : ""}
                                                                         </div>
-                                                                        {/* <img src={value.label_image} alt="label" width="50" /> */}
                                                                     </div>
                                                                 </div>
 
@@ -7310,8 +7255,6 @@ class Card extends React.Component {
         );
 
         const barcode = (
-
-
             <div className={boardval}>
                 <div className="properties-main-header clear">
                     <p>Barcode Properties</p>
@@ -7436,33 +7379,24 @@ class Card extends React.Component {
                                     name="questionGroup"
                                     className="language_list"
                                 />
-                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Sub Group 1</h3>
-                                <Select
-                                    placeholder={'select Question Sub Group1'}
-                                    value={this.state.fieldprops.properties.currentQuestionSubGroup1}
-                                    options={this.state.questionSubGroup}
-                                    onChange={e => this.handleQuestionSubGroupChange(e, "currentQuestionSubGroup1")}
-                                    name="subGroup1"
-                                    className="language_list"
-                                />
-                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Sub Group 2</h3>
-                                <Select
-                                    placeholder={'select Question Sub Group2'}
-                                    value={this.state.fieldprops.properties.currentQuestionSubGroup2}
-                                    options={this.state.questionSubGroup}
-                                    onChange={e => this.handleQuestionSubGroupChange(e, "currentQuestionSubGroup2")}
-                                    name="subGroup2"
-                                    className="language_list"
-                                />
-                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Sub Group 3</h3>
-                                <Select
-                                    placeholder={'select Question Sub Group3'}
-                                    value={this.state.fieldprops.properties.currentQuestionSubGroup3}
-                                    options={this.state.questionSubGroup}
-                                    onChange={e => this.handleQuestionSubGroupChange(e, "currentQuestionSubGroup3")}
-                                    name="subGroup3"
-                                    className="language_list"
-                                />
+                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>{`Sub Group 1`}</h3>
+                                    <Select
+                                        placeholder={`select Question Sub Group 1`}
+                                        value={this.state.fieldprops.properties.currentQuestionSubGroup1}
+                                        options={this.getSubGroupArray(1)}
+                                        onChange={e => this.handleQuestionSubGroupChange(e, `currentQuestionSubGroup1`)}
+                                        name="currentQuestionSubGroup"
+                                        className="language_list"
+                                /> 
+                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>{`Sub Group 2`}</h3>
+                                    <Select
+                                        placeholder={`select Question Sub Group 2`}
+                                        value={this.state.fieldprops.properties.currentQuestionSubGroup2}
+                                        options={this.getSubGroupArray(2)}
+                                        onChange={e => this.handleQuestionSubGroupChange(e, `currentQuestionSubGroup2`)}
+                                        name="currentQuestionSubGroup"
+                                        className="language_list"
+                               /> 
                                 <h3>Comments</h3>
                                 <div className="below-lanbel-body" style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
                                     <input type="text" name="productNum" className="mediumfm" value={this.state.fieldprops.properties.productNumber ? this.state.fieldprops.properties.productNumber : ""} onChange={e => this.inputtypeProductNum(e, "inputtypeProductNum")} />
@@ -7783,16 +7717,16 @@ class Card extends React.Component {
                         )}
 
                         {/*this.state.fieldprops.properties.gps_stats === "show" ? (
-                                            <li>
-                                                <h3>Sub Label</h3>
-                                                <div className="below-lanbel-body">
-                                                    <input type="text" name="name" value={this.state.fieldprops.properties.sublabel} className="mediumfm" onChange={e => this.updateprops(e, "sublabel")} />
-                                                    <label> Add a small description below the input field. </label>
-                                                </div>
-                                            </li>
-                                        ) : (
-                                            ""
-                                        )*/}
+                            <li>
+                                <h3>Sub Label</h3>
+                                <div className="below-lanbel-body">
+                                    <input type="text" name="name" value={this.state.fieldprops.properties.sublabel} className="mediumfm" onChange={e => this.updateprops(e, "sublabel")} />
+                                    <label> Add a small description below the input field. </label>
+                                </div>
+                            </li>
+                         ) : (
+                            ""
+                        )*/}
                     </ul>
                 </div>
             </div>
@@ -7808,8 +7742,6 @@ class Card extends React.Component {
 
         return (
             <div>{this.state.open === true ? (
-
-
                 <div style={Object.assign({}, style, { opacity })}>
                     {type === "info"
                         ? info
@@ -7831,9 +7763,7 @@ class Card extends React.Component {
                                                         ? gps
                                                         : false}
                 </div>
-
             ) : (
-
                 <div style={Object.assign({}, style, { opacity })}>
                     {type === "info"
                         ? info
@@ -7854,11 +7784,7 @@ class Card extends React.Component {
                                                     : type === "gps"
                                                         ? gps
                                                         : false}
-                </div>
-
-            )
-            }
-
+                </div> )}
                 <Snackbar
                     place="bc"
                     color={msgColor}
