@@ -7077,7 +7077,7 @@ class Card extends React.Component {
                                                                     style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops.properties.options && this.state.defaultdrops.properties.options[index] && this.state.defaultdrops.properties.options[index].label === "" ? disabledive : {} : {}}
                                                                 >
                                                                     <span>{alphabet[index]}</span>
-                                                                    {this.props.mappingProfileEnable == true ?
+                                                                    {/* {this.props.mappingProfileEnable == true ?
                                                                         <Select
                                                                             placeholder={'select value'}
                                                                             value={this.state.fieldprops.properties.currentProductNumber}
@@ -7085,8 +7085,8 @@ class Card extends React.Component {
                                                                             onChange={e => this.handleProductNumberChange(e, "productNumber")}
                                                                             name="productNumber"
                                                                             className="language_list"
-                                                                        />
-                                                                        : <ReactQuill
+                                                                        /> */}
+                                                                         <ReactQuill
                                                                             className={`${this.state.fieldprops.properties.multilevel ? 'multichoicequill' : 'choicequill'} ${'quillEditor'}`}
                                                                             value={this.state.fieldprops.properties.options[index].label_text ? this.state.fieldprops.properties.options[index].label_text : this.state.fieldprops.properties.options[index].label ? this.state.fieldprops.properties.options[index].label : ""}
                                                                             inlineStyles="true"
@@ -7104,7 +7104,8 @@ class Card extends React.Component {
                                                                             }}
                                                                             onBlur={() => this.handleOnBlurData("CHOICELABLE", index)}
                                                                         //  onChange={e => this.updateprops(e, "label", index)}
-                                                                        />}
+                                                                        />
+                                                                        {/* } */}
                                                                     {this.state.fieldprops.properties.multilevel ?
                                                                         <img onClick={() => this.showHide(index)} className="expandArrow" src={this.state.show[index] ? ExpandArrow : CollapseArrow} alt="expandArrow" />
                                                                         : ""}
