@@ -53,6 +53,7 @@ class Card extends React.Component {
             selectedFile: null,
             loaded: 0,
             productNumber: [],
+            choiceOptionsList : [],
             questionGroup: [],
             fieldprops: {
                 label: "",
@@ -67,7 +68,8 @@ class Card extends React.Component {
                     currentQuestionSubGroup1: {value : "" , label : ""},
                     currentQuestionSubGroup2: {value : "" , label : ""},
                     currentQuestionSubGroup3: {value : "" , label : ""},
-                    currentProductNumber: {value : "" , label : ""}
+                    currentProductNumber: {value : "" , label : ""},
+                    selectedChoiceGroup : {value: "" , label : "" , group_id : null}
                 }
             },
             updatedInfoVal: "",
@@ -309,6 +311,17 @@ class Card extends React.Component {
                         productNumber : resp.data.Product
                     })
                     this.setGroupQuestionAnswers(resp.data.Group);
+                }})
+                .catch(error => {
+                    console.error(error);
+                }); 
+            api2
+            .get("dropdown?client_id=" + (selectedProfile.id || 1))
+            .then(resp => {
+                if (resp.status === 200) {
+                    this.setState({
+                        choiceOptionsList:resp.data.data
+                    })
                 }})
                 .catch(error => {
                     console.error(error);
@@ -1863,6 +1876,28 @@ class Card extends React.Component {
     handleProductNumberChange = (e, i, index, key) => {
         let fieldprops = this.state.fieldprops;
         fieldprops.properties.currentProductNumber = e
+        this.setState({
+            fieldprops
+        });
+        this.props.autosave()
+    }
+
+    /* Map profile choice dropdon selection */
+    handleselectedChoiceGroup = (e, i, index, key) => {
+        let fieldprops = this.state.fieldprops;
+        const selectedChoiceGroupOptions = this.state.choiceOptionsList.length>0 ?
+                 this.state.choiceOptionsList.find((item)=>{return item.group_id == e.group_id}).options  : [];
+        const newOptions = selectedChoiceGroupOptions && selectedChoiceGroupOptions.length>0 ? 
+                                selectedChoiceGroupOptions.map((item , index)=>{
+                                    return {
+                                        id:index,
+                                        label : item.label,
+                                        label_text : `<p>${item.label}</p>`,
+                                        label_image : ""
+                                    }
+                                }) : []
+        fieldprops.properties.selectedChoiceGroup = e
+        fieldprops.properties.options = newOptions
         this.setState({
             fieldprops
         });
@@ -4515,6 +4550,7 @@ class Card extends React.Component {
         const infoicon = gallery.concat(infoico)
         const scaleicon = gallery.concat(scaleico)
         const mappingProfileEnable = this.props.mappingProfileEnable
+        const choiceOptionsList = this.state.choiceOptionsList
         const { open } = this.state;
         const scale_images = this.state.fieldprops && this.state.fieldprops.properties ? this.state.fieldprops.properties.scale_images : undefined;
         const scale_content = this.state.fieldprops && this.state.fieldprops.properties ? this.state.fieldprops.properties.scale_content : undefined;
@@ -4525,6 +4561,8 @@ class Card extends React.Component {
         let alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
         const { msgColor, br, message, MandatoryStyle } = this.state;
         const disabledive = { 'pointerEvents': 'none', opacity: 0.4, 'cursor': "none" }
+        const createChoiceGrpArray = choiceOptionsList.length>0 ? 
+                choiceOptionsList.map((item)=>{return { group_id : item.group_id , value : item.value , label : item.label }}) : [];
 
         const info = (
 
@@ -7008,9 +7046,6 @@ class Card extends React.Component {
                                         <h3
                                             style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                                         >Image Size</h3>
-                                        {
-                                            // imagesize
-                                        }
                                         <div className="twocol"
                                             style={this.state.currentlanguage.value !== "English" ?
                                                 disabledive : this.state.fieldprops.properties.multilevel ?
@@ -7053,7 +7088,6 @@ class Card extends React.Component {
                                                 </div>
                                             </div>
                                         </div>
-
                                         <div className="switch-textboxes xtboxestext"
                                             style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                                         >Multilevel</div>
@@ -7066,6 +7100,20 @@ class Card extends React.Component {
                                             </div>
                                         </div>
                                         <div className="clearfix" />
+
+                                        {this.props.mappingProfileEnable == true &&
+                                        <div className="mt-3">
+                                            <h3 className={"required-field"}>Select Group</h3>
+                                            <Select
+                                                placeholder={'select group'}
+                                                value={this.state.fieldprops.properties.selectedChoiceGroup}
+                                                options={createChoiceGrpArray}
+                                                onChange={e => this.handleselectedChoiceGroup(e, "selectedChoiceGroup")}
+                                                name="selectedChoiceGroup"
+                                                className="language_list"
+                                            />
+                                        </div>
+                                        }
                                         {this.state.fieldprops.properties.options
                                             ? this.state.fieldprops.properties.options.map(
                                                 function (value, index) {
@@ -7074,19 +7122,11 @@ class Card extends React.Component {
                                                             <div className="choicedropper dropper">
 
                                                                 <div className="parentlabel clear clearfix"
-                                                                    style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops.properties.options && this.state.defaultdrops.properties.options[index] && this.state.defaultdrops.properties.options[index].label === "" ? disabledive : {} : {}}
+                                                                    style={ this.state.currentlanguage.value !== "English" ? this.state.defaultdrops.properties.options && this.state.defaultdrops.properties.options[index] && this.state.defaultdrops.properties.options[index].label === "" ? disabledive : {} : {}}
                                                                 >
-                                                                    <span>{alphabet[index]}</span>
-                                                                    {/* {this.props.mappingProfileEnable == true ?
-                                                                        <Select
-                                                                            placeholder={'select value'}
-                                                                            value={this.state.fieldprops.properties.currentProductNumber}
-                                                                            options={this.state.productNumber}
-                                                                            onChange={e => this.handleProductNumberChange(e, "productNumber")}
-                                                                            name="productNumber"
-                                                                            className="language_list"
-                                                                        /> */}
+                                                                    <span>{alphabet[index]}</span>                                                                  
                                                                          <ReactQuill
+                                                                         style={this.props.mappingProfileEnable == true ? disabledive :{}}
                                                                             className={`${this.state.fieldprops.properties.multilevel ? 'multichoicequill' : 'choicequill'} ${'quillEditor'}`}
                                                                             value={this.state.fieldprops.properties.options[index].label_text ? this.state.fieldprops.properties.options[index].label_text : this.state.fieldprops.properties.options[index].label ? this.state.fieldprops.properties.options[index].label : ""}
                                                                             inlineStyles="true"
@@ -7105,7 +7145,7 @@ class Card extends React.Component {
                                                                             onBlur={() => this.handleOnBlurData("CHOICELABLE", index)}
                                                                         //  onChange={e => this.updateprops(e, "label", index)}
                                                                         />
-                                                                        {/* } */}
+                                                                        
                                                                     {this.state.fieldprops.properties.multilevel ?
                                                                         <img onClick={() => this.showHide(index)} className="expandArrow" src={this.state.show[index] ? ExpandArrow : CollapseArrow} alt="expandArrow" />
                                                                         : ""}
@@ -7215,7 +7255,6 @@ class Card extends React.Component {
                                             style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                                         >
                                             <div className="addmoreimage addmoreimage-big" onClick={() => this.addfun("options")}>
-                                                {" "}
                                                 <i className="fa fa-plus" /> Add{" "}
                                             </div>
                                         </div>

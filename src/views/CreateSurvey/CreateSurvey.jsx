@@ -1530,7 +1530,14 @@ class CreateSurvey extends React.Component {
                 return this.safeTrim(obj.label).length === 0
             })
             if (q.type === 'choice') {
-                if (q.properties && !q.properties.hasOwnProperty("options")) {
+                if(this.state.mappingProfileEnable && q.properties && !q.properties.hasOwnProperty("selectedChoiceGroup") || 
+                        (q.properties.selectedChoiceGroup.value=="")){
+                    choicecheck = false;
+                    labelname = q.label;
+                    type = "Choice";
+                    break;
+                }
+                else if (q.properties && !q.properties.hasOwnProperty("options")) {
                     choicecheck = false;
                     labelname = q.label;
                     type = "Choice";
@@ -1557,9 +1564,11 @@ class CreateSurvey extends React.Component {
     checkMappingProfile = () => {
         let mapProfileCheck = true;
         let defaultdrops = this.state.drops;
+        let labelName = "";
         if (this.state.mappingProfileEnable) {
             for (let i = 0; i < defaultdrops.length; i++) {
                 let q = defaultdrops[i];
+                labelName = q.label
                 if (q.type !== 'info' && q.type !== 'gps') {
                     if (q.properties && !q.properties.hasOwnProperty("currentProductNumber")) {
                         mapProfileCheck = false;
@@ -1569,17 +1578,17 @@ class CreateSurvey extends React.Component {
                         break;
                     } else if (q.properties && !q.properties.hasOwnProperty("currentQuestionSubGroup1")
                         || (q.properties.currentQuestionSubGroup1=="" || q.properties.currentQuestionSubGroup1==null || q.properties.currentQuestionSubGroup1.value=="")) {
-                        mapProfileCheck = false;
-                        break;
-                    }
-                    else if (q.properties && !q.properties.hasOwnProperty("currentQuestionSubGroup2")
-                        || (q.properties.currentQuestionSubGroup2=="" || q.properties.currentQuestionSubGroup2==null || q.properties.currentQuestionSubGroup2.value=="")) {
+                            mapProfileCheck = false;
+                            break;
+                        }
+                        else if (q.properties && !q.properties.hasOwnProperty("currentQuestionSubGroup2")
+                            || (q.properties.currentQuestionSubGroup2=="" || q.properties.currentQuestionSubGroup2==null || q.properties.currentQuestionSubGroup2.value=="")) {
                         mapProfileCheck = false;
                         break;
                     }
                 }
             }
-            if (!mapProfileCheck) { this.ShowNotification("Profile mapping is enabled. Please select product number, question group and sub group in all element", "danger", 3000); }
+            if (!mapProfileCheck) { this.ShowNotification(" ( " + labelName + " ) "+"Profile mapping is enabled. Please select product number, question group and sub group in all element", "danger", 5000); }
             return mapProfileCheck;
         }
         else {
@@ -1624,7 +1633,7 @@ class CreateSurvey extends React.Component {
                 }
             } else {
                 if (activeStep === 1) {
-                    next = this.CheckScale() && this.CheckChoice() && this.checkMappingProfile();
+                    next = this.CheckScale() && this.checkMappingProfile() && this.CheckChoice();
                     if (next) {
                         this.editlanguage(true);
                         this.OtherLancongenerate();
