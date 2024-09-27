@@ -458,7 +458,6 @@ class AgMissionResponse extends React.Component {
     });
   };
 
-
   /* Handles this function to update the selected project. */
   SelectedProject = () => {
     if (this.props.location.state && this.props.location.state.detail) {
@@ -493,7 +492,6 @@ class AgMissionResponse extends React.Component {
       this.getClientresponseconfig();
     }
   }
-
 
   /* Handles the project selection from dropdown and to update the mission list from the selected project. */
   handleProjectChange = e => {
@@ -588,7 +586,6 @@ class AgMissionResponse extends React.Component {
     );
   };
 
-
   /* Handle the close event of payment popup. */
   closePay = () => {
     this.setState({ pay: false });
@@ -616,8 +613,6 @@ class AgMissionResponse extends React.Component {
     this.api.resetRowHeights();
     this.columnApi = params.columnApi;
   };
-
-
 
   /* Handles the export ag grid data to excel. */
   exportCsv = () => {
@@ -718,7 +713,6 @@ class AgMissionResponse extends React.Component {
 
       })
   }
-
 
   /*  Handles the event to validate the column type and calls the api to update the answer. */
   onCellValueChanged = event => {
@@ -1010,8 +1004,6 @@ class AgMissionResponse extends React.Component {
         event.colDef.queType === "scale" ||
         event.colDef.queType === "input" ||
         event.colDef.queType === "choice"
-
-
       ) {
         this.getSelectedQuestion(event);
         this.getSelectedAnswer(event);
@@ -1024,7 +1016,6 @@ class AgMissionResponse extends React.Component {
       }
 
       else if (event.colDef.queType === "upload") {
-
         if (event.value.length === 0 || event.value[event.value.length - 1] === undefined) {
           this.setState({ openPopup: false })
         } else if (event.colDef.mediaType && (event.colDef.mediaType === 'video' || event.colDef.mediaType === 'audio')) {
@@ -1060,7 +1051,6 @@ class AgMissionResponse extends React.Component {
         } else {
           this.getAllRows()
           this.getPhotoEditorQuestion(event)
-
           this.setState({
             customer_id: event.data.customer_id,
             survey_tag_id: event.data.survey_tag_id

@@ -104,20 +104,21 @@ class PhotoEditor extends React.Component {
     if (selectedAnswer.queType === "barcode" || selectedAnswer.queType === "upload" || selectedAnswer.queType === "capture") {
       if (selectedAnswer.field.includes('B_oimage') || selectedAnswer.field.includes('U_oimage') || selectedAnswer.field.includes('C_oimage')) { disable = true; }
     }
-    this.state.filteredMissions[selectedAnswer.column_index].responses.forEach((r, index) => {
+    const selectedimagedata = this.state.filteredMissions.find((item)=>item.survey_tag_id ==selectedAnswer.survey_tag_id)
+    selectedimagedata && selectedimagedata.responses.forEach((r, index) => {
       if ((selectedAnswer.loop_set && selectedAnswer.loop_set != null && selectedAnswer.loop_set > 0) ?
-        selectedAnswer.loop_triggered_qid === r.loop_triggered_qid && selectedAnswer.loop_set === r.loop_set &&
-        selectedAnswer.loop_number === r.loop_number && r.question_id === selectedAnswer.question_id
-        :
-        (!r.loop_triggered_qid && r.question_id === this.props.selectedAnswer.question_id)
-      ) {
-        if (r.answers.image || r.answers.media) {
-          if (selectedAnswer.queType === "barcode" || selectedAnswer.queType === "capture") {
-            Column.image = disable ? r.answers.image_orig ? r.answers.image_orig : r.answers.image : r.answers.image
-          }
-          else if (selectedAnswer.queType === "upload") {
-            Column.image = disable ? r.answers.image_orig ? r.answers.image_orig : r.answers.media : r.answers.media
-          }
+      selectedAnswer.loop_triggered_qid === r.loop_triggered_qid && selectedAnswer.loop_set === r.loop_set &&
+      selectedAnswer.loop_number === r.loop_number && r.question_id === selectedAnswer.question_id
+      :
+      (!r.loop_triggered_qid && r.question_id === this.props.selectedAnswer.question_id)
+    ) {
+      if (r.answers.image || r.answers.media) {
+        if (selectedAnswer.queType === "barcode" || selectedAnswer.queType === "capture") {
+          Column.image = disable ? r.answers.image_orig ? r.answers.image_orig : r.answers.image : r.answers.image
+        }
+        else if (selectedAnswer.queType === "upload") {
+          Column.image = disable ? r.answers.image_orig ? r.answers.image_orig : r.answers.media : r.answers.media
+        }
           Column.title = selectedAnswer.headerName
           Column.question_id = selectedAnswer.question_id
           Column.survey_tag_id = selectedAnswer.survey_tag_id
@@ -136,7 +137,6 @@ class PhotoEditor extends React.Component {
         }
       }
     })
-
     this.setState({
       imageData: Column,
       open: true
@@ -514,8 +514,6 @@ class PhotoEditor extends React.Component {
     //npm install file-saver --save
     var FileSaver = require('file-saver');
     const editorInstance = this.editorRef.current.getInstance();
-    console.log(editorInstance.dataUrl);
-    console.log('editor instance')
     FileSaver.saveAs(editorInstance.toDataURL({ quality: 0.8 }), 'image.jpg')
   };
 
