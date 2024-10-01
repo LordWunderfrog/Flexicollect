@@ -29,6 +29,7 @@ import SurveyBuilder from "./SurveyBuilder/SurveyBuilder";
 import "./CreateSurvey.css";
 import Settings from "./settings";
 import $ from 'jquery';
+import Axios from "axios";
 
 const theme = createMuiTheme({
     typography: {
@@ -1531,7 +1532,7 @@ class CreateSurvey extends React.Component {
             })
             if (q.type === 'choice') {
                 if(this.state.mappingProfileEnable && q.properties && !q.properties.hasOwnProperty("selectedChoiceGroup") || 
-                        (q.properties.selectedChoiceGroup.value=="")){
+                        (q.properties.hasOwnProperty("selectedChoiceGroup")&&q.properties.selectedChoiceGroup.value=="")){
                     choicecheck = false;
                     labelname = q.label;
                     type = "Choice";
@@ -2126,6 +2127,22 @@ class CreateSurvey extends React.Component {
         this.handleOnClick2("draft", "auto", true)
     }
 
+    /* Handle Export button click API call */
+    exportSurveyQuestions = () => {
+        if(this.state.id || this.props.match.params.id){
+            const id = this.state.id || this.props.match.params.id;
+            api2.get('survey-document?survey_id='+id)
+            .then(resp => {
+                if (resp.status === 200) {
+                    window.open('https://382f-120-72-93-91.ngrok-free.app/survey-document?survey_id='+id , "_self")
+                }
+            })
+            .catch(error => {
+                //console.error(error);
+            });
+        }
+    }
+
     render() {
         const validater = this.state.activeStep === 0 ? (this.state.name === "" || this.state.duplicatemissionRefCode || (this.state.mappingProfileEnable && this.state.selectedProfile === "")) : this.state.drops.length === 0;
 
@@ -2289,26 +2306,41 @@ class CreateSurvey extends React.Component {
                             <div className={`relativeposition ${classes.root}`} style={{ alignContent: "center" }}>
                                 {activeStep !== 0 ? (
                                     <div style={{ position: "relative" }}>
-                                        <div className="stepersurveyname"
-                                            style={{
-                                                textAlign: "center",
-                                                fontSize: "18px",
-                                                fontWeight: "bold",
-                                                marginTop: "10px"
-                                            }}
-                                        >{previewname}</div>
-                                        <div
-                                            style={{
-                                                textAlign: "center",
-                                                fontSize: "14px",
-                                                color: "green",
-                                                fontWeight: "800"
-                                            }}
-                                        >
-                                            {this.state.updatedate !== "" &&
-                                                this.state.updatedate
-                                            }
+                                        <div>       
+                                            <div className="stepersurveyname"
+                                                style={{
+                                                    textAlign: "center",
+                                                    fontSize: "18px",
+                                                    fontWeight: "bold",
+                                                    marginTop: "10px"
+                                                }}
+                                            >{previewname}
+                                            </div>
+                                            <div
+                                                style={{
+                                                    textAlign: "center",
+                                                    fontSize: "14px",
+                                                    color: "green",
+                                                    fontWeight: "800"
+                                                }}
+                                            >
+                                                {this.state.updatedate !== "" &&
+                                                    this.state.updatedate
+                                                }
+                                            </div>
                                         </div>
+                                       <div className="position-absolute" style={{top:"15px" , right : "10px"}}>
+                                            {this.state.activeStep == 1 && 
+                                                <Button
+                                                    disabled={false}
+                                                    style={{ float: "left", left: 0 }}
+                                                    onClick={this.exportSurveyQuestions}
+                                                    className={classes.backButton} variant="contained"
+                                                    color="primary">
+                                                    Export Questions
+                                                </Button>
+                                            }
+                                       </div>
                                     </div>
                                 )
                                     : ("")
