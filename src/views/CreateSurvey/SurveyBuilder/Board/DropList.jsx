@@ -198,7 +198,8 @@ class DropList extends React.Component {
                 // currentlanguage: {label:'English',value:'English'},
             }, () => {
                 this.props.rightOpen(e, false, question_id)
-                if (this.state.currentlanguage.label !== 'English') {
+                // if (this.state.currentlanguage.label !== 'English') {
+                if (this.props.dropcurrentlanguage.label !== 'English') {
                     this.props.changedroplanguage('English')
                 }
             })
@@ -209,7 +210,8 @@ class DropList extends React.Component {
                 //   currentlanguage: {label:'English',value:'English'},
             }, () => {
                 this.props.rightOpen(e, false, question_id, this.props.index)
-                if (this.state.currentlanguage.label !== 'English') {
+                // if (this.state.currentlanguage.label !== 'English') {
+                if (this.props.dropcurrentlanguage.label !== 'English') {
                     this.props.changedroplanguage('English')
                 }
             });
@@ -219,7 +221,8 @@ class DropList extends React.Component {
     /* Handles and return the element to move one step downward. */
     downArrow() {
         return (
-            this.state.currentlanguage.value === "English" && (
+            // this.state.currentlanguage.value === "English" && (
+           this.props.dropcurrentlanguage.value === "English" && (
                 <span>
                     <i
                         className="fas fa-arrow-down"
@@ -240,7 +243,8 @@ class DropList extends React.Component {
     /* Handles and return the element to move one step upward. */
     upArrow() {
         return (
-            this.state.currentlanguage.value === "English" && (
+            // this.state.currentlanguage.value === "English" && (
+            this.props.dropcurrentlanguage.value === "English" && (
                 <span>
                     <i
                         className="fas fa-arrow-up"
@@ -337,7 +341,8 @@ class DropList extends React.Component {
                 condition.target.handler === this.state.fieldprops.handler
             );
         })
-        return this.state.currentlanguage.value === "English" &&
+        // return this.state.currentlanguage.value === "English" &&
+        return this.props.dropcurrentlanguage.value === "English" &&
             <span>
                 {conditions.length === 0 ?
                     <span>
@@ -368,7 +373,8 @@ class DropList extends React.Component {
 
     /* Handle the event to clone button */
     cloneAction = (questionID, type) => {
-        return this.state.currentlanguage.value === "English" &&
+        // return this.state.currentlanguage.value === "English" &&
+        return this.props.dropcurrentlanguage.value === "English" &&
             <span onClick={() => this.handleCloneClick(questionID, type)}>
                 <i className="far fa-clone" color="action" />
             </span>
