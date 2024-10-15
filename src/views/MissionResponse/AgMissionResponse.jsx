@@ -510,7 +510,9 @@ class AgMissionResponse extends React.Component {
           selectedMission: "",
           selectedproj: e,
           paymentEnableDetails: e.value,
-          paymentProjName: e.label
+          paymentProjName: e.label,
+          listItems : [],
+          pagecount : 0
         });
         localStorage.removeItem("defaultfilterState")
       })
@@ -3821,6 +3823,7 @@ class AgMissionResponse extends React.Component {
       })
     }
   };
+
   render() {
     const { classes } = this.props;
     const { msgColor, br, message, page, pagecount, rowsPerPage } = this.state;
@@ -3868,6 +3871,7 @@ class AgMissionResponse extends React.Component {
                     value={this.state.selectedproj}
                     options={this.state.projects}
                     onChange={this.handleProjectChange}
+                    isDisabled={this.state.selectedMission !== "" && this.state.listItems.length < this.state.totalrecords}
                   />
                 </GridItem>
               </div>
@@ -3878,6 +3882,7 @@ class AgMissionResponse extends React.Component {
                     value={this.state.selectedMission}
                     options={this.state.missions}
                     onChange={this.handleMissionChange}
+                    isDisabled={this.state.selectedMission !== "" && this.state.listItems.length < this.state.totalrecords}
                   />
                 </GridItem>
               </div>
