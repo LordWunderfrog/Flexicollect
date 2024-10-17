@@ -824,6 +824,7 @@ class Translation extends React.Component {
                                         resizable: true,
                                         animateRows: true
                                     }}
+                                    gridOptions={{ suppressHorizontalScroll: false}}
                                 />
                             </div>
                         </div>

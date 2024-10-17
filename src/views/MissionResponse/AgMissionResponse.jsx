@@ -4121,6 +4121,7 @@ class AgMissionResponse extends React.Component {
                             onFilterChanged={this.onFilterChangedGrid}
                             suppressPaginationPanel={true}
                             enableBrowserTooltips={true}
+                            gridOptions={{ suppressHorizontalScroll: false}}
                           />
                         </div>
                         <div style={{ display: 'flex', float: 'right', }}>
@@ -4238,6 +4239,7 @@ class AgMissionResponse extends React.Component {
                         onFilterChanged={this.onFilterChangedGrid}
                         suppressPaginationPanel={true}
                         enableBrowserTooltips={true}
+                        gridOptions={{ suppressHorizontalScroll: false}}
                       />
                     </div>
                     <div style={{ display: 'flex', float: 'right', }}>

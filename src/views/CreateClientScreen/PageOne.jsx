@@ -1695,6 +1695,7 @@ class PageOne extends Component {
                   filteredMetricList={this.state.filteredMetricList}
                   filteredconsumertype={this.state.filteredconsumertype}
                   questions={this.state.questions}
+                  gridOptions={{ suppressHorizontalScroll: false }}
                 />
               </div>
 

@@ -120,7 +120,7 @@ class CreateSurvey extends React.Component {
             draftid: 0,
             updatedate: "",
             platformType: "",
-            selectedProfile: {id:null , value:"" , label : ""},
+            selectedProfile: { id: null, value: "", label: "" },
             isAssigned: "",
             refcode: "",
             duplicatemissionRefCode: false,
@@ -141,7 +141,7 @@ class CreateSurvey extends React.Component {
             concurrentlanguage: { label: "English", value: 'English' },
             deletelanguage: [],
             mappingProfileEnable: false,
-            load: false 
+            load: false
         };
         this.props.handleCollapseScreen(false);
         this.elementsbar = this.showAddElements.bind(this);
@@ -205,8 +205,8 @@ class CreateSurvey extends React.Component {
                         isAssigned: resp.data.isAssigned ? resp.data.isAssigned : "",
                         oldrefcode: resp.data.refcode,
                         selectedlanguage: selectedlanguage,
-                        mappingProfileEnable : resp.data.question_mapping,
-                        selectedProfile : {id:resp.data.client_id || null , value : resp.data.client_name || "" , label : resp.data.client_name || ""},
+                        mappingProfileEnable: resp.data.question_mapping,
+                        selectedProfile: { id: resp.data.client_id || null, value: resp.data.client_name || "", label: resp.data.client_name || "" },
                         languages_drop: languages_drop
                     }, () => {
                         this.getlanguagedetails()
@@ -1531,8 +1531,8 @@ class CreateSurvey extends React.Component {
                 return this.safeTrim(obj.label).length === 0
             })
             if (q.type === 'choice') {
-                if(this.state.mappingProfileEnable && q.properties && !q.properties.hasOwnProperty("selectedChoiceGroup") || 
-                        (q.properties.hasOwnProperty("selectedChoiceGroup")&&q.properties.selectedChoiceGroup.value=="")){
+                if (this.state.mappingProfileEnable && q.properties && !q.properties.hasOwnProperty("selectedChoiceGroup") ||
+                    (q.properties.hasOwnProperty("selectedChoiceGroup") && q.properties.selectedChoiceGroup.value == "")) {
                     choicecheck = false;
                     labelname = q.label;
                     type = "Choice";
@@ -1578,18 +1578,18 @@ class CreateSurvey extends React.Component {
                         mapProfileCheck = false;
                         break;
                     } else if (q.properties && !q.properties.hasOwnProperty("currentQuestionSubGroup1")
-                        || (q.properties.currentQuestionSubGroup1=="" || q.properties.currentQuestionSubGroup1==null || q.properties.currentQuestionSubGroup1.value=="")) {
-                            mapProfileCheck = false;
-                            break;
-                        }
-                        else if (q.properties && !q.properties.hasOwnProperty("currentQuestionSubGroup2")
-                            || (q.properties.currentQuestionSubGroup2=="" || q.properties.currentQuestionSubGroup2==null || q.properties.currentQuestionSubGroup2.value=="")) {
+                        || (q.properties.currentQuestionSubGroup1 == "" || q.properties.currentQuestionSubGroup1 == null || q.properties.currentQuestionSubGroup1.value == "")) {
+                        mapProfileCheck = false;
+                        break;
+                    }
+                    else if (q.properties && !q.properties.hasOwnProperty("currentQuestionSubGroup2")
+                        || (q.properties.currentQuestionSubGroup2 == "" || q.properties.currentQuestionSubGroup2 == null || q.properties.currentQuestionSubGroup2.value == "")) {
                         mapProfileCheck = false;
                         break;
                     }
                 }
             }
-            if (!mapProfileCheck) { this.ShowNotification(" ( " + labelName + " ) "+"Profile mapping is enabled. Please select product number, question group and sub group in all element", "danger", 5000); }
+            if (!mapProfileCheck) { this.ShowNotification(" ( " + labelName + " ) " + "Profile mapping is enabled. Please select product number, question group and sub group in all element", "danger", 5000); }
             return mapProfileCheck;
         }
         else {
@@ -1626,11 +1626,11 @@ class CreateSurvey extends React.Component {
             let next = true;
             const { activeStep } = this.state;
             if (activeStep === 0) {
-             if(this.state.mappingProfileEnable==true && this.state.selectedProfile.value == ""){
-                this.ShowNotification("Profile mapping is enabled. Please select client", "danger", 5000); 
-             }else{
-                 this.state.draftid ? this.updateSurvey("draft", "auto", true) : this.addSurvey("draft", "auto", true);
-                 this.OtherLanguagegenerate()
+                if (this.state.mappingProfileEnable == true && this.state.selectedProfile.value == "") {
+                    this.ShowNotification("Profile mapping is enabled. Please select client", "danger", 5000);
+                } else {
+                    this.state.draftid ? this.updateSurvey("draft", "auto", true) : this.addSurvey("draft", "auto", true);
+                    this.OtherLanguagegenerate()
                 }
             } else {
                 if (activeStep === 1) {
@@ -1936,13 +1936,13 @@ class CreateSurvey extends React.Component {
             refcode: this.state.refcode,
         };
         this.state.mappingProfileEnable == true ?
-        data = {
-            ...data , 
-            question_mapping : this.state.mappingProfileEnable,
-            client_name: this.state.selectedProfile.value !== "" ? this.state.selectedProfile.value : null,
-            client_id : this.state.selectedProfile.id ? this.state.selectedProfile.id :  null
-        }
-        : data = data
+            data = {
+                ...data,
+                question_mapping: this.state.mappingProfileEnable,
+                client_name: this.state.selectedProfile.value !== "" ? this.state.selectedProfile.value : null,
+                client_id: this.state.selectedProfile.id ? this.state.selectedProfile.id : null
+            }
+            : data = data
 
         const self = this;
         if (dauto !== "auto") {
@@ -2051,12 +2051,12 @@ class CreateSurvey extends React.Component {
             positionChanged: this.state.positionChanged === true ? 1 : 0,
         };
 
-        if(this.state.mappingProfileEnable == true){ 
-            data = { 
-                ...data , 
-                question_mapping : this.state.mappingProfileEnable,
+        if (this.state.mappingProfileEnable == true) {
+            data = {
+                ...data,
+                question_mapping: this.state.mappingProfileEnable,
                 client_name: this.state.selectedProfile.value || null,
-                client_id : this.state.selectedProfile.id ||  null
+                client_id: this.state.selectedProfile.id || null
             }
         }
 
@@ -2129,17 +2129,17 @@ class CreateSurvey extends React.Component {
 
     /* Handle Export button click API call */
     exportSurveyQuestions = () => {
-        if(this.state.id || this.props.match.params.id){
+        if (this.state.id || this.props.match.params.id) {
             const id = this.state.id || this.props.match.params.id;
-            api2.get('survey-document?survey_id='+id)
-            .then(resp => {
-                if (resp.status === 200) {
-                    window.open('https://382f-120-72-93-91.ngrok-free.app/survey-document?survey_id='+id , "_self")
-                }
-            })
-            .catch(error => {
-                //console.error(error);
-            });
+            api2.get('survey-document?survey_id=' + id)
+                .then(resp => {
+                    if (resp.status === 200) {
+                        window.open('https://devapi.flexicollect.com/survey-document?survey_id=' + id, "_self")
+                    }
+                })
+                .catch(error => {
+                    //console.error(error);
+                });
         }
     }
 
@@ -2306,7 +2306,7 @@ class CreateSurvey extends React.Component {
                             <div className={`relativeposition ${classes.root}`} style={{ alignContent: "center" }}>
                                 {activeStep !== 0 ? (
                                     <div style={{ position: "relative" }}>
-                                        <div>       
+                                        <div>
                                             <div className="stepersurveyname"
                                                 style={{
                                                     textAlign: "center",
@@ -2329,8 +2329,8 @@ class CreateSurvey extends React.Component {
                                                 }
                                             </div>
                                         </div>
-                                       <div className="position-absolute" style={{top:"15px" , right : "10px"}}>
-                                            {this.state.activeStep == 1 && 
+                                        <div className="position-absolute" style={{ top: "15px", right: "10px" }}>
+                                            {this.state.activeStep == 1 &&
                                                 <Button
                                                     disabled={false}
                                                     style={{ float: "left", left: 0 }}
@@ -2340,7 +2340,7 @@ class CreateSurvey extends React.Component {
                                                     Export Questions
                                                 </Button>
                                             }
-                                       </div>
+                                        </div>
                                     </div>
                                 )
                                     : ("")

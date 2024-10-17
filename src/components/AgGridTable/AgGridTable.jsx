@@ -90,6 +90,7 @@ export default class AgGridTable extends Component {
             lockPosition: true,
             autoHeight: true
           }}
+          gridOptions={{ suppressHorizontalScroll: false}}
         />
       </div>
 
