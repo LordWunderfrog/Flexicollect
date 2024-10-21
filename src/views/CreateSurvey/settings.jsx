@@ -71,6 +71,21 @@ class Settings extends React.Component {
             projects: [],
             projectSource: [],
             rangeStartElement: [],
+            release_delay_time: [
+                { value: 0, label: 'Immediate Release' },
+                { value: 1, label: '1 HRS' },
+                { value: 2, label: '2 HRS' },
+                { value: 3, label: '3 HRS' },
+                { value: 4, label: '4 HRS' },
+                { value: 5, label: '5 HRS' },
+                { value: 6, label: '6 HRS' },
+                { value: 7, label: '7 HRS' },
+                { value: 8, label: '8 HRS' },
+                { value: 9, label: '9 HRS' },
+                { value: 10, label: '10 HRS' },
+                { value: 11, label: '11 HRS' },
+                { value: 12, label: '12 HRS' },
+            ]
         };
 
         this.addCondtion = this.addCondtion.bind(this);
@@ -640,6 +655,20 @@ class Settings extends React.Component {
                 // newcondtions[conditionid]['target']['mission_label'] = event.label;
                 this.setState({ newcondtions }, this.props.getCondtions(this.state.conditions), this.props.autosave())
             }
+            else if (label === 'delay_time') {
+                let value = event.target.value;
+                let conditionid = drop.condtion_id;
+                let cid = drop.condtion_id;
+                let newcondtions = this.state.conditions;
+                for (let i = 0; i < newcondtions.length; i++) {
+                    if (newcondtions[i].condtion_id === cid) {
+                        conditionid = i;
+                    }
+                }
+                newcondtions[conditionid]['target'][`${label}`] = parseInt(value);
+                // newcondtions[conditionid]['target']['mission_label'] = event.label;
+                this.setState({ newcondtions }, this.props.getCondtions(this.state.conditions), this.props.autosave())
+            }
             else if (event.target && event.target.value && event.target.value === 'release') {
                 let value = event.target.value;
                 let conditionid = drop.condtion_id;
@@ -654,6 +683,7 @@ class Settings extends React.Component {
                 newcondtions[conditionid][`${label}`]['project'] = "";
                 // newcondtions[conditionid][`${label}`]['project_label'] = "";
                 newcondtions[conditionid][`${label}`]['mission'] = "";
+                newcondtions[conditionid][`${label}`]['delay_time'] = 0;
                 delete newcondtions[conditionid][`${label}`].handler
                 // newcondtions[conditionid][`${label}`]['mission_label'] = "";
 
@@ -1394,7 +1424,31 @@ class Settings extends React.Component {
                                                                                             </option>
                                                                                         ))}
                                                                                     </select>
+                                                                                </div>
+                                                                            </div>
+                                                                            :
+                                                                            null
+                                                                    }
+                                                                    {
+                                                                        this.state.conditions[index].target.do === "release"
+                                                                            ?
+                                                                            <div className="form-group clear clearfix">
+                                                                                <div className="label-part">Delay Time</div>
+                                                                                <div className="ans-part">
+                                                                                    <select
+                                                                                        className="form-control"
+                                                                                        name="delay_time"
+                                                                                        onChange={e => this.addNewCondtions(e, drop, "delay_time")}>
+                                                                                        <option value="" disabled selected>
+                                                                                            Select Delay Time for release mission
+                                                                                        </option>
 
+                                                                                        {this.state.release_delay_time.map((subdrop, index) => (
+                                                                                            <option key={index} selected={drop.target.delay_time === subdrop.value ? "selected" : ""} value={subdrop.value}>
+                                                                                                {subdrop.label}
+                                                                                            </option>
+                                                                                        ))}
+                                                                                    </select>
                                                                                 </div>
                                                                             </div>
                                                                             :

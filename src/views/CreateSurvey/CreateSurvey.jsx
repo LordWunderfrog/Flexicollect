@@ -2134,7 +2134,8 @@ class CreateSurvey extends React.Component {
             api2.get('survey-document?survey_id=' + id)
                 .then(resp => {
                     if (resp.status === 200) {
-                        window.open('https://devapi.flexicollect.com/survey-document?survey_id=' + id, "_self")
+                        // we are taking base url in header from backend to make that url dynamic here
+                        window.open(resp.config.baseURL + '/survey-document?survey_id=' + id, "_self")
                     }
                 })
                 .catch(error => {
