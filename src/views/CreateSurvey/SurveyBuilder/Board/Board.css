@@ -985,6 +985,20 @@ border: none;
   transform: translateX(-370px)
 }
 
+.properties-mmain-tab.drag-options {
+  display: block !important;
+  transition:all 1s;
+  -moz-transition:all 1s;
+  -webkit-transition:all 1s;
+  -ms-transition:all 1s;
+}
+.properties-mmain-tab.drag-options.openbox {
+  -webkit-animation: inherit;
+  animation: inherit;
+  right: 0px;
+  transform: none;
+}
+
 @-webkit-keyframes fadeIn {
   from {
     transform: translateX(0px);

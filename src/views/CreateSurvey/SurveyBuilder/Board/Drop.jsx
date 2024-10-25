@@ -29,6 +29,7 @@ import Snackbar from "components/Snackbar/Snackbar.jsx";
 import ExpandArrow from "../../../../assets/img/expand-arrow.png";
 import CollapseArrow from "../../../../assets/img/collapse-arrow.png";
 import $ from 'jquery';
+import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 const style = {
     cursor: 'move',
 }
@@ -2905,8 +2906,6 @@ class Card extends React.Component {
             currentlanguage: event,
             updatedInfoVal: ""
         }, () => { this.props.changedroplanguage(event.label) })
-
-
     };
 
     /*inputtypeProductNum = (e, i, index, key) => {
@@ -4545,6 +4544,34 @@ class Card extends React.Component {
         } else return []
     }
 
+    onDragEnd = (result) => {
+        const { source, destination } = result;
+        if (!destination) {
+            return;
+        }
+        const updatedArray = Array.from(this.state.fieldprops.properties.options);
+        const [removed] = updatedArray.splice(source.index, 1);
+        updatedArray.splice(destination.index, 0, removed);
+        localStorage.setItem('updateProperties', true);
+        let fieldprops = this.state.fieldprops;
+        fieldprops.properties.options = updatedArray;
+        this.setState({
+            fieldprops
+        });
+
+        let selectedlanguage = this.props.selectedlanguage
+        let languages_drop = this.props.languages_drop;
+        selectedlanguage.forEach((a, b) => {
+            if (a.label !== 'English') {
+                const languageOptions = languages_drop[a.label].content[this.props.index].properties.options;
+                const updatedArray1 = Array.from(languageOptions);
+                const [removed1] = updatedArray1.splice(source.index, 1);
+                updatedArray1.splice(destination.index, 0, removed1);
+                languages_drop[a.label].content[this.props.index].properties.options = updatedArray1;
+            }
+        })
+    }
+
     render() {
         const gallery = this.props.gallery;
         const infoico = this.props.infoico;
@@ -4559,7 +4586,7 @@ class Card extends React.Component {
         const table_content = this.state.fieldprops && this.state.fieldprops.properties ? this.state.fieldprops.properties.table_content : undefined;
         const scale_length = scale_content ? scale_content.length : 0;
         const scale_len = scale_images ? scale_images.length : "";
-        const boardval = open ? "properties-mmain-tab openbox" : "properties-mmain-tab closebox";
+        const boardval = open ? "properties-mmain-tab drag-options openbox" : "properties-mmain-tab drag-options closebox";
         let alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
         const { msgColor, br, message, MandatoryStyle } = this.state;
         const disabledive = { 'pointerEvents': 'none', opacity: 0.4, 'cursor': "none" }
@@ -6712,6 +6739,10 @@ class Card extends React.Component {
 
         );
 
+        const getListStyle = isDraggingOver => ({
+            background: isDraggingOver ? '' : '',
+        });
+
         const choice = (
             <div>
                 <div className={boardval}>
@@ -7118,42 +7149,65 @@ class Card extends React.Component {
                                                 />
                                             </div>
                                         }
-                                        {this.state.fieldprops.properties.options
-                                            ? this.state.fieldprops.properties.options.map(
-                                                function (value, index) {
-                                                    return (
-                                                        <div className="twocol dropboxer" key={index}>
-                                                            <div className="choicedropper dropper">
 
-                                                                <div className="parentlabel clear clearfix"
-                                                                    style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops.properties.options && this.state.defaultdrops.properties.options[index] && this.state.defaultdrops.properties.options[index].label === "" ? disabledive : {} : {}}
+                                        <DragDropContext onDragEnd={(result) => this.onDragEnd(result)}>
+                                            <Droppable droppableId="ChoiceOptionDropable">
+                                                {(provided, snapshot) => (
+                                                    <ul style={getListStyle(snapshot.isDraggingOver)} ref={provided.innerRef} {...provided.droppableProps} className="droppable-area">
+                                                        {this.state.fieldprops.properties.options && this.state.fieldprops.properties.options.length > 0 &&
+                                                            this.state.fieldprops.properties.options.map((value, index) => (
+                                                                <Draggable
+                                                                    isDragDisabled={this.state.currentlanguage.value !== "English"}
+                                                                    draggableId={value.id.toString()}
+                                                                    key={value.id}
+                                                                    index={index}
                                                                 >
-                                                                    <span>{alphabet[index]}</span>
-                                                                    <ReactQuill
-                                                                        style={this.props.mappingProfileEnable == true ? disabledive : {}}
-                                                                        className={`${this.state.fieldprops.properties.multilevel ? 'multichoicequill' : 'choicequill'} ${'quillEditor'}`}
-                                                                        value={this.state.fieldprops.properties.options[index].label_text ? this.state.fieldprops.properties.options[index].label_text : this.state.fieldprops.properties.options[index].label ? this.state.fieldprops.properties.options[index].label : ""}
-                                                                        inlineStyles="true"
-                                                                        modules={this.modules_minimal}
-                                                                        formats={this.formats}
-                                                                        onChange={(html, delta, source) => {
-                                                                            // const containsImage = html.includes('<img');
-                                                                            // if (containsImage) {
-                                                                            //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
-                                                                            //     return
-                                                                            // }
-                                                                            if (source === 'user') {
-                                                                                this.label(html, "label", index)
-                                                                            }
-                                                                        }}
-                                                                        onBlur={() => this.handleOnBlurData("CHOICELABLE", index)}
-                                                                    //  onChange={e => this.updateprops(e, "label", index)}
-                                                                    />
+                                                                    {(provided, snapshot) => (
+                                                                        <div
+                                                                            ref={provided.innerRef}
+                                                                            {...provided.draggableProps}
+                                                                            {...provided.dragHandleProps}
+                                                                            style={{
+                                                                                opacity: snapshot.isDragging ? 0.5 : 1,
+                                                                                ...provided.draggableProps.style
+                                                                            }}
+                                                                        >
+                                                                            <div
+                                                                                style={{
+                                                                                    opacity: snapshot.isDragging ? 0.5 : 1,
+                                                                                }}
+                                                                                className="twocol dropboxer"
+                                                                            >
+                                                                                <div className="choicedropper dropper">
+                                                                                    <div className="parentlabel clear clearfix"
+                                                                                        style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops.properties.options && this.state.defaultdrops.properties.options[index] && this.state.defaultdrops.properties.options[index].label === "" ? disabledive : {} : {}}
+                                                                                    >
+                                                                                        <span>{alphabet[index]}</span>
+                                                                                        <ReactQuill
+                                                                                            style={this.props.mappingProfileEnable == true ? disabledive : {}}
+                                                                                            className={`${this.state.fieldprops.properties.multilevel ? 'multichoicequill' : 'choicequill'} ${'quillEditor'}`}
+                                                                                            value={this.state.fieldprops.properties.options[index].label_text ? this.state.fieldprops.properties.options[index].label_text : this.state.fieldprops.properties.options[index].label ? this.state.fieldprops.properties.options[index].label : ""}
+                                                                                            inlineStyles="true"
+                                                                                            modules={this.modules_minimal}
+                                                                                            formats={this.formats}
+                                                                                            onChange={(html, delta, source) => {
+                                                                                                // const containsImage = html.includes('<img');
+                                                                                                // if (containsImage) {
+                                                                                                //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
+                                                                                                //     return
+                                                                                                // }
+                                                                                                if (source === 'user') {
+                                                                                                    this.label(html, "label", index)
+                                                                                                }
+                                                                                            }}
+                                                                                            onBlur={() => this.handleOnBlurData("CHOICELABLE", index)}
+                                                                                        //  onChange={e => this.updateprops(e, "label", index)}
+                                                                                        />
 
-                                                                    {this.state.fieldprops.properties.multilevel ?
-                                                                        <img onClick={() => this.showHide(index)} className="expandArrow" src={this.state.show[index] ? ExpandArrow : CollapseArrow} alt="expandArrow" />
-                                                                        : ""}
-                                                                    {/* <input
+                                                                                        {this.state.fieldprops.properties.multilevel ?
+                                                                                            <img onClick={() => this.showHide(index)} className="expandArrow" src={this.state.show[index] ? ExpandArrow : CollapseArrow} alt="expandArrow" />
+                                                                                            : ""}
+                                                                                        {/* <input
                                                                         type="text"
                                                                         name="name"
                                                                         className="mediumfm"
@@ -7162,53 +7216,51 @@ class Card extends React.Component {
                                                                         onChange={e => this.updateprops(e, "label", index)}
                                                                     /> */}
 
-                                                                    <div className="wrap-upload-delete"
-                                                                        style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
-                                                                    >
-                                                                        <div style={this.state.fieldprops.properties.display_type === "dropdown" ? disabledive : null}>
-                                                                            <StyledDropZone accept={"image/png, image/gif, image/jpeg, image/*"} children="upload" onDrop={this.onDrop.bind(this, "parenlabel_image", index, "")} />
-                                                                        </div>
-                                                                        <div className="addimgs"
-                                                                            style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
-
-                                                                        >
-                                                                            {(value.id !== 'other' && value.id !== 'noneofabove') ? <i className="fa fa-trash" onClick={() => this.deletefun(index, "parentlabel")} /> : ""}
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-
-                                                                {this.state.fieldprops.properties.multilevel === 1 ? (
-                                                                    <div className={`${'sublabel'} ${this.state.show[index] ? 'd-none' : 'd-block'}`}>
-
-                                                                        {this.state.fieldprops.properties.options && this.state.fieldprops.properties.options[index].sublabel &&
-                                                                            this.state.fieldprops.properties.options[index].sublabel instanceof Array
-                                                                            ? this.state.fieldprops.properties.options[index].sublabel.map(
-                                                                                function (value, key) {
-                                                                                    return (
-                                                                                        <div className="clear clearfix"
-                                                                                            key={key}
-                                                                                            style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops.properties.options && this.state.defaultdrops.properties.options[index] && this.state.defaultdrops.properties.options[index].sublabel && this.state.defaultdrops.properties.options[index].sublabel[key].sublabel === "" ? disabledive : {} : {}}
+                                                                                        <div className="wrap-upload-delete"
+                                                                                            style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                                                                                         >
-                                                                                            <ReactQuill
-                                                                                                className="quillEditor"
-                                                                                                value={this.state.fieldprops.properties.options[index].sublabel[key].sublabel_text ? this.state.fieldprops.properties.options[index].sublabel[key].sublabel_text : this.state.fieldprops.properties.options[index].sublabel[key].sublabel ? this.state.fieldprops.properties.options[index].sublabel[key].sublabel : ""}
-                                                                                                inlineStyles="true"
-                                                                                                modules={this.modules_minimal}
-                                                                                                formats={this.formats}
-                                                                                                onChange={(html, delta, source) => {
-                                                                                                    // const containsImage = html.includes('<img');
-                                                                                                    // if (containsImage) {
-                                                                                                    //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
-                                                                                                    //     return
-                                                                                                    // }
-                                                                                                    if (source === 'user') {
-                                                                                                        this.childlabel(html, "childlabel", index, key)
-                                                                                                    }
-                                                                                                }}
-                                                                                                onBlur={() => this.handleOnBlurData("CHOICESUBLABLE", index, key)}
-                                                                                            // onChange={e => this.updateprops(e, "childlabel", index,key)}
-                                                                                            />
-                                                                                            {/* <input
+                                                                                            <div style={this.state.fieldprops.properties.display_type === "dropdown" ? disabledive : null}>
+                                                                                                <StyledDropZone accept={"image/png, image/gif, image/jpeg, image/*"} children="upload" onDrop={this.onDrop.bind(this, "parenlabel_image", index, "")} />
+                                                                                            </div>
+                                                                                            <div className="addimgs"
+                                                                                                style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
+
+                                                                                            >
+                                                                                                {(value.id !== 'other' && value.id !== 'noneofabove') ? <i className="fa fa-trash" onClick={() => this.deletefun(index, "parentlabel")} /> : ""}
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    {this.state.fieldprops.properties.multilevel === 1 ? (
+                                                                                        <div className={`${'sublabel'} ${this.state.show[index] ? 'd-none' : 'd-block'}`}>
+                                                                                            {this.state.fieldprops.properties.options && this.state.fieldprops.properties.options[index].sublabel &&
+                                                                                                this.state.fieldprops.properties.options[index].sublabel instanceof Array
+                                                                                                ? this.state.fieldprops.properties.options[index].sublabel.map(
+                                                                                                    function (value, key) {
+                                                                                                        return (
+                                                                                                            <div className="clear clearfix"
+                                                                                                                key={key}
+                                                                                                                style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops.properties.options && this.state.defaultdrops.properties.options[index] && this.state.defaultdrops.properties.options[index].sublabel && this.state.defaultdrops.properties.options[index].sublabel[key].sublabel === "" ? disabledive : {} : {}}
+                                                                                                            >
+                                                                                                                <ReactQuill
+                                                                                                                    className="quillEditor"
+                                                                                                                    value={this.state.fieldprops.properties.options[index].sublabel[key].sublabel_text ? this.state.fieldprops.properties.options[index].sublabel[key].sublabel_text : this.state.fieldprops.properties.options[index].sublabel[key].sublabel ? this.state.fieldprops.properties.options[index].sublabel[key].sublabel : ""}
+                                                                                                                    inlineStyles="true"
+                                                                                                                    modules={this.modules_minimal}
+                                                                                                                    formats={this.formats}
+                                                                                                                    onChange={(html, delta, source) => {
+                                                                                                                        // const containsImage = html.includes('<img');
+                                                                                                                        // if (containsImage) {
+                                                                                                                        //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
+                                                                                                                        //     return
+                                                                                                                        // }
+                                                                                                                        if (source === 'user') {
+                                                                                                                            this.childlabel(html, "childlabel", index, key)
+                                                                                                                        }
+                                                                                                                    }}
+                                                                                                                    onBlur={() => this.handleOnBlurData("CHOICESUBLABLE", index, key)}
+                                                                                                                // onChange={e => this.updateprops(e, "childlabel", index,key)}
+                                                                                                                />
+                                                                                                                {/* <input
                                                                                                 type="text"
                                                                                                 name="name"
                                                                                                 className="mediumfm"
@@ -7217,39 +7269,56 @@ class Card extends React.Component {
                                                                                                 onChange={e => this.updateprops(e, "childlabel", index, key)}
                                                                                             /> */}
 
-                                                                                            <div className="wrap-upload-delete"
-                                                                                                style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
-                                                                                            >
-                                                                                                <div style={this.state.fieldprops.properties.display_type === "dropdown" ? disabledive : null}>
-                                                                                                    <StyledDropZone accept={"image/png, image/gif, image/jpeg, image/*"} children="upload" onDrop={this.onDrop.bind(this, "sublabel_image", index, key)} />
-                                                                                                </div>
-                                                                                                <div className="addimgs"
-                                                                                                    style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
+                                                                                                                <div className="wrap-upload-delete"
+                                                                                                                    style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
+                                                                                                                >
+                                                                                                                    <div style={this.state.fieldprops.properties.display_type === "dropdown" ? disabledive : null}>
+                                                                                                                        <StyledDropZone accept={"image/png, image/gif, image/jpeg, image/*"} children="upload" onDrop={this.onDrop.bind(this, "sublabel_image", index, key)} />
+                                                                                                                    </div>
+                                                                                                                    <div className="addimgs"
+                                                                                                                        style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
 
-                                                                                                >
-                                                                                                    {(value.id !== 'other' && value.id !== 'noneofabove') ? <i className="fa fa-trash" onClick={() => this.deletefun(index, "childlabel", key)} /> : ""}
+                                                                                                                    >
+                                                                                                                        {(value.id !== 'other' && value.id !== 'noneofabove') ? <i className="fa fa-trash" onClick={() => this.deletefun(index, "childlabel", key)} /> : ""}
+                                                                                                                    </div>
+                                                                                                                    {/* <img src={value.label_image} alt="label" width="50" /> */}
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        );
+                                                                                                    }.bind(this)
+                                                                                                )
+                                                                                                :
+                                                                                                ""}
+                                                                                            {value.id !== 'other' &&
+                                                                                                <div className="addmoreimage"
+                                                                                                    style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
+                                                                                                    onClick={() => this.addfun("suboptions", index)}>
+                                                                                                    {" "}
+                                                                                                    <i className="fa fa-plus" /> Add{" "}
                                                                                                 </div>
-                                                                                                {/* <img src={value.label_image} alt="label" width="50" /> */}
-                                                                                            </div>
+                                                                                            }
                                                                                         </div>
-                                                                                    );
-                                                                                }.bind(this)
-                                                                            )
-                                                                            :
-                                                                            ""}
-                                                                        {value.id !== 'other' &&
-                                                                            <div className="addmoreimage"
-                                                                                style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
-                                                                                onClick={() => this.addfun("suboptions", index)}>
-                                                                                {" "}
-                                                                                <i className="fa fa-plus" /> Add{" "}
+                                                                                    ) : (
+                                                                                        ""
+                                                                                    )}
+                                                                                </div>
                                                                             </div>
-                                                                        }
-                                                                    </div>
-                                                                ) : (
-                                                                    ""
-                                                                )}
-                                                            </div>
+                                                                        </div>
+                                                                    )}
+                                                                </Draggable>
+                                                            ))}
+                                                        {provided.placeholder}
+                                                    </ul>
+                                                )}
+                                            </Droppable>
+                                        </DragDropContext>
+
+
+                                        {this.state.fieldprops.properties.options
+                                            ? this.state.fieldprops.properties.options.map(
+                                                function (value, index) {
+                                                    return (
+                                                        <div className="twocol dropboxer" key={index}>
                                                         </div>
                                                     );
                                                 }.bind(this)
