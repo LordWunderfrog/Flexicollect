@@ -42,6 +42,7 @@ class Card extends React.Component {
     constructor(props) {
         super(props);
         this.contentEditable = React.createRef();
+        this.quillRef = React.createRef();
         this.state = {
             selecteddrops: [],
             option: [{ id: 1, value: "option 1" }],
@@ -93,6 +94,7 @@ class Card extends React.Component {
             repeatAttribute: [],
             allQuestionGroupArray: [],
             selectedGroupData: {},
+            pasteKeyPressed: false
         };
         this.handleFocus = this.handleFocus.bind(this);
         this.handleBlur = this.handleBlur.bind(this);
@@ -296,7 +298,17 @@ class Card extends React.Component {
         }, () => {
             this.manageMaxdiffSettingOption()
         });
-    }
+        // Add keydown event listener to Quill editor container
+        if (this.quillRef.current && this.quillRef.current.editor) {
+            this.quillRef.current.editor.container.addEventListener("paste", this.handleKeyDown);
+        }
+    };
+
+    componentWillUnmount() {
+        if (this.quillRef.current && this.quillRef.current.editor) {
+            this.quillRef.current.editor.container.removeEventListener("paste", this.handleKeyDown);
+        }
+    };
 
     /* Fetch question of client's */
     fetchClientesQuestion = (selectedProfile) => {
@@ -349,22 +361,26 @@ class Card extends React.Component {
 
     /* Handles the event to update the props. */
     handleBlur = (e) => {
-        if (e === "<p><br></p>" || e === "<p></p>") {
-            let fieldprops = this.state.fieldprops;
-            let fieldans = fieldprops.properties;
-            let message = fieldprops.type === "info" ? "Type Information" : fieldprops.type === "capture" ? "Type the message" : "Type a question";
-            let message_text = fieldprops.type === "info" ? "<p>Type Information</p>" : fieldprops.type === "capture" ? "<p>Type the message</p>" : "<p>Type a question</p>";
-            fieldans.question = message
-            fieldans.question_text = message_text
-            this.setState({ fieldprops: fieldprops });
-        }
-        else {
-            let fieldprops = this.state.fieldprops;
-            let fieldans = fieldprops.properties;
-            fieldans.question = fieldans.question.replace(/&nbsp;/gi, '').trim()
-            fieldans.question_text = fieldans.question_text.replace(/&nbsp;/gi, '').trim()
-            this.setState({ fieldprops: fieldprops });
-        }
+        setTimeout(() => {
+            if (!this.state.pasteKeyPressed) {
+                if (e === "<p><br></p>" || e === "<p></p>" || e === "") {
+                    let fieldprops = this.state.fieldprops;
+                    let fieldans = fieldprops.properties;
+                    let message = fieldprops.type === "info" ? "Type Information" : fieldprops.type === "capture" ? "Type the message" : "Type a question";
+                    let message_text = fieldprops.type === "info" ? "<p>Type Information</p>" : fieldprops.type === "capture" ? "<p>Type the message</p>" : "<p>Type a question</p>";
+                    fieldans.question = message
+                    fieldans.question_text = message_text
+                    this.setState({ fieldprops: fieldprops });
+                }
+                else {
+                    let fieldprops = this.state.fieldprops;
+                    let fieldans = fieldprops.properties;
+                    fieldans.question = fieldans.question.replace(/&nbsp;/gi, '').trim()
+                    fieldans.question_text = fieldans.question_text.replace(/&nbsp;/gi, '').trim()
+                    this.setState({ fieldprops: fieldprops });
+                }
+            }
+        }, 200)
     }
     handleOnBlurData = (e, index, subindex) => {
         let fieldprops = this.state.fieldprops;
@@ -1994,7 +2010,17 @@ class Card extends React.Component {
         this.setState({
             fieldprops
         });
+        if (this.state.pasteKeyPressed) {
+            setTimeout(() => {
+                this.setState({
+                    pasteKeyPressed: false
+                })
+            }, 200)
+        }
         // this.props.updateProperties(this.state.fieldprops)
+    }
+    handleKeyDown = (e) => {
+        this.setState({ pasteKeyPressed: true })
     }
     inputsubheading = (e, i, index, key) => {
         this.checkValue(e);
@@ -4618,6 +4644,7 @@ class Card extends React.Component {
                                 style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops && this.state.defaultdrops.properties.question === "" ? disabledive : {} : {}}
                             >
                                 <ReactQuill
+                                    ref={this.quillRef}
                                     className="quillEditor"
                                     name="inputquestion"
                                     value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""}
@@ -4984,6 +5011,7 @@ class Card extends React.Component {
 
                             >
                                 <ReactQuill
+                                    ref={this.quillRef}
                                     className="quillEditor"
                                     value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""}
                                     inlineStyles="true"
@@ -5318,6 +5346,7 @@ class Card extends React.Component {
                             <div className="below-lanbel-body"
                             >
                                 <ReactQuill
+                                    ref={this.quillRef}
                                     className="quillEditor"
                                     value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""}
                                     inlineStyles="true"
@@ -5695,6 +5724,7 @@ class Card extends React.Component {
                                 style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops === undefined || this.state.defaultdrops.properties.question === ("" || null || undefined) ? disabledive : {} : {}}
                             >
                                 <ReactQuill
+                                    ref={this.quillRef}
                                     className="quillEditor"
                                     value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""}
                                     inlineStyles="true"
@@ -6051,6 +6081,7 @@ class Card extends React.Component {
                             <div className="below-lanbel-body"
                             >
                                 <ReactQuill
+                                    ref={this.quillRef}
                                     className="quillEditor"
                                     value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""}
                                     inlineStyles="true"
@@ -6768,6 +6799,7 @@ class Card extends React.Component {
                                     style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops === undefined || this.state.defaultdrops.properties.question === ("" || null || undefined) ? disabledive : {} : {}}
                                 >
                                     <ReactQuill
+                                        ref={this.quillRef}
                                         className="quillEditor"
                                         value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""}
                                         inlineStyles="true"
@@ -7391,6 +7423,7 @@ class Card extends React.Component {
                                 style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops === undefined || this.state.defaultdrops.properties.question === ("" || null || undefined) ? disabledive : {} : {}}
                             >
                                 <ReactQuill
+                                    ref={this.quillRef}
                                     className="quillEditor"
                                     value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""}
                                     inlineStyles="true"
@@ -7670,6 +7703,7 @@ class Card extends React.Component {
                                 style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops === undefined || this.state.defaultdrops.properties.question === ("" || null || undefined) ? disabledive : {} : {}}
                             >
                                 <ReactQuill
+                                    ref={this.quillRef}
                                     className="quillEditor"
                                     value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""}
                                     inlineStyles="true"
