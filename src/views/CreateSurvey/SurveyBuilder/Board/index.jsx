@@ -2179,6 +2179,7 @@ class Board extends Component {
       }, () => {
         this.props.ondraglick(this.state.drops, true);
         this.props.updatelanguagedrop("reorder", destination.index, source.index);
+        this.checkDroppedQuesitonHideRange();
       })
     }
     else if ((source.droppableId === 'droppable') && (destination && destination.droppableId === 'droppable2')) {
@@ -2216,6 +2217,7 @@ class Board extends Component {
           this.state.dropAction = "reorder";
           this.checkrefcode();
           this.props.ondraglick(this.state.drops, true);
+          this.checkDroppedQuesitonHideRange();
           // this.props.autosave();
         })
       })
@@ -2237,6 +2239,51 @@ class Board extends Component {
 
     }
   };
+
+  /** Check Dropped indexes are available in hide range conditions or not */
+  checkDroppedQuesitonHideRange = () => {
+    const tempArray = this.state.drops;
+    const findHideRangeCondition = this.findHideRangeCondition();
+    for (let i = 0; i < findHideRangeCondition.length; i++) {
+      if (findHideRangeCondition[i].target.multifield && findHideRangeCondition[i].target.multifield.length > 0) {
+        const multiField = findHideRangeCondition[i].target.multifield;
+
+        const findFirstIndex = tempArray.findIndex(item => item.handler === multiField[0].value);
+        const findLastIndex = tempArray.findIndex(item => item.handler === multiField[multiField.length - 1].value);
+
+        const slice = tempArray.slice(findFirstIndex, findLastIndex + 1);
+        const tempArr = slice.map((item) => { return { value: item.handler, label: item.label } });
+
+        if (!this.arraysMatch(multiField, tempArr)) {
+          const condition = this.props.oldconditions;
+          const condition_index = condition.findIndex((item) => item.condtion_id == findHideRangeCondition[i].condtion_id)
+          condition[condition_index]['target']['multifield'] = tempArr;
+          this.autoSave();
+        }
+      }
+    }
+  };
+
+  arraysMatch = (arr1, arr2) => {
+    if (arr1.length !== arr2.length) {
+      return false;
+    }
+    return arr1.every((item, index) =>
+      item.value === arr2[index].value && item.label === arr2[index].label
+    );
+  };
+
+
+  findHideRangeCondition = () => {
+    let findHideRangeTemp = [];
+    this.props.oldconditions.map((condition) => {
+      if (condition.target.uniqueID !== "" && condition.target.uniqueID == "hide_range") {
+        findHideRangeTemp.push(condition)
+      }
+    })
+    return findHideRangeTemp;
+  };
+
   updateProperties = (e) => {
     this.setState({ drops: this.state.drops })
   }

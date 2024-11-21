@@ -511,8 +511,8 @@ class AgMissionResponse extends React.Component {
           selectedproj: e,
           paymentEnableDetails: e.value,
           paymentProjName: e.label,
-          listItems : [],
-          pagecount : 0
+          listItems: [],
+          pagecount: 0
         });
         localStorage.removeItem("defaultfilterState")
       })
@@ -4121,7 +4121,7 @@ class AgMissionResponse extends React.Component {
                             onFilterChanged={this.onFilterChangedGrid}
                             suppressPaginationPanel={true}
                             enableBrowserTooltips={true}
-                            gridOptions={{ suppressHorizontalScroll: false}}
+                            gridOptions={{ suppressHorizontalScroll: false }}
                           />
                         </div>
                         <div style={{ display: 'flex', float: 'right', }}>
@@ -4239,7 +4239,7 @@ class AgMissionResponse extends React.Component {
                         onFilterChanged={this.onFilterChangedGrid}
                         suppressPaginationPanel={true}
                         enableBrowserTooltips={true}
-                        gridOptions={{ suppressHorizontalScroll: false}}
+                        gridOptions={{ suppressHorizontalScroll: false }}
                       />
                     </div>
                     <div style={{ display: 'flex', float: 'right', }}>
