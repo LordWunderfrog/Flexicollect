@@ -59,6 +59,7 @@ class Card extends React.Component {
             questionGroup: [],
             fieldprops: {
                 label: "",
+                group_number: false,
                 properties: {
                     question: "",
                     subheading: "",
@@ -71,7 +72,7 @@ class Card extends React.Component {
                     currentQuestionSubGroup2: { value: "", label: "" },
                     currentQuestionSubGroup3: { value: "", label: "" },
                     currentProductNumber: { value: "", label: "" },
-                    selectedChoiceGroup: { value: "", label: "", group_id: null }
+                    selectedChoiceGroup: { value: "", label: "", group_id: null },
                 }
             },
             updatedInfoVal: "",
@@ -94,7 +95,19 @@ class Card extends React.Component {
             repeatAttribute: [],
             allQuestionGroupArray: [],
             selectedGroupData: {},
-            pasteKeyPressed: false
+            randomizedOptions: [
+                { value: 1, label: 'Group 1' },
+                { value: 2, label: 'Group 2' },
+                { value: 3, label: 'Group 3' },
+                { value: 4, label: 'Group 4' },
+                { value: 5, label: 'Group 5' },
+                { value: 6, label: 'Group 6' },
+                { value: 7, label: 'Group 7' },
+                { value: 8, label: 'Group 8' },
+                { value: 9, label: 'Group 9' },
+                { value: 10, label: 'Group 10' },
+            ],
+            pasteKeyPressed: false,
         };
         this.handleFocus = this.handleFocus.bind(this);
         this.handleBlur = this.handleBlur.bind(this);
@@ -1874,6 +1887,36 @@ class Card extends React.Component {
         });
         // this.props.updateProperties(this.state.fieldprops)this.props.updateProperties(this.state.fieldprops)
     }
+
+    /** Randomise some set of question based on group selected. 
+     *  for example - if selected group 1 in four choice question then 
+     *  that question will ask in random order 
+     */
+    RandomizeGroupName = (e) => {
+        let fieldprops = this.state.fieldprops;
+        fieldprops.group_number = e.value
+        let selectedlanguage = this.props.selectedlanguage
+        let languages_drop = this.props.languages_drop;
+        selectedlanguage.forEach((a, b) => {
+            if (a.label !== 'English') {
+                languages_drop[a.label].content[this.props.index].group_number = evalue;
+            }
+        })
+        this.setState({
+            fieldprops
+        },
+            () => {
+                this.props.autosave()
+            });
+    };
+
+    getSelectedRandomizeGroupName = (value) => {
+        if (value) {
+            return this.state.randomizedOptions.find((item) => item.value == value)
+        }
+        else return null
+    };
+
     onBlurName = (e, i, index, key) => {
         this.checkValue(e);
         /** code for change the question in condition of Hide/show if lable is change */
@@ -6952,6 +6995,18 @@ class Card extends React.Component {
                                         </div>
                                     </div>
                                 </div>
+                            </li>
+
+                            <li>
+                                <h3>Randomize Question Group Number</h3>
+                                <Select
+                                    placeholder={'select Randomize Group Number'}
+                                    value={this.getSelectedRandomizeGroupName(this.state.fieldprops.group_number)}
+                                    options={this.state.randomizedOptions}
+                                    onChange={(e) => this.RandomizeGroupName(e)}
+                                    name="language"
+                                    className="language_list"
+                                />
                             </li>
 
                             <li
