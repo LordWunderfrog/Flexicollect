@@ -42,6 +42,7 @@ i18n
           SurveySubmitted: "Vraelys suksesvol ingedien",
           Cancel: "kanselleer",
           Ok: "OK",
+          VideoLengthError : "Video duration should not be more then 3 minute"
         }
       },
       Arabic: {
@@ -78,6 +79,7 @@ i18n
           SurveySubmitted: "تم إرسال الاستبيان بنجاح",
           Cancel: "إلغاء",
           Ok: "موافق",
+          VideoLengthError : "Video duration should not be more then 3 minute"
         }
       },
       Chinese: {
@@ -114,6 +116,7 @@ i18n
           SurveySubmitted: "调查问卷提交成功",
           Cancel: "取消",
           Ok: "确定",
+          VideoLengthError : "Video duration should not be more then 3 minute"
         }
       },
       Dutch: {
@@ -150,6 +153,7 @@ i18n
           SurveySubmitted: "Vragenlijst succesvol verzonden",
           Cancel: "Annuleren",
           Ok: "OK",
+          VideoLengthError : "Video duration should not be more then 3 minute"
         }
       },
       English: {
@@ -186,6 +190,7 @@ i18n
           SurveySubmitted: "Survey Submitted Successfully",
           Cancel: "Cancel",
           Ok: "OK",
+          VideoLengthError : "Video duration should not be more then 3 minute"
         }
       },
       French: {
@@ -222,6 +227,7 @@ i18n
           SurveySubmitted: "L'enquête a été soumise avec succès",
           Cancel: "Annuler",
           Ok: "OK",
+          VideoLengthError : "Video duration should not be more then 3 minute"
         }
       },
       German: {
@@ -258,6 +264,7 @@ i18n
           SurveySubmitted: "Umfrage erfolgreich abgeschickt",
           Cancel: "Abbrechen",
           Ok: "OK",
+          VideoLengthError : "Video duration should not be more then 3 minute"
         }
       },
       Greek: {
@@ -294,6 +301,7 @@ i18n
           SurveySubmitted: "Survey Submitted Successfully",
           Cancel: "Άκυρο",
           Ok: "ΟΚ",
+          VideoLengthError : "Video duration should not be more then 3 minute"
         }
       },
       Hindi: {
@@ -330,6 +338,7 @@ i18n
           SurveySubmitted: "प्रश्नावली सफलतापूर्वक प्रस्तुत की गई",
           Cancel: "रद्द करें",
           Ok: "ठीक है",
+          VideoLengthError : "Video duration should not be more then 3 minute"
         }
       },
       Indonesian: {
@@ -366,6 +375,7 @@ i18n
           SurveySubmitted: "Survei Berhasil Dikirim",
           Cancel: "Batal",
           Ok: "OK",
+          VideoLengthError : "Video duration should not be more then 3 minute"
         }
       },
       Italian: {
@@ -402,6 +412,7 @@ i18n
           SurveySubmitted: "Questionario inviato con successo",
           Cancel: "Annulla",
           Ok: "OK",
+          VideoLengthError : "Video duration should not be more then 3 minute"
         }
       },
       Japanese: {
@@ -438,6 +449,7 @@ i18n
           SurveySubmitted: "アンケートは正常に送信されました",
           Cancel: "キャンセル",
           Ok: "わかった",
+          VideoLengthError : "Video duration should not be more then 3 minute"
         }
       },
       Malay: {
@@ -474,6 +486,7 @@ i18n
           SurveySubmitted: "Soal selidik berjaya dihantar",
           Cancel: "Batal",
           Ok: "Baik",
+          VideoLengthError : "Video duration should not be more then 3 minute"
         }
       },
       Polish: {
@@ -510,6 +523,7 @@ i18n
           SurveySubmitted: "Kwestionariusz przesłany pomyślnie",
           Cancel: "Anuluj",
           Ok: "Dobra",
+          VideoLengthError : "Video duration should not be more then 3 minute"
         }
       },
       Portuguese: {
@@ -546,6 +560,7 @@ i18n
           SurveySubmitted: "Questionário enviado com sucesso",
           Cancel: "Cancelar",
           Ok: "OK",
+          VideoLengthError : "Video duration should not be more then 3 minute"
         }
       },
       Russian: {
@@ -582,6 +597,7 @@ i18n
           SurveySubmitted: "Анкета успешно отправлена",
           Cancel: "Отмена",
           Ok: "хорошо",
+          VideoLengthError : "Video duration should not be more then 3 minute"
         }
       },
       Spanish: {
@@ -618,6 +634,7 @@ i18n
           SurveySubmitted: "Cuestionario enviado exitosamente",
           Cancel: "Cancelar",
           Ok: "Bueno",
+          VideoLengthError : "Video duration should not be more then 3 minute"
         }
       },
       Tagalog: {
@@ -654,6 +671,7 @@ i18n
           SurveySubmitted: "Matagumpay na naisumite ang survey",
           Cancel: "Kanselahin",
           Ok: "Sige",
+          VideoLengthError : "Video duration should not be more then 3 minute"
         }
       },
       Thai: {
@@ -690,6 +708,7 @@ i18n
           SurveySubmitted: "ส่งแบบสำรวจเรียบร้อยแล้ว",
           Cancel: "ยกเลิก",
           Ok: "ตกลง",
+          VideoLengthError : "Video duration should not be more then 3 minute"
         }
       },
       Vietnamese: {
@@ -726,6 +745,7 @@ i18n
           SurveySubmitted: "Đã gửi khảo sát thành công",
           Cancel: "Hủy bỏ",
           Ok: "Đồng ý",
+          VideoLengthError : "Video duration should not be more then 3 minute"
         }
       },
       Urdu: {
@@ -762,6 +782,7 @@ i18n
           SurveySubmitted: "سروے کامیابی کے ساتھ جمع کرایا گیا۔",
           Cancel: "منسوخ کریں",
           Ok: "تصدیق کریں",
+          VideoLengthError : "Video duration should not be more then 3 minute"
         }
       },
     },

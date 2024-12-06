@@ -1452,7 +1452,7 @@ class WebLink extends React.Component {
     }
 
     newQuestion = temp_questionsArr;
-
+    newQuestion = this.setHideShowQuestions(newQuestion, target)
     this.setState(
       {
         questions: newQuestion,
@@ -1464,6 +1464,146 @@ class WebLink extends React.Component {
     );
 
   }
+  /** Set hide/show question as per already hide/showed passed from admin BY KR*/
+  setHideShowQuestions(queArr, target, unMetTarget) {
+    const finalarr = queArr.length > 0 && queArr.map((que, index) => {
+      const keyname = que.question.type == 'capture' ? 'img_stats' : `${que.question.type}_stats`;
+      if (!unMetTarget || unMetTarget.length == 0) {
+        const existInTarget = this.findQuestionexistInTarget(que.question.handler, target);
+        if (que.question.properties && que.question.properties[keyname] && que.question.properties[keyname] == 'hide') {
+          let queobj = que;
+          if (existInTarget) {
+            if (que.isHide) {
+              queobj = {
+                ...que,
+                isHide: que.isHide
+              }
+            } else {
+              queobj = que
+            }
+          } else {
+            queobj = {
+              ...que,
+              isHide: true
+            }
+          }
+          return queobj
+        }
+        else if (que.question.properties && que.question.properties[keyname] && que.question.properties[keyname] == 'show') {
+          let queobjShow = que;
+          if (existInTarget) {
+            if (que.isHide) {
+              queobjShow = {
+                ...que,
+                isHide: que.isHide
+              }
+            } else {
+              queobjShow = que
+            }
+          } else {
+            queobjShow = {
+              ...que,
+              isHide: false
+            }
+          }
+          return queobjShow
+        } else {
+          return que
+        }
+      }
+      else if (unMetTarget && unMetTarget.length > 0) {
+        const unMettargetfind = unMetTarget.length > 0 && unMetTarget.find((tar) => tar.handler == que.question.handler);
+        if (unMettargetfind && unMettargetfind) {
+          const keyname = que.question.type == 'capture' ? 'img_stats' : `${que.question.type}_stats`;
+          const existInTarget = this.findQuestionexistInTarget(unMettargetfind.handler, target);
+          if (que.question.properties[keyname] && que.question.properties[keyname] == 'hide') {
+            return {
+              ...que,
+              isHide: existInTarget ? que.isHide : true
+            }
+          }
+          else if (que.question.properties[keyname] && que.question.properties[keyname] == 'show') {
+            return {
+              ...que,
+              isHide: existInTarget ? que.isHide : false
+            }
+          } else {
+            return que
+          }
+        } else {
+          return que
+        }
+      }
+      else return que
+    })
+    this.setState({
+      questions: finalarr
+    })
+    return finalarr
+  };
+
+  /** Set hide Multiple question if un match the condition of show_multiple BY KR */
+  setHideShowMultipleUnmetTarget(queArr, unmetTarget, target) {
+    const unMettargetfind = unmetTarget.length > 0 && unmetTarget.find((tar) => tar.hasOwnProperty("multifield"));
+    const finalarr = queArr.length > 0 && queArr.map((que, index) => {
+      const keyname = que.question.type == 'capture' ? 'img_stats' : `${que.question.type}_stats`;
+      if (unMettargetfind && unMettargetfind) {
+        const matchedField = unMettargetfind.multifield.find((item) => item.value == que.question.handler);
+        const existInTarget = matchedField && this.findQuestionexistInTarget(matchedField.value, target);
+        if (matchedField && que.question.properties[keyname] && que.question.properties[keyname] == 'hide') {
+          return {
+            ...que,
+            isHide: existInTarget ? que.isHide : true
+          }
+        }
+        else if (matchedField && que.question.properties[keyname] && que.question.properties[keyname] == 'show') {
+          return {
+            ...que,
+            isHide: existInTarget ? que.isHide : true
+          }
+        }
+        else {
+          return que;
+        }
+      }
+      else {
+        return que;
+      }
+
+    });
+    this.setState({
+      questions: finalarr
+    })
+    return finalarr;
+  };
+
+  /** Find Question handler in target array */
+  findQuestionexistInTarget(queHandler, target) {
+    let exist = false;
+    for (let i = 0; i < target.length; i++) {
+      if ((target[i].do == 'show_multiple' || target[i].do == 'hide_multiple')
+        && target[i].multifield && target[i].multifield.length > 0) {
+        for (let j = 0; j < target[i].multifield.length; j++) {
+          if (target[i].multifield[j].value == queHandler) {
+            exist = true
+          }
+          else {
+            exist = exist ? true : false
+          }
+        }
+      }
+      else if (target[i].do == 'show' || target[i].do == 'hide') {
+        if (target[i].handler == queHandler) {
+          exist = true
+        }
+        else {
+          exist = exist ? true : false
+        }
+      }
+    }
+    return exist;
+  };
+
   /* Handles the api to post the formatted data. */
   postID(type, question_id, survey_answer_tag_id, answers, value, survey_id) {
     let answer = {};
@@ -1711,15 +1851,18 @@ class WebLink extends React.Component {
   /* Used to remove the hidden questions from the question array. */
   removeHiddenQuestion(questionsArray) {
     let questions = []
-
+    const nextConditionIndex = questionsArray.findIndex((item) => item.question.conditions.length > 0)
     for (let i = 0; i < questionsArray.length; i++) {
-      if (
+
+      if (nextConditionIndex >= 0 && i >= nextConditionIndex) {
+        questions.push(questionsArray[i])
+      }
+      else if (
         !questionsArray[i].isHide || questionsArray[i].isHide === false
       ) {
         questions.push(questionsArray[i])
       }
     }
-
     return questions
   }
 
@@ -1784,7 +1927,6 @@ class WebLink extends React.Component {
     let nextExists = false;
     let questionsArray = this.state.questions;
     let arrLength = questionsArray.length;
-
     for (let i = currentPage; i < questionsArray.length; i++) {
       if (i > currentPage && (!questionsArray[i].isHide || questionsArray[i].isHide === false)) {
         nextPage = i;
@@ -2021,12 +2163,6 @@ class WebLink extends React.Component {
         }
       }
       else if (question.type === 'scale') {
-        // console.dir("question " + JSON.stringify(question, null, 4))
-        // console.log("question " + question.properties.table_content.value_length)
-        // console.log("answer " + answer)
-        // console.log("answer.selected_option " + JSON.stringify(answer.selected_option))
-        // console.log("answer.selected_option.length " + answer.selected_option.length)
-        // console.log("answer.label " + answer.label)
         // if (answer && ((answer.selected_option && answer.selected_option.length >= question.properties.table_content.value_length) || (answer.label && answer.label !== ""))) {
         let scaleType = question.properties.scale_type
         if (scaleType == "table" && (answer && (answer.selected_option && answer.selected_option.length < question.properties.table_content.table_value.length))) {
@@ -2460,6 +2596,17 @@ class WebLink extends React.Component {
             }
           }
           questionsArray = this.state.questions
+        }
+      }
+      this.setHideShowQuestions(questionsArray, target, unMetTarget)
+      const unMettargetfindShowMultifield =
+        unMetTarget.length > 0
+        && unMetTarget.filter((tar) => tar.hasOwnProperty('multifield')
+          && (tar.do == 'show_multiple' || tar.do == 'hide_multiple')
+          && tar.multifield.length > 0);
+      if (unMettargetfindShowMultifield && unMettargetfindShowMultifield.length > 0) {
+        for (let i = 0; i < unMettargetfindShowMultifield.length; i++) {
+          questionsArray = this.setHideShowMultipleUnmetTarget(questionsArray, [unMettargetfindShowMultifield[i]], target);
         }
       }
     }
@@ -3971,10 +4118,22 @@ class WebLink extends React.Component {
     // }
     if (!validImageTypes.includes(fileType)) {
       this.getBase64(file).then(data => {
-        Upload["media"] = data;
-        this.setState({
-          Upload: Upload
-        })
+        const videoURL = URL.createObjectURL(file);
+        const video = document.createElement("video");
+        video.src = videoURL;
+        video.preload = "metadata";
+        video.onloadedmetadata = async () => {
+          const duration = video.duration;
+          if (duration && duration > 180) {
+            this.showNotification(this.props.t("VideoLengthError"), "danger");
+          }
+          else {
+            Upload["media"] = data;
+            this.setState({
+              Upload: Upload
+            })
+          }
+        }
       })
     }
     else {
