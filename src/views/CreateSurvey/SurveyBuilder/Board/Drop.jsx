@@ -376,7 +376,7 @@ class Card extends React.Component {
     handleBlur = (e) => {
         setTimeout(() => {
             if (!this.state.pasteKeyPressed) {
-                if (e === "<p><br></p>" || e === "<p></p>" || e === "") {
+                if (e === "<p><br></p>" || e === "<p></p>") {
                     let fieldprops = this.state.fieldprops;
                     let fieldans = fieldprops.properties;
                     let message = fieldprops.type === "info" ? "Type Information" : fieldprops.type === "capture" ? "Type the message" : "Type a question";
@@ -1899,7 +1899,7 @@ class Card extends React.Component {
         let languages_drop = this.props.languages_drop;
         selectedlanguage.forEach((a, b) => {
             if (a.label !== 'English') {
-                languages_drop[a.label].content[this.props.index].group_number = evalue;
+                languages_drop[a.label].content[this.props.index].group_number = e.value;
             }
         })
         this.setState({
@@ -6997,7 +6997,7 @@ class Card extends React.Component {
                                 </div>
                             </li>
 
-                            <li>
+                            <li style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
                                 <h3>Randomize Question Group Number</h3>
                                 <Select
                                     placeholder={'select Randomize Group Number'}
