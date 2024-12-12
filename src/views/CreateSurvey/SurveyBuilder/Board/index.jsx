@@ -1773,6 +1773,7 @@ class Board extends Component {
       question: String(this.state.drops[index].properties.question).trim()
     }
     newDrop['question'] = String(this.state.drops[index].properties.question).trim()
+    if (this.state.drops[index].group_number) { newDrop['group_number'] = Number(this.state.drops[index].group_number) }
     newDrop.question_id = Number([...this.state.drops].sort((a, b) => Number(b.question_id) - Number(a.question_id))[0].question_id) + 1
 
     let dropindex = newDropsArray.findIndex((element) => element.question_id === question_id);
