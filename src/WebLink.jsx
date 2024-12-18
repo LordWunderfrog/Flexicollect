@@ -130,7 +130,7 @@ class WebLink extends React.Component {
     super(props);
     this.state = {
       questions: [],
-
+      hidden_question : [],
       selectedAnswer: {},
 
       index: 0,
@@ -1866,11 +1866,34 @@ class WebLink extends React.Component {
     return questions
   }
 
+  /** store no return hidden questions to localstorage with "isFromHiddenStorage" key true to identify*/
+  setHiddenQuestionsToAsync(hiddenQuestionArr){
+        const data =  hiddenQuestionArr.length > 0 &&  hiddenQuestionArr.map((item)=>{
+          return {
+            ...item,
+            isFromHiddenStorage : true
+          }
+        }) || [];
+        localStorage.setItem(`HIDDEN_${this.state.cust_id}` , JSON.stringify(data))
+        this.setState({
+          hidden_question : data ? data : []
+        });
+    };
+    
+  getHiddenQuestionsFromAsync(){
+        const data = localStorage.getItem(`HIDDEN_${this.state.cust_id}`);
+        this.setState({
+          hidden_question : data && JSON.parse(data) ?  JSON.parse(data) : []
+        })
+        return data && JSON.parse(data) ?  JSON.parse(data) : [];
+  };
+
   /* Validate the current question property.
   * If the property noreturn is true user not able to move to previous questions . */
   validateNoReturn = () => {
     let question = this.state.questions[this.state.index];
-
+    const getHiddenQuestion = this.getHiddenQuestionsFromAsync();
+    let setHiddenQuestion = [];
     let hiddenQuestions = this.getHiddenQuestions();
     let post_object = {
       hideList: hiddenQuestions
@@ -1886,6 +1909,23 @@ class WebLink extends React.Component {
       if (resp.data.status === 200) {
         let newQuestion = this.state.questions.slice(this.state.index + 1);
         let filteredQuestions = this.removeHiddenQuestion(newQuestion);
+        for (let i = 0; i < this.state.questions.length; i++) {
+          const find = filteredQuestions.find((item) => item.question.handler === this.state.questions[i].question.handler);
+          if (find) {
+            const findArray = this.state.questions.filter((item) => item.question.handler == find.question.handler)
+            if (findArray.length > 1) {
+              const checkLoopNumber = findArray.find((item) => !item.hasOwnProperty('loop_number'));
+              if (checkLoopNumber) {
+                setHiddenQuestion.push(this.state.questions[i]);
+              }
+            }
+          }
+          if (!find) {
+            setHiddenQuestion.push(this.state.questions[i]);
+          }
+        }
+      const arrCombine = [...getHiddenQuestion, ...setHiddenQuestion]
+      this.setHiddenQuestionsToAsync(arrCombine)
         this.setState({
           updatedText: "",
           updatedChoiceOptions: [],
@@ -2267,7 +2307,7 @@ class WebLink extends React.Component {
       if (this.state.selectedQuestion.type !== 'gps' && this.state.selectedQuestion.properties.refcode) {
         newData.answer.refcode = this.state.selectedQuestion.properties.refcode
       }
-
+      this.setHiddenQuestionsToAsync([]);
       axios.post(url, newData, {
         headers: {
           'Content-Type': 'application/json',
@@ -3098,9 +3138,10 @@ class WebLink extends React.Component {
       ) {
         loop_set_num = questionsArray[parentIndex].loop_set_num + 1;
       }
-
+      // array with hidden and current all questions.
+      const tempArr = [...this.state.hidden_question , ...questionsArray]; 
       newconditions.forEach((m, cindex) => {
-        questionsArr.forEach((q, index) => {
+        tempArr.forEach((q, index) => {
           let check = false;
           if (!check && m.value === q.question.handler) {
             if (q.hasOwnProperty('loop_number')) { check = true; }
@@ -3139,9 +3180,9 @@ class WebLink extends React.Component {
                 newquesarr.conditions = this.setloopquesconditions(q.question.conditions, questionID, loop_set_num, loop_number, false, false)
               }
 
-              if (questionsArr[index].loop_answers && questionsArr[index].loop_answers.length > 0) {
+              if (tempArr[index].loop_answers && tempArr[index].loop_answers.length > 0) {
 
-                questionsArr[index].loop_answers.forEach((a, aindex) => {
+                tempArr[index].loop_answers.forEach((a, aindex) => {
                   if (label === 'loop_input') {
                     if (questionID === a.loop_triggered_qid && a.loop_set === loop_set_num && loop_number === a.loop_number) {
                       newquesarr.answers = a.answers;
