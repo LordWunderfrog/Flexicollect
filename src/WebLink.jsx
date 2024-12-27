@@ -3205,7 +3205,8 @@ class WebLink extends React.Component {
         })
       })
       if (arry.length > 0) {
-        newquestionsArray.splice(spliceparentIndex + 1, 0, ...arry)
+        const newArray = this.shuffleArray(arry)
+        newquestionsArray.splice(spliceparentIndex + 1, 0, ...newArray)
         if (this.state.selectedQuestion.length > 0) {
           this.setSelectedChoiceOptions()
         }
@@ -3214,6 +3215,34 @@ class WebLink extends React.Component {
     }
   }
 
+  /** Shuffle the array of loop question before adding to main question array if qroup number exist */
+  shuffleArray = (loopQuestions) => {
+    const maxBatch = Math.max(...loopQuestions.map(item => item.question.group_number ? Number(item.question.group_number) : 0))
+    let start = 0;
+    let _array = [];
+    if (maxBatch > 0) {
+      for (let i = 0; i <= maxBatch; i++) {
+        _array = loopQuestions.filter((item) => item.question.group_number == i);
+         if (_array.length > 0) {
+          start = loopQuestions.findIndex((item) => item.question.handler == _array[0].question.handler)
+          let currentIndex = _array.length;
+          // While there remain elements to shuffle...
+          while (currentIndex != 0) {
+            // Pick a remaining element...
+            let randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            // And swap it with the current element.
+            [_array[currentIndex], _array[randomIndex]] = [
+              _array[randomIndex], _array[currentIndex]];
+          }
+        }
+      }
+    }
+    _array.map((item, index) => {
+      loopQuestions.splice(start + index, 1, item);
+    })
+    return loopQuestions;
+  };  
 
   /**
    * Copy the condition to created loop question.
