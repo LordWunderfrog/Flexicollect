@@ -238,6 +238,7 @@ class AgMissionResponse extends React.Component {
 
       /* Ag grid values. */
       columnDefs: [],
+      columnDefs_backup: [],
       quickFilterText: '',
       column_order: {},
 
@@ -1589,7 +1590,7 @@ class AgMissionResponse extends React.Component {
         this.state.updatedAnswer.is_deleted = false;
         this.setState({ loading: true, openPopup: false });
       }
-      else if(background_update === 'delete') {
+      else if (background_update === 'delete') {
         this.state.updatedAnswer.image = dataURL;
         this.state.updatedAnswer.is_deleted = true;
         this.setState({ loading: true, openPopup: false });
@@ -1617,7 +1618,7 @@ class AgMissionResponse extends React.Component {
         this.state.updatedAnswer.is_deleted = false;
         this.setState({ loading: true, openPopup: false });
       }
-      else if(background_update === 'delete') {
+      else if (background_update === 'delete') {
         this.state.updatedAnswer.media = dataURL.split(',')[1];
         this.state.updatedAnswer.media_type = "image";
         this.state.updatedAnswer.media_format = "png";
@@ -1639,7 +1640,7 @@ class AgMissionResponse extends React.Component {
         this.updateImageAnswerData(this.Editor.current.getImageData(), this.Editor.current.getdataURL(), background_update);
         let newData = {
           consumer_id: this.state.imageData.customer_id,
-          answer:this.state.updatedAnswer,
+          answer: this.state.updatedAnswer,
           mission_id: this.state.missionId,
           survey_id: this.state.survey_id,
           question_id: this.state.imageData.question_id,
@@ -1667,7 +1668,7 @@ class AgMissionResponse extends React.Component {
             }
           })
           .catch(error => {
-            console.log("ERROR : : -- >> " , error)
+            console.log("ERROR : : -- >> ", error)
             if (!background_update) {
               this.setState({ openModal: false, openPopup: false });
             }
@@ -1786,46 +1787,46 @@ class AgMissionResponse extends React.Component {
     let background_update = ''
     if (handleChange !== undefined && handleChange !== null) { background_update = handleChange }
     if (this.Editor.current.getdataURL() && this.Editor.current.getdataURL().length > 0) {
-        this.updateImageAnswerData(this.Editor.current.getImageData(), this.Editor.current.getdataURL(), background_update);
-        let newData = {
-          consumer_id: this.state.imageData.customer_id,
-          answer:this.state.updatedAnswer,
-          mission_id: this.state.missionId,
-          survey_id: this.state.survey_id,
-          question_id: this.state.imageData.question_id,
-          survey_answer_tag_id: this.state.imageData.survey_tag_id,
-          question_type: this.state.imageData.type
-        };
-        if (this.state.imageData.loop_number) {
-          newData.loop_number = this.state.imageData.loop_number
-          newData.loop_set = this.state.imageData.loop_set
-          newData.loop_triggered_qid = this.state.imageData.loop_triggered_qid
-        }
-        api2
-          .delete("/web_survey_answers", {data : newData})
-          .then(resp => {
-              this.onEditAnswerRefresh(this.state.selectedlanguage.value)
-              this.setState({
-                openModal: false,
-                openPopup: false,
-                selectedAnswer: {},
-                answer_id: "",
-                selectedQuestion: {},
-                updatedAnswer: {}
-              });
-          })
-          .catch(error => {
-            if (!background_update) {
-              this.setState({ openModal: false, openPopup: false });
-            }
-            console.error(error);
-            this.setState({
-              selectedAnswer: {},
-              answer_id: "",
-              selectedQuestion: {},
-              updatedAnswer: {}
-            });
+      this.updateImageAnswerData(this.Editor.current.getImageData(), this.Editor.current.getdataURL(), background_update);
+      let newData = {
+        consumer_id: this.state.imageData.customer_id,
+        answer: this.state.updatedAnswer,
+        mission_id: this.state.missionId,
+        survey_id: this.state.survey_id,
+        question_id: this.state.imageData.question_id,
+        survey_answer_tag_id: this.state.imageData.survey_tag_id,
+        question_type: this.state.imageData.type
+      };
+      if (this.state.imageData.loop_number) {
+        newData.loop_number = this.state.imageData.loop_number
+        newData.loop_set = this.state.imageData.loop_set
+        newData.loop_triggered_qid = this.state.imageData.loop_triggered_qid
+      }
+      api2
+        .delete("/web_survey_answers", { data: newData })
+        .then(resp => {
+          this.onEditAnswerRefresh(this.state.selectedlanguage.value)
+          this.setState({
+            openModal: false,
+            openPopup: false,
+            selectedAnswer: {},
+            answer_id: "",
+            selectedQuestion: {},
+            updatedAnswer: {}
           });
+        })
+        .catch(error => {
+          if (!background_update) {
+            this.setState({ openModal: false, openPopup: false });
+          }
+          console.error(error);
+          this.setState({
+            selectedAnswer: {},
+            answer_id: "",
+            selectedQuestion: {},
+            updatedAnswer: {}
+          });
+        });
     };
   };
 
@@ -2650,8 +2651,17 @@ class AgMissionResponse extends React.Component {
     else {
       updatedColumnDefs = columnDefs;
     }
+
+    const _columnDefs = updatedColumnDefs.map((item) => {
+      return {
+        ...item,
+        filter: false
+      }
+    });
+
     await this.setState({
-      columnDefs: updatedColumnDefs,
+      columnDefs_backup: updatedColumnDefs,
+      columnDefs: this.state.totalrecords < this.state.rowsPerPage ? updatedColumnDefs : _columnDefs,
       tableFields: tableFields
     });
     let sepMission = [];
@@ -2845,6 +2855,7 @@ class AgMissionResponse extends React.Component {
       this.getMissionResponsepage(this.state.selectedlanguage.value, page)
     } else {
       this.setState({
+        columnDefs: this.state.columnDefs_backup,
         listItems: loadedlistItems,
         datapagecount: loadedlistItems.length
       }, () => { this.api.resetRowHeights() })
@@ -2878,8 +2889,8 @@ class AgMissionResponse extends React.Component {
           }
         }
         else if (ans != {} && ans.type && ans.type === 'upload' && ans.answers && ans.answers.media_type && ans.answers.media_type === 'image' && ans.answers.media) {
-          if(ans.answers && ans.answers.is_deleted && ans.answers.is_deleted){ // if image is deleted ( is_deleted == true )
-            arr[c.field] = ["" , ""]
+          if (ans.answers && ans.answers.is_deleted && ans.answers.is_deleted) { // if image is deleted ( is_deleted == true )
+            arr[c.field] = ["", ""]
           }
           else if (c.field.includes('-U_oimage')) {
             arr[c.field] = [0, ans.answers.image_orig ? (ans.answers.image_orig + '?thumbnail=yes') : (ans.answers.media + '?thumbnail=yes'), ans.answers.image_orig ? ans.answers.image_orig : ans.answers.media]
@@ -4441,7 +4452,7 @@ class AgMissionResponse extends React.Component {
               <PhotoEditor
                 ref={this.Editor}
                 FilterRowData={this.state.FilterRowData}
-                handleDeleteImage={()=>this.handleDeleteImage("delete")}
+                handleDeleteImage={() => this.handleDeleteImage("delete")}
                 selectedAnswer={this.state.imageEdit}
                 questions={this.state.questions}
                 colDef={this.state.columnDefs}
