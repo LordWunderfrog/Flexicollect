@@ -43,6 +43,9 @@ class Card extends React.Component {
         super(props);
         this.contentEditable = React.createRef();
         this.quillRef = React.createRef();
+        this.nameRef = React.createRef();
+        this.subNameRef = React.createRef();
+        this.infoContRef = React.createRef();
         this.state = {
             selecteddrops: [],
             option: [{ id: 1, value: "option 1" }],
@@ -4641,6 +4644,24 @@ class Card extends React.Component {
         })
     }
 
+    keyPressCapture = (e , type , isInfo , isGps) => {
+        const isTabbingInEditor = e.key === 'Tab'
+        if (isTabbingInEditor) {
+            e.preventDefault();
+            e.target.blur();
+            if(type==1){
+                this.nameRef.current.focus();
+            }
+            if(!isGps && type==2){
+                this.subNameRef.current.editor.focus();
+            }
+            if(type == 3 && isInfo){
+                this.infoContRef.current.editor.focus();
+            }
+            return false;
+        }
+    };
+
     render() {
         const gallery = this.props.gallery;
         const infoico = this.props.infoico;
@@ -4687,6 +4708,7 @@ class Card extends React.Component {
                                 style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops && this.state.defaultdrops.properties.question === "" ? disabledive : {} : {}}
                             >
                                 <ReactQuill
+                                    onKeyDown={(e)=>this.keyPressCapture(e , 1)}
                                     ref={this.quillRef}
                                     className="quillEditor"
                                     name="inputquestion"
@@ -4704,7 +4726,8 @@ class Card extends React.Component {
 
                                         //     return
                                         // }
-                                        if (source === 'user') {
+                                        const find = delta.ops.find((item)=>item.insert == "\t")
+                                        if (!find && source === 'user') {
                                             this.inputquestion(html, "inputquestion")
                                         }
                                     }}
@@ -4719,7 +4742,16 @@ class Card extends React.Component {
                             <div className="below-lanbel-body"
                                 style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                             >
-                                <input type="text" name="name" className="mediumfm" value={this.state.fieldprops.label ? this.state.fieldprops.label : ""} onChange={e => this.inputtypename(e, "inputtypename")} onBlur={e => this.onBlurName(e, "onBlurName")} />
+                                <input
+                                    onKeyDown={(e)=>this.keyPressCapture(e , 2)}
+                                    ref={this.nameRef}
+                                    type="text" 
+                                    name="name" 
+                                    className="mediumfm" 
+                                    value={this.state.fieldprops.label ? this.state.fieldprops.label : ""} 
+                                    onChange={e => this.inputtypename(e, "inputtypename")} 
+                                    onBlur={e => this.onBlurName(e, "onBlurName")} 
+                                />
                                 <label> Edit your Name </label>
                             </div>
                         </li>
@@ -4730,6 +4762,8 @@ class Card extends React.Component {
                                 style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops === undefined || this.state.defaultdrops.properties.subheading === ("" || null || undefined) ? disabledive : {} : {}}
                             >
                                 <ReactQuill
+                                    onKeyDown={(e)=>this.keyPressCapture(e , 3 , true)}
+                                    ref={this.subNameRef}
                                     className="quillEditor"
                                     value={this.state.fieldprops.properties.subheading_text ? this.state.fieldprops.properties.subheading_text : this.state.fieldprops.properties.subheading ? this.state.fieldprops.properties.subheading : ""}
                                     inlineStyles="true"
@@ -4742,7 +4776,8 @@ class Card extends React.Component {
                                         //     this.showNotification("Image not allowed. Please use bellow information type image option to add image", "danger")
                                         //     return
                                         // }
-                                        if (source === 'user') {
+                                        const find = delta.ops.find((item)=>item.insert == "\t")
+                                        if (!find && source === 'user') {
                                             this.inputsubheading(html, "inputsubheading")
                                         }
                                     }}
@@ -4788,6 +4823,8 @@ class Card extends React.Component {
                                     <h3>Information Content</h3>
                                     <div>
                                         <ReactQuill
+                                            onKeyDown={(e)=>this.keyPressCapture(e , 4)}
+                                            ref={this.infoContRef}
                                             className="infocontentQuill"
                                             value={this.state.fieldprops.properties.info_text ? this.state.fieldprops.properties.info_text : ""}
                                             inlineStyles="true"
@@ -4799,7 +4836,8 @@ class Card extends React.Component {
                                                 //     this.showNotification("Image not allowed. Please use bellow information type image option to add image", "danger")
                                                 //     return
                                                 // }
-                                                if (source === 'user') {
+                                                const find = delta.ops.find((item)=>item.insert == "\t")
+                                                if (!find && source === 'user') {
                                                     this.info_text(html, "info_text")
                                                 }
                                             }}
@@ -5054,6 +5092,7 @@ class Card extends React.Component {
 
                             >
                                 <ReactQuill
+                                    onKeyDown={(e)=>this.keyPressCapture(e , 1)}
                                     ref={this.quillRef}
                                     className="quillEditor"
                                     value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""}
@@ -5074,7 +5113,8 @@ class Card extends React.Component {
                                         //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
                                         //     return
                                         // }
-                                        if (source === 'user') {
+                                        const find = delta.ops.find((item)=>item.insert == "\t")
+                                        if (!find && source === 'user') {
                                             this.inputquestion(html, "inputquestion")
                                         }
                                     }}
@@ -5106,7 +5146,16 @@ class Card extends React.Component {
                             <div className="below-lanbel-body"
                                 style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                             >
-                                <input type="text" name="name" className="mediumfm" value={this.state.fieldprops.label ? this.state.fieldprops.label : ""} onChange={e => this.inputtypename(e, "inputtypename")} onBlur={e => this.onBlurName(e, "onBlurName")} />
+                                <input
+                                    onKeyDown={(e)=>this.keyPressCapture(e , 2)}
+                                    ref={this.nameRef}
+                                    type="text" 
+                                    name="name" 
+                                    className="mediumfm" 
+                                    value={this.state.fieldprops.label ? this.state.fieldprops.label : ""} 
+                                    onChange={e => this.inputtypename(e, "inputtypename")} 
+                                    onBlur={e => this.onBlurName(e, "onBlurName")} 
+                                />
                                 <label> Edit your Name </label>
                             </div>
                         </li>
@@ -5118,6 +5167,8 @@ class Card extends React.Component {
 
                             >
                                 <ReactQuill
+                                    onKeyDown={(e)=>this.keyPressCapture(e , 3)}
+                                    ref={this.subNameRef}
                                     className="quillEditor"
                                     value={this.state.fieldprops.properties.subheading_text ? this.state.fieldprops.properties.subheading_text : this.state.fieldprops.properties.subheading ? this.state.fieldprops.properties.subheading : ""}
                                     inlineStyles="true"
@@ -5129,7 +5180,8 @@ class Card extends React.Component {
                                         //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
                                         //     return
                                         // }
-                                        if (source === 'user') {
+                                        const find = delta.ops.find((item)=>item.insert == "\t")
+                                        if (!find && source === 'user') {
                                             this.inputsubheading(html, "inputsubheading")
                                             //   this.updateprops(html, "inputsubheading")
                                         }
@@ -5389,6 +5441,7 @@ class Card extends React.Component {
                             <div className="below-lanbel-body"
                             >
                                 <ReactQuill
+                                    onKeyDown={(e)=>this.keyPressCapture(e , 1)}
                                     ref={this.quillRef}
                                     className="quillEditor"
                                     value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""}
@@ -5401,7 +5454,8 @@ class Card extends React.Component {
                                         //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
                                         //     return
                                         // }
-                                        if (source === 'user') {
+                                        const find = delta.ops.find((item)=>item.insert == "\t")
+                                        if (!find && source === 'user') {
                                             this.inputquestion(html, "inputquestion")
                                         }
                                     }}
@@ -5418,9 +5472,17 @@ class Card extends React.Component {
                             style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                         >
                             <h3>Name</h3>
-                            <div className="below-lanbel-body"
-                            >
-                                <input type="text" name="name" className="mediumfm" value={this.state.fieldprops.label} onChange={e => this.inputtypename(e, "inputtypename")} onBlur={e => this.onBlurName(e, "onBlurName")} />
+                            <div className="below-lanbel-body">
+                                <input
+                                    onKeyDown={(e)=>this.keyPressCapture(e , 2)}
+                                    ref={this.nameRef}
+                                    type="text" 
+                                    name="name" 
+                                    className="mediumfm" 
+                                    value={this.state.fieldprops.label ? this.state.fieldprops.label : ""} 
+                                    onChange={e => this.inputtypename(e, "inputtypename")} 
+                                    onBlur={e => this.onBlurName(e, "onBlurName")} 
+                                />
                                 <label> Edit your Name </label>
                             </div>
                         </li>
@@ -5431,6 +5493,8 @@ class Card extends React.Component {
                             <h3>Sub Heading</h3>
                             <div className="below-lanbel-body">
                                 <ReactQuill
+                                    onKeyDown={(e)=>this.keyPressCapture(e , 3)}
+                                    ref={this.subNameRef}
                                     className="quillEditor"
                                     value={this.state.fieldprops.properties.subheading_text ? this.state.fieldprops.properties.subheading_text : this.state.fieldprops.properties.subheading ? this.state.fieldprops.properties.subheading : ""}
                                     inlineStyles="true"
@@ -5443,7 +5507,8 @@ class Card extends React.Component {
                                         //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
                                         //     return
                                         // }
-                                        if (source === 'user') {
+                                        const find = delta.ops.find((item)=>item.insert == "\t")
+                                        if (!find && source === 'user') {
                                             this.inputsubheading(html, "inputsubheading")
                                         }
                                     }}
@@ -5767,6 +5832,7 @@ class Card extends React.Component {
                                 style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops === undefined || this.state.defaultdrops.properties.question === ("" || null || undefined) ? disabledive : {} : {}}
                             >
                                 <ReactQuill
+                                    onKeyDown={(e)=>this.keyPressCapture(e , 1)}
                                     ref={this.quillRef}
                                     className="quillEditor"
                                     value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""}
@@ -5781,7 +5847,8 @@ class Card extends React.Component {
                                         //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
                                         //     return
                                         // }
-                                        if (source === 'user') {
+                                        const find = delta.ops.find((item)=>item.insert == "\t")
+                                        if (!find && source === 'user') {
                                             this.inputquestion(html, "inputquestion")
                                         }
                                     }}
@@ -5796,7 +5863,16 @@ class Card extends React.Component {
                             <div className="below-lanbel-body"
                                 style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                             >
-                                <input type="text" name="name" className="mediumfm" value={this.state.fieldprops.label} onChange={e => this.inputtypename(e, "inputtypename")} onBlur={e => this.onBlurName(e, "onBlurName")} />
+                                <input
+                                    onKeyDown={(e)=>this.keyPressCapture(e , 2)}
+                                    ref={this.nameRef}
+                                    type="text" 
+                                    name="name" 
+                                    className="mediumfm" 
+                                    value={this.state.fieldprops.label ? this.state.fieldprops.label : ""} 
+                                    onChange={e => this.inputtypename(e, "inputtypename")} 
+                                    onBlur={e => this.onBlurName(e, "onBlurName")} 
+                                />
                                 <label> Edit Your Name </label>
                             </div>
                         </li>
@@ -5807,6 +5883,8 @@ class Card extends React.Component {
                                 style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops === undefined || this.state.defaultdrops.properties.subheading === ("" || null || undefined) ? disabledive : {} : {}}
                             >
                                 <ReactQuill
+                                    onKeyDown={(e)=>this.keyPressCapture(e , 3)}
+                                    ref={this.subNameRef}
                                     className="quillEditor"
                                     value={this.state.fieldprops.properties.subheading_text ? this.state.fieldprops.properties.subheading_text : this.state.fieldprops.properties.subheading ? this.state.fieldprops.properties.subheading : ""}
                                     inlineStyles="true"
@@ -5818,7 +5896,8 @@ class Card extends React.Component {
                                         //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
                                         //     return
                                         // }
-                                        if (source === 'user') {
+                                        const find = delta.ops.find((item)=>item.insert == "\t")
+                                        if (!find && source === 'user') {
                                             this.inputsubheading(html, "inputsubheading")
                                         }
                                     }}
@@ -6124,6 +6203,7 @@ class Card extends React.Component {
                             <div className="below-lanbel-body"
                             >
                                 <ReactQuill
+                                    onKeyDown={(e)=>this.keyPressCapture(e , 1)}
                                     ref={this.quillRef}
                                     className="quillEditor"
                                     value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""}
@@ -6138,7 +6218,8 @@ class Card extends React.Component {
                                         //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
                                         //     return
                                         // }
-                                        if (source === 'user') {
+                                        const find = delta.ops.find((item)=>item.insert == "\t")
+                                        if (!find && source === 'user') {
                                             this.inputquestion(html, "inputquestion")
                                         }
                                     }}
@@ -6153,7 +6234,16 @@ class Card extends React.Component {
                         >
                             <h3>Name</h3>
                             <div className="below-lanbel-body">
-                                <input type="text" name="name" className="mediumfm" value={this.state.fieldprops.label} onChange={e => this.inputtypename(e, "inputtypename")} onBlur={e => this.onBlurName(e, "onBlurName")} />
+                            <input
+                                    onKeyDown={(e)=>this.keyPressCapture(e , 2)}
+                                    ref={this.nameRef}
+                                    type="text" 
+                                    name="name" 
+                                    className="mediumfm" 
+                                    value={this.state.fieldprops.label ? this.state.fieldprops.label : ""} 
+                                    onChange={e => this.inputtypename(e, "inputtypename")} 
+                                    onBlur={e => this.onBlurName(e, "onBlurName")} 
+                                />
                                 <label> Edit Your Name </label>
                             </div>
                         </li>
@@ -6164,6 +6254,8 @@ class Card extends React.Component {
                             <h3>Sub Heading</h3>
                             <div className="below-lanbel-body">
                                 <ReactQuill
+                                    onKeyDown={(e)=>this.keyPressCapture(e , 3)}
+                                    ref={this.subNameRef}
                                     className="quillEditor"
                                     value={this.state.fieldprops.properties.subheading_text ? this.state.fieldprops.properties.subheading_text : this.state.fieldprops.properties.subheading ? this.state.fieldprops.properties.subheading : ""}
                                     inlineStyles="true"
@@ -6175,7 +6267,8 @@ class Card extends React.Component {
                                         //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
                                         //     return
                                         // }
-                                        if (source === 'user') {
+                                        const find = delta.ops.find((item)=>item.insert == "\t")
+                                        if (!find && source === 'user') {
                                             this.inputsubheading(html, "inputsubheading")
                                         }
                                     }}
@@ -6842,6 +6935,7 @@ class Card extends React.Component {
                                     style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops === undefined || this.state.defaultdrops.properties.question === ("" || null || undefined) ? disabledive : {} : {}}
                                 >
                                     <ReactQuill
+                                        onKeyDown={(e)=>this.keyPressCapture(e , 1)}
                                         ref={this.quillRef}
                                         className="quillEditor"
                                         value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""}
@@ -6856,7 +6950,8 @@ class Card extends React.Component {
                                             //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
                                             //     return
                                             // }
-                                            if (source === 'user') {
+                                            const find = delta.ops.find((item)=>item.insert == "\t")
+                                            if (!find && source === 'user') {
                                                 this.inputquestion(html, "inputquestion")
                                             }
                                         }}
@@ -6871,7 +6966,16 @@ class Card extends React.Component {
                                 <div className="below-lanbel-body"
                                     style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                                 >
-                                    <input type="text" name="name" className="mediumfm" value={this.state.fieldprops.label} onChange={e => this.inputtypename(e, "inputtypename")} onBlur={e => this.onBlurName(e, "onBlurName")} />
+                                <input
+                                    onKeyDown={(e)=>this.keyPressCapture(e , 2)}
+                                    ref={this.nameRef}
+                                    type="text" 
+                                    name="name" 
+                                    className="mediumfm" 
+                                    value={this.state.fieldprops.label ? this.state.fieldprops.label : ""} 
+                                    onChange={e => this.inputtypename(e, "inputtypename")} 
+                                    onBlur={e => this.onBlurName(e, "onBlurName")} 
+                                />
                                     <label> Edit your Name </label>
                                 </div>
                             </li>
@@ -6882,6 +6986,8 @@ class Card extends React.Component {
                                     style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops === undefined || this.state.defaultdrops.properties.subheading === ("" || null || undefined) ? disabledive : {} : {}}
                                 >
                                     <ReactQuill
+                                        onKeyDown={(e)=>this.keyPressCapture(e , 3)}
+                                        ref={this.subNameRef}
                                         className="quillEditor"
                                         value={this.state.fieldprops.properties.subheading_text ? this.state.fieldprops.properties.subheading_text : this.state.fieldprops.properties.subheading ? this.state.fieldprops.properties.subheading : ""}
                                         inlineStyles="true"
@@ -6893,7 +6999,8 @@ class Card extends React.Component {
                                             //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
                                             //     return
                                             // }
-                                            if (source === 'user') {
+                                            const find = delta.ops.find((item)=>item.insert == "\t")
+                                            if (!find && source === 'user') {
                                                 this.inputsubheading(html, "inputsubheading")
                                             }
                                         }}
@@ -7478,6 +7585,7 @@ class Card extends React.Component {
                                 style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops === undefined || this.state.defaultdrops.properties.question === ("" || null || undefined) ? disabledive : {} : {}}
                             >
                                 <ReactQuill
+                                    onKeyDown={(e)=>this.keyPressCapture(e , 1)}
                                     ref={this.quillRef}
                                     className="quillEditor"
                                     value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""}
@@ -7492,7 +7600,8 @@ class Card extends React.Component {
                                         //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
                                         //     return
                                         // }
-                                        if (source === 'user') {
+                                        const find = delta.ops.find((item)=>item.insert == "\t")
+                                        if (!find && source === 'user') {
                                             this.inputquestion(html, "inputquestion")
                                         }
                                     }}
@@ -7507,7 +7616,16 @@ class Card extends React.Component {
                             <div className="below-lanbel-body"
                                 style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                             >
-                                <input type="text" name="name" className="mediumfm" value={this.state.fieldprops.label} onChange={e => this.inputtypename(e, "inputtypename")} onBlur={e => this.onBlurName(e, "onBlurName")} />
+                                <input
+                                    onKeyDown={(e)=>this.keyPressCapture(e , 2)}
+                                    ref={this.nameRef}
+                                    type="text" 
+                                    name="name" 
+                                    className="mediumfm" 
+                                    value={this.state.fieldprops.label ? this.state.fieldprops.label : ""} 
+                                    onChange={e => this.inputtypename(e, "inputtypename")} 
+                                    onBlur={e => this.onBlurName(e, "onBlurName")} 
+                                />
                                 <label> Edit Your Name </label>
                             </div>
                         </li>
@@ -7518,6 +7636,8 @@ class Card extends React.Component {
                                 style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops === undefined || this.state.defaultdrops.properties.subheading === ("" || null || undefined) ? disabledive : {} : {}}
                             >
                                 <ReactQuill
+                                    onKeyDown={(e)=>this.keyPressCapture(e , 3)}
+                                    ref={this.subNameRef}
                                     className="quillEditor"
                                     value={this.state.fieldprops.properties.subheading_text ? this.state.fieldprops.properties.subheading_text : this.state.fieldprops.properties.subheading ? this.state.fieldprops.properties.subheading : ""}
                                     inlineStyles="true"
@@ -7529,7 +7649,8 @@ class Card extends React.Component {
                                         //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
                                         //     return
                                         // }
-                                        if (source === 'user') {
+                                        const find = delta.ops.find((item)=>item.insert == "\t")
+                                        if (!find && source === 'user') {
                                             this.inputsubheading(html, "inputsubheading")
                                         }
                                     }}
@@ -7758,6 +7879,7 @@ class Card extends React.Component {
                                 style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops === undefined || this.state.defaultdrops.properties.question === ("" || null || undefined) ? disabledive : {} : {}}
                             >
                                 <ReactQuill
+                                    onKeyDown={(e)=>this.keyPressCapture(e , 1)}
                                     ref={this.quillRef}
                                     className="quillEditor"
                                     value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""}
@@ -7772,7 +7894,8 @@ class Card extends React.Component {
                                         //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
                                         //     return
                                         // }
-                                        if (source === 'user') {
+                                        const find = delta.ops.find((item)=>item.insert == "\t")
+                                        if (!find && source === 'user') {
                                             this.inputquestion(html, "inputquestion")
                                         }
                                     }}
@@ -7786,9 +7909,17 @@ class Card extends React.Component {
                             <h3>Name</h3>
                             <div className="below-lanbel-body"
                                 style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
-
                             >
-                                <input type="text" name="name" className="mediumfm" value={this.state.fieldprops.label} onChange={e => this.inputtypename(e, "inputtypename")} onBlur={e => this.onBlurName(e, "onBlurName")} />
+                                <input
+                                    onKeyDown={(e)=>this.keyPressCapture(e , 2 , false , true)}
+                                    ref={this.nameRef}
+                                    type="text" 
+                                    name="name" 
+                                    className="mediumfm" 
+                                    value={this.state.fieldprops.label ? this.state.fieldprops.label : ""} 
+                                    onChange={e => this.inputtypename(e, "inputtypename")} 
+                                    onBlur={e => this.onBlurName(e, "onBlurName")} 
+                                />
                                 <label> Edit Your Name </label>
                             </div>
                         </li>
@@ -7892,6 +8023,8 @@ class Card extends React.Component {
                                 <h3>Sub heading</h3>
                                 <div className="below-lanbel-body">
                                     <ReactQuill
+                                        onKeyDown={(e)=>this.keyPressCapture(e , 3)}
+                                        ref={this.subNameRef}
                                         className="quillEditor"
                                         value={this.state.fieldprops.properties.subheading_text ? this.state.fieldprops.properties.subheading_text : this.state.fieldprops.properties.subheading ? this.state.fieldprops.properties.subheading : ""}
                                         inlineStyles="true"
