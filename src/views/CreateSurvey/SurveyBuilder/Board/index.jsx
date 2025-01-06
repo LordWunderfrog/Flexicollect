@@ -1241,14 +1241,14 @@ class Board extends Component {
         text: "Text Input"
 
       },
-      {
-        id: "item3",
-        type: "Dropdown",
-        icon: "fa fa-caret-square-o-down",
-        text: "Dropdown"
+      // {
+      //   id: "item3",
+      //   type: "Dropdown",
+      //   icon: "fa fa-caret-square-o-down",
+      //   text: "Dropdown"
 
 
-      },
+      // },
       {
         id: "item4",
         type: "gps",
