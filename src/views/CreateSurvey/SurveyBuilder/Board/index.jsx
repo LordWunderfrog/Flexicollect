@@ -2011,27 +2011,23 @@ class Board extends Component {
     } else if (type === 1) {
       type = "input"
 
-    } else if (type === 2) {
-      type = "dropdown"
-
-    } else if (type === 3) {
+    }else if (type === 2) {
       type = "gps"
 
-    } else if (type === 4) {
+    } else if (type === 3) {
       type = "capture"
 
-    } else if (type === 5) {
+    } else if (type === 4) {
       type = "scale"
 
-    } else if (type === 6) {
+    } else if (type === 5) {
       type = "upload"
 
-    } else if (type === 7) {
+    } else if (type === 6) {
       type = "barcode"
 
-    } else if (type === 8) {
+    } else if (type === 7) {
       type = "choice"
-
     }
 
 
