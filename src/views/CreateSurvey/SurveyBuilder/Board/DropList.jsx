@@ -511,7 +511,7 @@ class DropList extends React.Component {
                             <span onClick={() => this.handleClickOpen("open2")}>
                                 <i className="fa fa-cog" />
                             </span>
-                            {this.cloneAction(this.state.fieldprops.question_id, 6)}
+                            {this.cloneAction(this.state.fieldprops.question_id, 5)}
                             {this.deleteAlert()}
                         </div>
                     </div>
@@ -548,7 +548,7 @@ class DropList extends React.Component {
                             <span onClick={() => this.handleClickOpen("open2")}>
                                 <i className="fa fa-cog" />
                             </span>
-                            {this.cloneAction(this.state.fieldprops.question_id, 4)}
+                            {this.cloneAction(this.state.fieldprops.question_id, 3)}
                             {this.deleteAlert()}
                         </div>
                     </div>
@@ -586,7 +586,7 @@ class DropList extends React.Component {
                             <span onClick={() => this.handleClickOpen("open2")}>
                                 <i className="fa fa-cog" />
                             </span>
-                            {this.cloneAction(this.state.fieldprops.question_id, 5)}
+                            {this.cloneAction(this.state.fieldprops.question_id, 4)}
                             {this.deleteAlert()}
                         </div>
                     </div>
@@ -624,7 +624,7 @@ class DropList extends React.Component {
                             <span onClick={() => this.handleClickOpen("open2")}>
                                 <i className="fa fa-cog" />
                             </span>
-                            {this.cloneAction(this.state.fieldprops.question_id, 8)}
+                            {this.cloneAction(this.state.fieldprops.question_id, 7)}
                             {this.deleteAlert()}
                         </div>
                     </div>
@@ -717,7 +717,7 @@ class DropList extends React.Component {
                             <span onClick={() => this.handleClickOpen("open2")}>
                                 <i className="fa fa-cog" />
                             </span>
-                            {this.cloneAction(this.state.fieldprops.question_id, 7)}
+                            {this.cloneAction(this.state.fieldprops.question_id, 6)}
                             {this.deleteAlert()}
                         </div>
                     </div>
@@ -755,7 +755,7 @@ class DropList extends React.Component {
                             <span onClick={() => this.handleClickOpen("open2")}>
                                 <i className="fa fa-cog" />
                             </span>
-                            {this.cloneAction(this.state.fieldprops.question_id, 3)}
+                            {this.cloneAction(this.state.fieldprops.question_id, 2)}
                             {this.deleteAlert()}
                         </div>
                     </div>

@@ -114,6 +114,7 @@ class Card extends React.Component {
         };
         this.handleFocus = this.handleFocus.bind(this);
         this.handleBlur = this.handleBlur.bind(this);
+        this.choiceInputRefs = {};
     }
 
     /** Rich text editor Toolbar control. */
@@ -4665,6 +4666,16 @@ class Card extends React.Component {
         }
     };
 
+    // Method to focus next option input by its key
+    onOptionTabClick = (key , e) => {
+        const isTabbingInEditor = e.key === 'Tab'
+        if(isTabbingInEditor){
+            if (this.choiceInputRefs[key]) {
+                this.choiceInputRefs[key].current.editor.focus();
+            }
+        }
+    };
+
     render() {
         const gallery = this.props.gallery;
         const infoico = this.props.infoico;
@@ -7346,13 +7357,18 @@ class Card extends React.Component {
                                                 />
                                             </div>
                                         }
-
                                         <DragDropContext onDragEnd={(result) => this.onDragEnd(result)}>
                                             <Droppable droppableId="ChoiceOptionDropable">
                                                 {(provided, snapshot) => (
                                                     <ul style={getListStyle(snapshot.isDraggingOver)} ref={provided.innerRef} {...provided.droppableProps} className="droppable-area">
                                                         {this.state.fieldprops.properties.options && this.state.fieldprops.properties.options.length > 0 &&
-                                                            this.state.fieldprops.properties.options.map((value, index) => (
+                                                            this.state.fieldprops.properties.options.map((value, index) => {
+                                                                const refKey = `input-${index}`;
+                                                                const nextRefKey = `input-${index+1}`;
+                                                                if (!this.choiceInputRefs[refKey]) {
+                                                                  this.choiceInputRefs[refKey] = React.createRef();
+                                                                }
+                                                            return(
                                                                 <Draggable
                                                                     isDragDisabled={this.state.currentlanguage.value !== "English"}
                                                                     draggableId={value.id.toString()}
@@ -7381,6 +7397,8 @@ class Card extends React.Component {
                                                                                     >
                                                                                         <span>{alphabet[index]}</span>
                                                                                         <ReactQuill
+                                                                                            ref={this.choiceInputRefs[refKey]}
+                                                                                            onKeyDown={(e) => this.onOptionTabClick(nextRefKey , e)}
                                                                                             style={this.props.mappingProfileEnable == true ? disabledive : {}}
                                                                                             className={`${this.state.fieldprops.properties.multilevel ? 'multichoicequill' : 'choicequill'} ${'quillEditor'}`}
                                                                                             value={this.state.fieldprops.properties.options[index].label_text ? this.state.fieldprops.properties.options[index].label_text : this.state.fieldprops.properties.options[index].label ? this.state.fieldprops.properties.options[index].label : ""}
@@ -7393,7 +7411,8 @@ class Card extends React.Component {
                                                                                                 //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
                                                                                                 //     return
                                                                                                 // }
-                                                                                                if (source === 'user') {
+                                                                                                const find = delta.ops.find((item) => item.insert == "\t")
+                                                                                                if (!find && source === 'user') {
                                                                                                     this.label(html, "label", index)
                                                                                                 }
                                                                                             }}
@@ -7503,7 +7522,7 @@ class Card extends React.Component {
                                                                         </div>
                                                                     )}
                                                                 </Draggable>
-                                                            ))}
+                                                            )})}
                                                         {provided.placeholder}
                                                     </ul>
                                                 )}
