@@ -2149,11 +2149,11 @@ class Board extends Component {
       return
 
     }
-    else if ((source.droppableId === 'droppable') && (this.props.platformType != "App Only" && source.index === 4)) {
+    else if ((source.droppableId === 'droppable') && (this.props.platformType != "App Only" && source.index === 3)) {
 
       return;
     }
-    else if ((source.droppableId === 'droppable') && (this.props.platformType != "App Only" && source.index === 7)) {
+    else if ((source.droppableId === 'droppable') && (this.props.platformType != "App Only" && source.index === 6)) {
 
       return;
     }
