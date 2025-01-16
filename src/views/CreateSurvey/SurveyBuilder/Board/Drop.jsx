@@ -4679,10 +4679,13 @@ class Card extends React.Component {
                     this.addfun("suboptions", optionId);
                 }
                 setTimeout(() => {
-                    this.choiceSubInputRefs[key] && this.choiceSubInputRefs[key].current.editor.focus();
+                    this.choiceSubInputRefs[key] 
+                    && this.choiceSubInputRefs[key].current 
+                    && this.choiceSubInputRefs[key].current.editor
+                    && this.choiceSubInputRefs[key].current.editor.focus();
                 }, 100)
             }
-            else if (this.choiceSubInputRefs[key]) {
+            else if (this.choiceSubInputRefs[key] && this.choiceSubInputRefs[key].current) {
                 this.choiceSubInputRefs[key].current.editor.focus();
             }
         }
@@ -4697,10 +4700,13 @@ class Card extends React.Component {
                         this.addfun("options");
                     }
                     setTimeout(() => {
-                        this.choiceInputRefs[key] && this.choiceInputRefs[key].current.editor.focus();
+                        this.choiceInputRefs[key] 
+                        && this.choiceInputRefs[key].current 
+                        && this.choiceInputRefs[key].current.editor
+                        && this.choiceInputRefs[key].current.editor.focus();
                     }, 100)
                 }
-                else if (this.choiceInputRefs[key]) {
+                else if (this.choiceInputRefs[key] && this.choiceInputRefs[key].current) {
                     this.choiceInputRefs[key].current.editor.focus();
                 }
             }

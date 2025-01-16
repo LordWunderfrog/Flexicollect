@@ -1019,15 +1019,15 @@ class AgMissionResponse extends React.Component {
       }
 
       else if (event.colDef.queType === "upload") {
-        if (event.value.length === 0 || event.value[event.value.length - 1] === undefined) {
-          this.getAllRows()
-          this.getPhotoEditorQuestion(event)
-          this.setState({ openPopup: true })
-        } else if (event.colDef.mediaType && (event.colDef.mediaType === 'video' || event.colDef.mediaType === 'audio')) {
-          // skip audio video clicks		
+        if (event.colDef.mediaType && (event.colDef.mediaType === 'video' || event.colDef.mediaType === 'audio')) {
+          // skip audio video clicks
+        } else if (event.value.length === 0 || event.value[event.value.length - 1] === undefined) {
+          this.getAllRows();
+          this.getPhotoEditorQuestion(event);
+          this.setState({ openPopup: true });
         } else {
-          this.getAllRows()
-          this.getPhotoEditorQuestion(event)
+          this.getAllRows();
+          this.getPhotoEditorQuestion(event);
 
           this.setState({
             customer_id: event.data.customer_id,
@@ -1052,7 +1052,9 @@ class AgMissionResponse extends React.Component {
       }
       else if (event.colDef.queType === "capture" && !event.colDef.field.includes("-C_instext") && !event.colDef.field.includes("-C_scale")) {
         if (event.value === "" || event.value === undefined) {
-          this.setState({ openPopup: false })
+          this.getAllRows()
+          this.getPhotoEditorQuestion(event)
+          this.setState({ openPopup: true })
         } else {
           this.getAllRows()
           this.getPhotoEditorQuestion(event)
