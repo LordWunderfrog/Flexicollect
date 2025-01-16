@@ -81,20 +81,10 @@ class CreateGallery extends React.Component {
         api2
             .post("v1/gallery/images/tmp", data)
             .then(resp => {
-                console.log(resp);
                 window.location.reload();
             })
             .catch(error => {
-                if (error.response) {
-                    console.log(error.response.data);
-                    console.log(error.response.status);
-                    console.log(error.response.headers);
-                } else if (error.request) {
-                    console.log(error.request);
-                } else {
-                    console.log("Error", error.message);
-                }
-                console.log(error.config);
+                console.log(error);
             });
     }
 
@@ -113,8 +103,6 @@ class CreateGallery extends React.Component {
         });
     }
 
-
-
     render() {
         const tags = this.state.imagetag
         return (
@@ -124,7 +112,6 @@ class CreateGallery extends React.Component {
                     <div className="hdeadingbck">
                         <i className="fa fa-picture-o" aria-hidden="true"></i>  <h4>Gallery</h4>
                     </div>
-
                     {(this.state.step === 0) ?
                         <div className="fullwidthgallerg">
                             {tags.map((tag, index) => (

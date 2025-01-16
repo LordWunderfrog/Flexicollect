@@ -2,7 +2,6 @@
  * Preview  component.
  * 
  * This component is used to preview the final survey page with input values.
- *
  * 
  */
 import React from "react";
@@ -267,8 +266,6 @@ class Previewsurvey extends React.Component {
         const { classes } = this.props;
         const previewobj = this.state.preview;
         const checker = this.state.staticval + 1;
-
-
         return (
             <div>
                 {this.props.loading === 1 ? (
@@ -352,11 +349,11 @@ class Previewsurvey extends React.Component {
                                                         </div>
                                                         {prevdata.properties.barcode_ids ? <p>{prevdata.properties.barcode_ids[0]}</p> : ""}
                                                         {/* <ul className="barcodeli">
-                                                  {(prevdata.properties.barcode_ids) ? (
-                                                      prevdata.properties.barcode_ids.map(function(value) {
-                                                          return <li> {value} </li>
-                                                      }.bind(this))):""}
-                                              </ul> */}
+                                                                {(prevdata.properties.barcode_ids) ? (
+                                                                prevdata.properties.barcode_ids.map(function(value) {
+                                                                    return <li> {value} </li>
+                                                                }.bind(this))):""}
+                                                        </ul> */}
                                                     </div>
                                                 ) : prevdata.type === "gps" ? (
                                                     <div>

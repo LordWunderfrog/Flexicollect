@@ -981,7 +981,6 @@
 
 //     return (
 //       <DragDropContext onDragEnd={this.onDragEnd}
-//       // onBeforeDragStart={(e)=>console.log(e)}
 //       >
 //         <div id="board" className={boardval} >
 //           <div className="new-btn pointer" onClick={() => this.openevent()}>
@@ -1242,14 +1241,14 @@ class Board extends Component {
         text: "Text Input"
 
       },
-      {
-        id: "item3",
-        type: "Dropdown",
-        icon: "fa fa-caret-square-o-down",
-        text: "Dropdown"
+      // {
+      //   id: "item3",
+      //   type: "Dropdown",
+      //   icon: "fa fa-caret-square-o-down",
+      //   text: "Dropdown"
 
 
-      },
+      // },
       {
         id: "item4",
         type: "gps",
@@ -1774,6 +1773,7 @@ class Board extends Component {
       question: String(this.state.drops[index].properties.question).trim()
     }
     newDrop['question'] = String(this.state.drops[index].properties.question).trim()
+    if (this.state.drops[index].group_number) { newDrop['group_number'] = Number(this.state.drops[index].group_number) }
     newDrop.question_id = Number([...this.state.drops].sort((a, b) => Number(b.question_id) - Number(a.question_id))[0].question_id) + 1
 
     let dropindex = newDropsArray.findIndex((element) => element.question_id === question_id);
@@ -2011,27 +2011,23 @@ class Board extends Component {
     } else if (type === 1) {
       type = "input"
 
-    } else if (type === 2) {
-      type = "dropdown"
-
-    } else if (type === 3) {
+    }else if (type === 2) {
       type = "gps"
 
-    } else if (type === 4) {
+    } else if (type === 3) {
       type = "capture"
 
-    } else if (type === 5) {
+    } else if (type === 4) {
       type = "scale"
 
-    } else if (type === 6) {
+    } else if (type === 5) {
       type = "upload"
 
-    } else if (type === 7) {
+    } else if (type === 6) {
       type = "barcode"
 
-    } else if (type === 8) {
+    } else if (type === 7) {
       type = "choice"
-
     }
 
 
@@ -2153,11 +2149,11 @@ class Board extends Component {
       return
 
     }
-    else if ((source.droppableId === 'droppable') && (this.props.platformType != "App Only" && source.index === 4)) {
+    else if ((source.droppableId === 'droppable') && (this.props.platformType != "App Only" && source.index === 3)) {
 
       return;
     }
-    else if ((source.droppableId === 'droppable') && (this.props.platformType != "App Only" && source.index === 7)) {
+    else if ((source.droppableId === 'droppable') && (this.props.platformType != "App Only" && source.index === 6)) {
 
       return;
     }
@@ -2180,6 +2176,7 @@ class Board extends Component {
       }, () => {
         this.props.ondraglick(this.state.drops, true);
         this.props.updatelanguagedrop("reorder", destination.index, source.index);
+        this.checkDroppedQuesitonHideRange();
       })
     }
     else if ((source.droppableId === 'droppable') && (destination && destination.droppableId === 'droppable2')) {
@@ -2217,6 +2214,7 @@ class Board extends Component {
           this.state.dropAction = "reorder";
           this.checkrefcode();
           this.props.ondraglick(this.state.drops, true);
+          this.checkDroppedQuesitonHideRange();
           // this.props.autosave();
         })
       })
@@ -2238,6 +2236,51 @@ class Board extends Component {
 
     }
   };
+
+  /** Check Dropped indexes are available in hide range conditions or not */
+  checkDroppedQuesitonHideRange = () => {
+    const tempArray = this.state.drops;
+    const findHideRangeCondition = this.findHideRangeCondition();
+    for (let i = 0; i < findHideRangeCondition.length; i++) {
+      if (findHideRangeCondition[i].target.multifield && findHideRangeCondition[i].target.multifield.length > 0) {
+        const multiField = findHideRangeCondition[i].target.multifield;
+
+        const findFirstIndex = tempArray.findIndex(item => item.handler === multiField[0].value);
+        const findLastIndex = tempArray.findIndex(item => item.handler === multiField[multiField.length - 1].value);
+
+        const slice = tempArray.slice(findFirstIndex, findLastIndex + 1);
+        const tempArr = slice.map((item) => { return { value: item.handler, label: item.label } });
+
+        if (!this.arraysMatch(multiField, tempArr)) {
+          const condition = this.props.oldconditions;
+          const condition_index = condition.findIndex((item) => item.condtion_id == findHideRangeCondition[i].condtion_id)
+          condition[condition_index]['target']['multifield'] = tempArr;
+          this.autoSave();
+        }
+      }
+    }
+  };
+
+  arraysMatch = (arr1, arr2) => {
+    if (arr1.length !== arr2.length) {
+      return false;
+    }
+    return arr1.every((item, index) =>
+      item.value === arr2[index].value && item.label === arr2[index].label
+    );
+  };
+
+
+  findHideRangeCondition = () => {
+    let findHideRangeTemp = [];
+    this.props.oldconditions.map((condition) => {
+      if (condition.target.uniqueID !== "" && condition.target.uniqueID == "hide_range") {
+        findHideRangeTemp.push(condition)
+      }
+    })
+    return findHideRangeTemp;
+  };
+
   updateProperties = (e) => {
     this.setState({ drops: this.state.drops })
   }
@@ -2294,7 +2337,6 @@ class Board extends Component {
 
     return (
       <DragDropContext onDragEnd={this.onDragEnd}
-      // onBeforeDragStart={(e)=>console.log(e)}
       >
         <div id="board" className={boardval} >
           <div className="new-btn pointer" onClick={() => this.openevent()}>
@@ -2360,11 +2402,7 @@ class Board extends Component {
             </div>
           </div>
 
-          <div
-
-            id="board__targets"
-          >
-
+          <div id="board__targets">
             <Droppable droppableId="droppable2">
               {(provided, snapshot) => (
                 <div
@@ -2415,7 +2453,6 @@ class Board extends Component {
                             downArrowFuncLanguage={this.props.downArrowFuncLanguage}
                             upArrowFuncLanguage={this.props.upArrowFuncLanguage}
                           />
-
                         </div>
                       )}
                     </Draggable>
@@ -2466,51 +2503,10 @@ class Board extends Component {
                   downArrowFuncLanguage={this.props.downArrowFuncLanguage}
                   upArrowFuncLanguage={this.props.upArrowFuncLanguage}
                   updateProperties={() => this.updateProperties()}
+                  mappingProfileEnable={this.props.mappingProfileEnable}
+                  selectedProfile={this.props.selectedProfile}
                 />
               </div> : ""}
-
-            {/* {this.state.drops.map((drop, index) => (drops[index] ? (
-              <div key={index}>
-                <Card
-                  index={index}
-                  color={drop.color}
-                  key={index}
-                  question_id={drop.question_id}
-                  id={drop.id}
-                  shape={drop.shape}
-                  text={drop.label}
-                  type={drop.type}
-                  attrib={() => this.updateattrib()}
-                  deleteddrops={(e) => this.deleteDrops(e)}
-                  dropstate={this.state.drops}
-                  rightStatus={drop.rightStatus}
-                  rightOpen={this.ropen}
-                  labelprop={drop}
-                  oldprop={drop}
-                  test={drop.question}
-                  oldconditions={this.props.oldconditions}
-                  autosave={() => this.autoSave()}
-                  upArrowFunc={e => this.upArrowFun(e)}
-                  downArrowFunc={e => this.downArrowFun(e)}
-                  scaleico={this.state.scaleico}
-                  infoico={this.state.infoico}
-                  emojis={this.state.emojis}
-                  gallery={this.state.gallery.images}
-                  refcode={this.props.refcode}
-                  selectedlanguage={this.props.selectedlanguage}
-                  changedroplanguage={this.props.changedroplanguage}
-                  dropcurrentlanguage={this.props.dropcurrentlanguage}
-                  defaultdrops={this.props.defaultdrops[index]}
-                  defaultdropsstatus={this.props.defaultdrops}
-                  updatelanguageproperties={this.props.updatelanguageproperties}
-                  languages_drop={this.props.languages_drop}
-                  downArrowFuncLanguage={this.props.downArrowFuncLanguage}
-                  upArrowFuncLanguage={this.props.upArrowFuncLanguage}
-                  updateProperties={() => this.updateProperties()}
-                />
-              </div>
-            ) : ""
-            ))} */}
 
           </div>
 

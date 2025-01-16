@@ -130,7 +130,7 @@ class WebLink extends React.Component {
     super(props);
     this.state = {
       questions: [],
-
+      hidden_question : [],
       selectedAnswer: {},
 
       index: 0,
@@ -1452,7 +1452,7 @@ class WebLink extends React.Component {
     }
 
     newQuestion = temp_questionsArr;
-
+    newQuestion = this.setHideShowQuestions(newQuestion, target)
     this.setState(
       {
         questions: newQuestion,
@@ -1464,6 +1464,146 @@ class WebLink extends React.Component {
     );
 
   }
+  /** Set hide/show question as per already hide/showed passed from admin BY KR*/
+  setHideShowQuestions(queArr, target, unMetTarget) {
+    const finalarr = queArr.length > 0 && queArr.map((que, index) => {
+      const keyname = que.question.type == 'capture' ? 'img_stats' : `${que.question.type}_stats`;
+      if (!unMetTarget || unMetTarget.length == 0) {
+        const existInTarget = this.findQuestionexistInTarget(que.question.handler, target);
+        if (que.question.properties && que.question.properties[keyname] && que.question.properties[keyname] == 'hide') {
+          let queobj = que;
+          if (existInTarget) {
+            if (que.isHide) {
+              queobj = {
+                ...que,
+                isHide: que.isHide
+              }
+            } else {
+              queobj = que
+            }
+          } else {
+            queobj = {
+              ...que,
+              isHide: true
+            }
+          }
+          return queobj
+        }
+        else if (que.question.properties && que.question.properties[keyname] && que.question.properties[keyname] == 'show') {
+          let queobjShow = que;
+          if (existInTarget) {
+            if (que.isHide) {
+              queobjShow = {
+                ...que,
+                isHide: que.isHide
+              }
+            } else {
+              queobjShow = que
+            }
+          } else {
+            queobjShow = {
+              ...que,
+              isHide: false
+            }
+          }
+          return queobjShow
+        } else {
+          return que
+        }
+      }
+      else if (unMetTarget && unMetTarget.length > 0) {
+        const unMettargetfind = unMetTarget.length > 0 && unMetTarget.find((tar) => tar.handler == que.question.handler);
+        if (unMettargetfind && unMettargetfind) {
+          const keyname = que.question.type == 'capture' ? 'img_stats' : `${que.question.type}_stats`;
+          const existInTarget = this.findQuestionexistInTarget(unMettargetfind.handler, target);
+          if (que.question.properties[keyname] && que.question.properties[keyname] == 'hide') {
+            return {
+              ...que,
+              isHide: existInTarget ? que.isHide : true
+            }
+          }
+          else if (que.question.properties[keyname] && que.question.properties[keyname] == 'show') {
+            return {
+              ...que,
+              isHide: existInTarget ? que.isHide : false
+            }
+          } else {
+            return que
+          }
+        } else {
+          return que
+        }
+      }
+      else return que
+    })
+    this.setState({
+      questions: finalarr
+    })
+    return finalarr
+  };
+
+  /** Set hide Multiple question if un match the condition of show_multiple BY KR */
+  setHideShowMultipleUnmetTarget(queArr, unmetTarget, target) {
+    const unMettargetfind = unmetTarget.length > 0 && unmetTarget.find((tar) => tar.hasOwnProperty("multifield"));
+    const finalarr = queArr.length > 0 && queArr.map((que, index) => {
+      const keyname = que.question.type == 'capture' ? 'img_stats' : `${que.question.type}_stats`;
+      if (unMettargetfind && unMettargetfind) {
+        const matchedField = unMettargetfind.multifield.find((item) => item.value == que.question.handler);
+        const existInTarget = matchedField && this.findQuestionexistInTarget(matchedField.value, target);
+        if (matchedField && que.question.properties[keyname] && que.question.properties[keyname] == 'hide') {
+          return {
+            ...que,
+            isHide: existInTarget ? que.isHide : true
+          }
+        }
+        else if (matchedField && que.question.properties[keyname] && que.question.properties[keyname] == 'show') {
+          return {
+            ...que,
+            isHide: existInTarget ? que.isHide : true
+          }
+        }
+        else {
+          return que;
+        }
+      }
+      else {
+        return que;
+      }
+
+    });
+    this.setState({
+      questions: finalarr
+    })
+    return finalarr;
+  };
+
+  /** Find Question handler in target array */
+  findQuestionexistInTarget(queHandler, target) {
+    let exist = false;
+    for (let i = 0; i < target.length; i++) {
+      if ((target[i].do == 'show_multiple' || target[i].do == 'hide_multiple')
+        && target[i].multifield && target[i].multifield.length > 0) {
+        for (let j = 0; j < target[i].multifield.length; j++) {
+          if (target[i].multifield[j].value == queHandler) {
+            exist = true
+          }
+          else {
+            exist = exist ? true : false
+          }
+        }
+      }
+      else if (target[i].do == 'show' || target[i].do == 'hide') {
+        if (target[i].handler == queHandler) {
+          exist = true
+        }
+        else {
+          exist = exist ? true : false
+        }
+      }
+    }
+    return exist;
+  };
+
   /* Handles the api to post the formatted data. */
   postID(type, question_id, survey_answer_tag_id, answers, value, survey_id) {
     let answer = {};
@@ -1711,23 +1851,49 @@ class WebLink extends React.Component {
   /* Used to remove the hidden questions from the question array. */
   removeHiddenQuestion(questionsArray) {
     let questions = []
-
+    const nextConditionIndex = questionsArray.findIndex((item) => item.question.conditions.length > 0)
     for (let i = 0; i < questionsArray.length; i++) {
-      if (
+
+      if (nextConditionIndex >= 0 && i >= nextConditionIndex) {
+        questions.push(questionsArray[i])
+      }
+      else if (
         !questionsArray[i].isHide || questionsArray[i].isHide === false
       ) {
         questions.push(questionsArray[i])
       }
     }
-
     return questions
   }
+
+  /** store no return hidden questions to localstorage with "isFromHiddenStorage" key true to identify*/
+  setHiddenQuestionsToAsync(hiddenQuestionArr){
+        const data =  hiddenQuestionArr.length > 0 &&  hiddenQuestionArr.map((item)=>{
+          return {
+            ...item,
+            isFromHiddenStorage : true
+          }
+        }) || [];
+        localStorage.setItem(`HIDDEN_${this.state.cust_id}` , JSON.stringify(data))
+        this.setState({
+          hidden_question : data ? data : []
+        });
+    };
+    
+  getHiddenQuestionsFromAsync(){
+        const data = localStorage.getItem(`HIDDEN_${this.state.cust_id}`);
+        this.setState({
+          hidden_question : data && JSON.parse(data) ?  JSON.parse(data) : []
+        })
+        return data && JSON.parse(data) ?  JSON.parse(data) : [];
+  };
 
   /* Validate the current question property.
   * If the property noreturn is true user not able to move to previous questions . */
   validateNoReturn = () => {
     let question = this.state.questions[this.state.index];
-
+    const getHiddenQuestion = this.getHiddenQuestionsFromAsync();
+    let setHiddenQuestion = [];
     let hiddenQuestions = this.getHiddenQuestions();
     let post_object = {
       hideList: hiddenQuestions
@@ -1743,6 +1909,23 @@ class WebLink extends React.Component {
       if (resp.data.status === 200) {
         let newQuestion = this.state.questions.slice(this.state.index + 1);
         let filteredQuestions = this.removeHiddenQuestion(newQuestion);
+        for (let i = 0; i < this.state.questions.length; i++) {
+          const find = filteredQuestions.find((item) => item.question.handler === this.state.questions[i].question.handler);
+          if (find) {
+            const findArray = this.state.questions.filter((item) => item.question.handler == find.question.handler)
+            if (findArray.length > 1) {
+              const checkLoopNumber = findArray.find((item) => !item.hasOwnProperty('loop_number'));
+              if (checkLoopNumber) {
+                setHiddenQuestion.push(this.state.questions[i]);
+              }
+            }
+          }
+          if (!find) {
+            setHiddenQuestion.push(this.state.questions[i]);
+          }
+        }
+      const arrCombine = [...getHiddenQuestion, ...setHiddenQuestion]
+      this.setHiddenQuestionsToAsync(arrCombine)
         this.setState({
           updatedText: "",
           updatedChoiceOptions: [],
@@ -1784,7 +1967,6 @@ class WebLink extends React.Component {
     let nextExists = false;
     let questionsArray = this.state.questions;
     let arrLength = questionsArray.length;
-
     for (let i = currentPage; i < questionsArray.length; i++) {
       if (i > currentPage && (!questionsArray[i].isHide || questionsArray[i].isHide === false)) {
         nextPage = i;
@@ -2021,12 +2203,6 @@ class WebLink extends React.Component {
         }
       }
       else if (question.type === 'scale') {
-        // console.dir("question " + JSON.stringify(question, null, 4))
-        // console.log("question " + question.properties.table_content.value_length)
-        // console.log("answer " + answer)
-        // console.log("answer.selected_option " + JSON.stringify(answer.selected_option))
-        // console.log("answer.selected_option.length " + answer.selected_option.length)
-        // console.log("answer.label " + answer.label)
         // if (answer && ((answer.selected_option && answer.selected_option.length >= question.properties.table_content.value_length) || (answer.label && answer.label !== ""))) {
         let scaleType = question.properties.scale_type
         if (scaleType == "table" && (answer && (answer.selected_option && answer.selected_option.length < question.properties.table_content.table_value.length))) {
@@ -2131,7 +2307,7 @@ class WebLink extends React.Component {
       if (this.state.selectedQuestion.type !== 'gps' && this.state.selectedQuestion.properties.refcode) {
         newData.answer.refcode = this.state.selectedQuestion.properties.refcode
       }
-
+      this.setHiddenQuestionsToAsync([]);
       axios.post(url, newData, {
         headers: {
           'Content-Type': 'application/json',
@@ -2460,6 +2636,17 @@ class WebLink extends React.Component {
             }
           }
           questionsArray = this.state.questions
+        }
+      }
+      this.setHideShowQuestions(questionsArray, target, unMetTarget)
+      const unMettargetfindShowMultifield =
+        unMetTarget.length > 0
+        && unMetTarget.filter((tar) => tar.hasOwnProperty('multifield')
+          && (tar.do == 'show_multiple' || tar.do == 'hide_multiple')
+          && tar.multifield.length > 0);
+      if (unMettargetfindShowMultifield && unMettargetfindShowMultifield.length > 0) {
+        for (let i = 0; i < unMettargetfindShowMultifield.length; i++) {
+          questionsArray = this.setHideShowMultipleUnmetTarget(questionsArray, [unMettargetfindShowMultifield[i]], target);
         }
       }
     }
@@ -2951,9 +3138,10 @@ class WebLink extends React.Component {
       ) {
         loop_set_num = questionsArray[parentIndex].loop_set_num + 1;
       }
-
+      // array with hidden and current all questions.
+      const tempArr = [...this.state.hidden_question , ...questionsArray]; 
       newconditions.forEach((m, cindex) => {
-        questionsArr.forEach((q, index) => {
+        tempArr.forEach((q, index) => {
           let check = false;
           if (!check && m.value === q.question.handler) {
             if (q.hasOwnProperty('loop_number')) { check = true; }
@@ -2992,9 +3180,9 @@ class WebLink extends React.Component {
                 newquesarr.conditions = this.setloopquesconditions(q.question.conditions, questionID, loop_set_num, loop_number, false, false)
               }
 
-              if (questionsArr[index].loop_answers && questionsArr[index].loop_answers.length > 0) {
+              if (tempArr[index].loop_answers && tempArr[index].loop_answers.length > 0) {
 
-                questionsArr[index].loop_answers.forEach((a, aindex) => {
+                tempArr[index].loop_answers.forEach((a, aindex) => {
                   if (label === 'loop_input') {
                     if (questionID === a.loop_triggered_qid && a.loop_set === loop_set_num && loop_number === a.loop_number) {
                       newquesarr.answers = a.answers;
@@ -3017,7 +3205,8 @@ class WebLink extends React.Component {
         })
       })
       if (arry.length > 0) {
-        newquestionsArray.splice(spliceparentIndex + 1, 0, ...arry)
+        const newArray = this.shuffleArray(arry)
+        newquestionsArray.splice(spliceparentIndex + 1, 0, ...newArray)
         if (this.state.selectedQuestion.length > 0) {
           this.setSelectedChoiceOptions()
         }
@@ -3026,6 +3215,34 @@ class WebLink extends React.Component {
     }
   }
 
+  /** Shuffle the array of loop question before adding to main question array if qroup number exist */
+  shuffleArray = (loopQuestions) => {
+    const maxBatch = Math.max(...loopQuestions.map(item => item.question.group_number ? Number(item.question.group_number) : 0))
+    let start = 0;
+    let _array = [];
+    if (maxBatch > 0) {
+      for (let i = 0; i <= maxBatch; i++) {
+        _array = loopQuestions.filter((item) => item.question.group_number == i);
+         if (_array.length > 0) {
+          start = loopQuestions.findIndex((item) => item.question.handler == _array[0].question.handler)
+          let currentIndex = _array.length;
+          // While there remain elements to shuffle...
+          while (currentIndex != 0) {
+            // Pick a remaining element...
+            let randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            // And swap it with the current element.
+            [_array[currentIndex], _array[randomIndex]] = [
+              _array[randomIndex], _array[currentIndex]];
+          }
+        }
+      }
+    }
+    _array.map((item, index) => {
+      loopQuestions.splice(start + index, 1, item);
+    })
+    return loopQuestions;
+  };  
 
   /**
    * Copy the condition to created loop question.
@@ -3971,10 +4188,22 @@ class WebLink extends React.Component {
     // }
     if (!validImageTypes.includes(fileType)) {
       this.getBase64(file).then(data => {
-        Upload["media"] = data;
-        this.setState({
-          Upload: Upload
-        })
+        const videoURL = URL.createObjectURL(file);
+        const video = document.createElement("video");
+        video.src = videoURL;
+        video.preload = "metadata";
+        video.onloadedmetadata = async () => {
+          const duration = video.duration;
+          if (duration && duration > 180) {
+            this.showNotification(this.props.t("VideoLengthError"), "danger");
+          }
+          else {
+            Upload["media"] = data;
+            this.setState({
+              Upload: Upload
+            })
+          }
+        }
       })
     }
     else {

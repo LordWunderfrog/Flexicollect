@@ -29,6 +29,7 @@ import Snackbar from "components/Snackbar/Snackbar.jsx";
 import ExpandArrow from "../../../../assets/img/expand-arrow.png";
 import CollapseArrow from "../../../../assets/img/collapse-arrow.png";
 import $ from 'jquery';
+import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 const style = {
     cursor: 'move',
 }
@@ -41,6 +42,10 @@ class Card extends React.Component {
     constructor(props) {
         super(props);
         this.contentEditable = React.createRef();
+        this.quillRef = React.createRef();
+        this.nameRef = React.createRef();
+        this.subNameRef = React.createRef();
+        this.infoContRef = React.createRef();
         this.state = {
             selecteddrops: [],
             option: [{ id: 1, value: "option 1" }],
@@ -52,43 +57,12 @@ class Card extends React.Component {
             conditions: [],
             selectedFile: null,
             loaded: 0,
-
-            productNumber: [
-                { label: "1", value: "1" },
-                { label: "2", value: "2" },
-                { label: "3", value: "3" }
-            ],
-            questionGroup: [
-                { label: "Ambient", value: "Ambient" },
-                { label: "Appearance", value: "Appearance" },
-                { label: "Chilled", value: "Chilled" },
-                { label: "Ease of Opening", value: "Ease of Opening" },
-                { label: "Frozen", value: "Frozen" },
-                { label: "General", value: "General" },
-                { label: "Ignore", value: "Ignore" },
-                { label: "Loose counter", value: "Loose counter" },
-                { label: "Pack", value: "Pack" },
-                { label: "ReSeal", value: "ReSeal" },
-                { label: "Shape", value: "Shape" },
-                { label: "Shelf", value: "Shelf" },
-                { label: "Store", value: "Store" }
-
-            ],
-            otherGroup: [
-                { label: "Action", value: "Action" },
-                { label: "AnotherBrand", value: "AnotherBrand" },
-                { label: "Availability", value: "Availability" },
-                { label: "BackPackPic", value: "BackPackPic" },
-                { label: "BarCode", value: "BarCode" },
-                { label: "Batch", value: "Batch" },
-                { label: "Comparison", value: "Comparison" },
-                { label: "DefectPhoto", value: "DefectPhoto" },
-                { label: "DifficultyOpening", value: "DifficultyOpening" },
-                { label: "OverallExperience", value: "OverallExperience" },
-                { label: "PurchaseLikelyHood", value: "PurchaseLikelyHood" },
-                { label: "ReasonRating", value: "ReasonRating" }],
+            productNumber: [],
+            choiceOptionsList: [],
+            questionGroup: [],
             fieldprops: {
                 label: "",
+                group_number: false,
                 properties: {
                     question: "",
                     subheading: "",
@@ -97,8 +71,11 @@ class Card extends React.Component {
                     productNumber: 0,
                     ReportTag: '',
                     currentQuestionGroup: '',
-                    currentOtherGroup: '',
-                    currentProductNumber: ''
+                    currentQuestionSubGroup1: { value: "", label: "" },
+                    currentQuestionSubGroup2: { value: "", label: "" },
+                    currentQuestionSubGroup3: { value: "", label: "" },
+                    currentProductNumber: { value: "", label: "" },
+                    selectedChoiceGroup: { value: "", label: "", group_id: null },
                 }
             },
             updatedInfoVal: "",
@@ -118,16 +95,30 @@ class Card extends React.Component {
             show: [false, false, false, false],
             maximumAttribute: [],
             attributePerTask: [],
-            repeatAttribute: []
+            repeatAttribute: [],
+            allQuestionGroupArray: [],
+            selectedGroupData: {},
+            randomizedOptions: [
+                { value: 1, label: 'Group 1' },
+                { value: 2, label: 'Group 2' },
+                { value: 3, label: 'Group 3' },
+                { value: 4, label: 'Group 4' },
+                { value: 5, label: 'Group 5' },
+                { value: 6, label: 'Group 6' },
+                { value: 7, label: 'Group 7' },
+                { value: 8, label: 'Group 8' },
+                { value: 9, label: 'Group 9' },
+                { value: 10, label: 'Group 10' },
+            ],
+            pasteKeyPressed: false,
         };
         this.handleFocus = this.handleFocus.bind(this);
         this.handleBlur = this.handleBlur.bind(this);
+        this.choiceInputRefs = {};
+        this.choiceSubInputRefs = {};
     }
 
-    /**
-     * Rich text editor Toolbar control.
-     *
-     */
+    /** Rich text editor Toolbar control. */
     modules = {
         toolbar: [
             [{ header: [1, 2, false] }],
@@ -147,10 +138,7 @@ class Card extends React.Component {
         ]
     };
 
-    /**
-     * Rich text editor formats control.
-     *
-     */
+    /* Rich text editor formats control. */
     formats = [
         "header",
         "bold",
@@ -171,10 +159,7 @@ class Card extends React.Component {
         "right"
     ];
 
-    /**
-     * Rich text editor submit function.
-     *
-     */
+    /* Rich text editor submit function. */
     richText = value => {
         let match = false;
         this.setState({ updatedInfoVal: value })
@@ -195,6 +180,7 @@ class Card extends React.Component {
         }
         //this.props.autosave()
     };
+
     /* Unused function.Kept this code for reference. */
     completedvaluecheck(fieldprops) {
         if (fieldprops.type === 'info') {
@@ -292,14 +278,17 @@ class Card extends React.Component {
             selectedlanguage: nextProps.selectedlanguage,
             currentlanguage: nextProps.dropcurrentlanguage,
             defaultdrops: nextProps.defaultdrops
-
         });
     }
 
     /* One time functions which call after mounting. */
     componentDidMount() {
+        const selectedProfile = this.props.selectedProfile && this.props.selectedProfile.value !== "";
+        const mappingProfileEnable = this.props.mappingProfileEnable;
+        if (mappingProfileEnable && selectedProfile) {
+            this.fetchClientesQuestion(this.props.selectedProfile);
+        }
         let fieldprops = this.props.oldprop;
-
         if (fieldprops.type === "choice") {
             if (fieldprops.properties.options) {
                 fieldprops.properties.options.map((option) => {
@@ -315,10 +304,6 @@ class Card extends React.Component {
                     }
                 })
             }
-
-            // if(!fieldprops.properties.options.label_text && fieldprops.properties.options.label){
-            //     fieldprops.properties.options.label=fieldprops.properties.options.label_text;
-            // }
         }
         fieldprops.question_id = this.props.question_id;
         this.setState({
@@ -331,10 +316,53 @@ class Card extends React.Component {
         }, () => {
             this.manageMaxdiffSettingOption()
         });
-    }
+        // Add keydown event listener to Quill editor container
+        if (this.quillRef.current && this.quillRef.current.editor) {
+            this.quillRef.current.editor.container.addEventListener("paste", this.handleKeyDown);
+        }
+    };
+
+    componentWillUnmount() {
+        if (this.quillRef.current && this.quillRef.current.editor) {
+            this.quillRef.current.editor.container.removeEventListener("paste", this.handleKeyDown);
+        }
+    };
+
+    /* Fetch question of client's */
+    fetchClientesQuestion = (selectedProfile) => {
+        if (this.state.allQuestionGroupArray.length > 0) {
+            this.setGroupQuestionAnswers(this.state.allQuestionGroupArray);
+        } else {
+            api2
+                .get("questions_of_client?id=" + (selectedProfile.id || 1))
+                .then(resp => {
+                    if (resp.status === 200) {
+                        this.setState({
+                            allQuestionGroupArray: resp.data.Group,
+                            productNumber: resp.data.Product
+                        })
+                        this.setGroupQuestionAnswers(resp.data.Group);
+                    }
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+            api2
+                .get("dropdown?client_id=" + (selectedProfile.id || 1))
+                .then(resp => {
+                    if (resp.status === 200) {
+                        this.setState({
+                            choiceOptionsList: resp.data.data
+                        })
+                    }
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        }
+    };
 
     /* Handles the event to update the question props. */
-
     handleFocus = (e) => {
         let fieldprops = this.state.fieldprops;
         let fieldans = fieldprops.properties;
@@ -351,22 +379,26 @@ class Card extends React.Component {
 
     /* Handles the event to update the props. */
     handleBlur = (e) => {
-        if (e === "<p><br></p>" || e === "<p></p>") {
-            let fieldprops = this.state.fieldprops;
-            let fieldans = fieldprops.properties;
-            let message = fieldprops.type === "info" ? "Type Information" : fieldprops.type === "capture" ? "Type the message" : "Type a question";
-            let message_text = fieldprops.type === "info" ? "<p>Type Information</p>" : fieldprops.type === "capture" ? "<p>Type the message</p>" : "<p>Type a question</p>";
-            fieldans.question = message
-            fieldans.question_text = message_text
-            this.setState({ fieldprops: fieldprops });
-        }
-        else {
-            let fieldprops = this.state.fieldprops;
-            let fieldans = fieldprops.properties;
-            fieldans.question = fieldans.question.replace(/&nbsp;/gi, '')
-            fieldans.question_text = fieldans.question_text.replace(/&nbsp;/gi, '')
-            this.setState({ fieldprops: fieldprops });
-        }
+        setTimeout(() => {
+            if (!this.state.pasteKeyPressed) {
+                if (e === "<p><br></p>" || e === "<p></p>") {
+                    let fieldprops = this.state.fieldprops;
+                    let fieldans = fieldprops.properties;
+                    let message = fieldprops.type === "info" ? "Type Information" : fieldprops.type === "capture" ? "Type the message" : "Type a question";
+                    let message_text = fieldprops.type === "info" ? "<p>Type Information</p>" : fieldprops.type === "capture" ? "<p>Type the message</p>" : "<p>Type a question</p>";
+                    fieldans.question = message
+                    fieldans.question_text = message_text
+                    this.setState({ fieldprops: fieldprops });
+                }
+                else {
+                    let fieldprops = this.state.fieldprops;
+                    let fieldans = fieldprops.properties;
+                    fieldans.question = fieldans.question.replace(/&nbsp;/gi, '').trim()
+                    fieldans.question_text = fieldans.question_text.replace(/&nbsp;/gi, '').trim()
+                    this.setState({ fieldprops: fieldprops });
+                }
+            }
+        }, 200)
     }
     handleOnBlurData = (e, index, subindex) => {
         let fieldprops = this.state.fieldprops;
@@ -398,6 +430,12 @@ class Card extends React.Component {
         }
 
         this.setState({ fieldprops: fieldprops });
+    }
+    handlePaste = (e) => {
+        e.preventDefault();
+        let text = e.clipboardData.getData('text/plain');
+        // You can perform further cleaning on the pasted text here if needed
+        document.execCommand('insertText', false, text);
     }
 
     /* Handles the api to validate the ref code. */
@@ -499,9 +537,6 @@ class Card extends React.Component {
         this.props.upArrowFunc(this.props.question_id);
         this.props.upArrowFuncLanguage(this.props.question_id);
     }
-
-
-
 
     /* Formation of data in base64 format. */
     getBase64(file) {
@@ -1418,8 +1453,6 @@ class Card extends React.Component {
         // this.props.autosave()
     }
 
-
-
     checkValue = (e) => {
         if (e.target) {
             evalue = e.target.value;
@@ -1593,7 +1626,7 @@ class Card extends React.Component {
         // this.props.updateProperties(this.state.fieldprops)
     }
 
-    /** handle Attribute selection  */
+    /* handle Attribute selection  */
     handleAttribute = (e, attributename) => {
         let fieldprops = this.state.fieldprops;
         let selectedlanguage = this.props.selectedlanguage
@@ -1814,7 +1847,6 @@ class Card extends React.Component {
     //         }
     //     }
 
-    //     console.log('final set is', setOfAttribute)
     //     fieldprops.properties['attribute_Set'] = setOfAttribute
     //     this.setState({
     //         fieldprops
@@ -1835,16 +1867,10 @@ class Card extends React.Component {
         return false;
     }
 
-    /*handleQuestionGroupChange(name, event) {
-        console.log('hi')
+    /* handleQuestionGroupChange(name, event) {
         //this.checkValue(e);
-        console.log('event');
         let fieldprops = this.state.fieldprops;
         fieldprops.properties.currentQuestionGroup = event
-        //console.log(event.target.value);
-        console.log(event.label);
-        console.log(event);
-        console.log('here');
         this.setState({
             fieldprops
         });
@@ -1866,6 +1892,36 @@ class Card extends React.Component {
         });
         // this.props.updateProperties(this.state.fieldprops)this.props.updateProperties(this.state.fieldprops)
     }
+
+    /** Randomise some set of question based on group selected. 
+     *  for example - if selected group 1 in four choice question then 
+     *  that question will ask in random order 
+     */
+    RandomizeGroupName = (e) => {
+        let fieldprops = this.state.fieldprops;
+        fieldprops.group_number = e.value
+        let selectedlanguage = this.props.selectedlanguage
+        let languages_drop = this.props.languages_drop;
+        selectedlanguage.forEach((a, b) => {
+            if (a.label !== 'English') {
+                languages_drop[a.label].content[this.props.index].group_number = e.value;
+            }
+        })
+        this.setState({
+            fieldprops
+        },
+            () => {
+                this.props.autosave()
+            });
+    };
+
+    getSelectedRandomizeGroupName = (value) => {
+        if (value) {
+            return this.state.randomizedOptions.find((item) => item.value == value)
+        }
+        else return null
+    };
+
     onBlurName = (e, i, index, key) => {
         this.checkValue(e);
         /** code for change the question in condition of Hide/show if lable is change */
@@ -1883,25 +1939,8 @@ class Card extends React.Component {
         }
     }
 
-    handleQuestionGroupChange = (e, i, index, key) => {
-        let fieldprops = this.state.fieldprops;
-        fieldprops.properties.currentQuestionGroup = e
-        this.setState({
-            fieldprops
-        });
-        this.props.autosave()
-    }
-    handleOtherGroupChange = (e, i, index, key) => {
-        console.log(e)
-        let fieldprops = this.state.fieldprops;
-        fieldprops.properties.currentOtherGroup = e
-        this.setState({
-            fieldprops
-        });
-        this.props.autosave()
-    }
+    /* Map profile dropdon selection */
     handleProductNumberChange = (e, i, index, key) => {
-        console.log(e)
         let fieldprops = this.state.fieldprops;
         fieldprops.properties.currentProductNumber = e
         this.setState({
@@ -1910,7 +1949,58 @@ class Card extends React.Component {
         this.props.autosave()
     }
 
+    /* Map profile choice dropdon selection */
+    handleselectedChoiceGroup = (e, i, index, key) => {
+        let fieldprops = this.state.fieldprops;
+        const selectedChoiceGroupOptions = this.state.choiceOptionsList.length > 0 ?
+            this.state.choiceOptionsList.find((item) => { return item.group_id == e.group_id }).options : [];
+        const newOptions = selectedChoiceGroupOptions && selectedChoiceGroupOptions.length > 0 ?
+            selectedChoiceGroupOptions.map((item, index) => {
+                return {
+                    id: index,
+                    label: item.label,
+                    label_text: `<p>${item.label}</p>`,
+                    label_image: ""
+                }
+            }) : []
+        fieldprops.properties.selectedChoiceGroup = e
+        fieldprops.properties.options = newOptions
+        this.setState({
+            fieldprops
+        });
+        this.props.autosave()
+    }
 
+    handleSetQuestionGroupData = (e, index) => {
+        let groupArray = this.state.allQuestionGroupArray.length > 0 && this.state.allQuestionGroupArray.find((item, id) => { return item.group.value == e.value });
+        this.setState({
+            selectedGroupData: groupArray
+        });
+    };
+
+    handleQuestionGroupChange = (e, i, index, key) => {
+        let fieldprops = this.state.fieldprops;
+        fieldprops.properties.currentQuestionGroup = e
+        fieldprops.properties.currentQuestionSubGroup1 = { value: "", label: "" }
+        fieldprops.properties.currentQuestionSubGroup2 = { value: "", label: "" }
+        this.setState({
+            fieldprops
+        });
+        // this.props.autosave();
+        this.handleSetQuestionGroupData(e, index)
+    }
+    handleQuestionSubGroupChange = (e, i, index, key) => {
+        let fieldprops = this.state.fieldprops;
+        const val = { value: e.value, label: e.label }
+        if (i == 'currentQuestionSubGroup1') {
+            fieldprops.properties.currentQuestionSubGroup2 = { value: "", label: "" }
+        }
+        fieldprops.properties[i] = val
+        this.setState({
+            fieldprops
+        });
+        this.props.autosave()
+    }
 
     inputtypeProductNum = (e, i, index, key) => {
         this.checkValue(e);
@@ -1943,7 +2033,7 @@ class Card extends React.Component {
             fieldprops
         });
         // this.props.updateProperties(this.state.fieldprops)this.props.updateProperties(this.state.fieldprops)
-    }//inputtypeOther
+    }
     inputtypeOther = (e, i, index, key) => {
         this.checkValue(e);
         let fieldprops = this.state.fieldprops;
@@ -1968,7 +2058,17 @@ class Card extends React.Component {
         this.setState({
             fieldprops
         });
+        if (this.state.pasteKeyPressed) {
+            setTimeout(() => {
+                this.setState({
+                    pasteKeyPressed: false
+                })
+            }, 200)
+        }
         // this.props.updateProperties(this.state.fieldprops)
+    }
+    handleKeyDown = (e) => {
+        this.setState({ pasteKeyPressed: true })
     }
     inputsubheading = (e, i, index, key) => {
         this.checkValue(e);
@@ -2416,10 +2516,6 @@ class Card extends React.Component {
         // this.props.updateProperties(this.state.fieldprops)
     }
 
-
-
-
-
     /* Handles gallery popup function.     */
     localGallery(i, y, x) {
 
@@ -2865,12 +2961,10 @@ class Card extends React.Component {
         );
     };
 
-
     /* Handles the callback function.   */
     testfun() {
         this.props.attrib(this.state.fieldlabel, this.props.vid);
     }
-
 
     /* Handles the callback function to update fieldprops.   */
     handleClick() {
@@ -2885,11 +2979,11 @@ class Card extends React.Component {
         this.setState({
             currentlanguage: event,
             updatedInfoVal: ""
-        }, () => { this.props.changedroplanguage(event.label) })
-
-
+        }, () => {
+            this.props.changedroplanguage(event.label)
+            this.props.autosave()
+        })
     };
-
 
     /*inputtypeProductNum = (e, i, index, key) => {
         this.checkValue(e);
@@ -2996,7 +3090,6 @@ class Card extends React.Component {
             })
         }
     };
-
 
     /* Handles the close event of settings.   */
     handleClose = e => {
@@ -4449,17 +4542,7 @@ class Card extends React.Component {
                 );
             })
             .catch(error => {
-
-                if (error.response) {
-                    console.log(error.response.data);
-                    console.log(error.response.status);
-                    console.log(error.response.headers);
-                } else if (error.request) {
-                    console.log(error.request);
-                } else {
-                    console.log("Error", error.message);
-                }
-                console.log(error.config);
+                console.log("Error", error);
             });
     };
 
@@ -4498,24 +4581,158 @@ class Card extends React.Component {
         $(`#sublabelid${num}`).addClass("d-none")
 
     }
+
+    /* Fetch questions after client is selected */
+    setGroupQuestionAnswers = (data) => {
+        this.setState({ allQuestionGroupArray: data })
+        let groupArray = [];
+        const selectedGroupAnswers = this.props.oldprop.properties;                                                 // selected question's properties
+        const _allQuestionGroupArray = data;
+        if (selectedGroupAnswers) {
+            const isGroupSelected = selectedGroupAnswers.hasOwnProperty('currentQuestionGroup') &&                  // is Group selected
+                selectedGroupAnswers.currentQuestionGroup.hasOwnProperty("value");
+
+            const tempGroupArray = _allQuestionGroupArray.map((item, index) => {                                      // all groups list array
+                if (isGroupSelected && item.group.value == selectedGroupAnswers.currentQuestionGroup.value) {
+                    groupArray = item
+                }
+                return item.group
+            }) || [];
+
+            this.setState({
+                questionGroup: tempGroupArray,
+                selectedGroupData: groupArray
+            })
+        }
+    }
+
+    getSubGroupArray = (type) => {
+        const selectedGroup = this.state.selectedGroupData;
+        const subGroup = selectedGroup && selectedGroup.Subgroups
+        if (type == 1 && selectedGroup && subGroup) {
+            return selectedGroup && selectedGroup.Subgroups && selectedGroup.Subgroups.map((item => item.Subgroup1))
+        }
+        else if (type == 2 && selectedGroup && subGroup) {
+            const val1 = this.state.fieldprops.properties.currentQuestionSubGroup1 && this.state.fieldprops.properties.currentQuestionSubGroup1.value || "";
+            const temparray = selectedGroup && selectedGroup.Subgroups && selectedGroup.Subgroups.find((item) => item.Subgroup1.value == val1);
+            if (temparray && temparray.Subgroup1 && temparray.Subgroup1.Subgroup2) {
+                return temparray.Subgroup1.Subgroup2
+            } else return []
+        } else return []
+    }
+
+    onDragEnd = (result) => {
+        const { source, destination } = result;
+        if (!destination) {
+            return;
+        }
+        const updatedArray = Array.from(this.state.fieldprops.properties.options);
+        const [removed] = updatedArray.splice(source.index, 1);
+        updatedArray.splice(destination.index, 0, removed);
+        localStorage.setItem('updateProperties', true);
+        let fieldprops = this.state.fieldprops;
+        fieldprops.properties.options = updatedArray;
+        this.setState({
+            fieldprops
+        });
+
+        let selectedlanguage = this.props.selectedlanguage
+        let languages_drop = this.props.languages_drop;
+        selectedlanguage.forEach((a, b) => {
+            if (a.label !== 'English') {
+                const languageOptions = languages_drop[a.label].content[this.props.index].properties.options;
+                const updatedArray1 = Array.from(languageOptions);
+                const [removed1] = updatedArray1.splice(source.index, 1);
+                updatedArray1.splice(destination.index, 0, removed1);
+                languages_drop[a.label].content[this.props.index].properties.options = updatedArray1;
+            }
+        })
+    }
+
+    keyPressCapture = (e, type, isInfo, isGps) => {
+        const isTabbingInEditor = e.key === 'Tab'
+        if (isTabbingInEditor) {
+            e.preventDefault();
+            e.target.blur();
+            if (type == 1) {
+                this.nameRef.current.focus();
+            }
+            if (!isGps && type == 2) {
+                this.subNameRef.current.editor.focus();
+            }
+            if (type == 3 && isInfo) {
+                this.infoContRef.current.editor.focus();
+            }
+            return false;
+        }
+    };
+
+    // Method to focus next option input by its key
+    onOptionTabClick = (key, e, subOption, subOptions, optionId) => {
+        const isTabbingInEditor = e.key === 'Tab'
+        if (subOption && isTabbingInEditor) {
+            const findLastOption = subOptions[subOptions.length - 1].id;
+            const isIdFromZero = subOptions[0].id == 0 ? true : false;
+            const isLastOptionfocused = key.includes(`${optionId}${isIdFromZero ? findLastOption + 1 : findLastOption}`)
+            if (isLastOptionfocused) {
+                if (this.state.currentlanguage.value == "English") {
+                    this.addfun("suboptions", optionId);
+                }
+                setTimeout(() => {
+                    this.choiceSubInputRefs[key] 
+                    && this.choiceSubInputRefs[key].current 
+                    && this.choiceSubInputRefs[key].current.editor
+                    && this.choiceSubInputRefs[key].current.editor.focus();
+                }, 100)
+            }
+            else if (this.choiceSubInputRefs[key] && this.choiceSubInputRefs[key].current) {
+                this.choiceSubInputRefs[key].current.editor.focus();
+            }
+        }
+        else {
+            if (isTabbingInEditor) {
+                const totalOptions = this.state.fieldprops.properties.options;
+                const findLastOption = totalOptions[totalOptions.length - 1].id;
+                const isIdFromZero = totalOptions[0].id == 0 ? true : false;
+                const isLastOptionfocused = key.includes(`${isIdFromZero ? findLastOption + 1 : findLastOption}`);
+                if (isLastOptionfocused) {
+                    if (this.state.currentlanguage.value == "English") {
+                        this.addfun("options");
+                    }
+                    setTimeout(() => {
+                        this.choiceInputRefs[key] 
+                        && this.choiceInputRefs[key].current 
+                        && this.choiceInputRefs[key].current.editor
+                        && this.choiceInputRefs[key].current.editor.focus();
+                    }, 100)
+                }
+                else if (this.choiceInputRefs[key] && this.choiceInputRefs[key].current) {
+                    this.choiceInputRefs[key].current.editor.focus();
+                }
+            }
+        }
+    };
+
     render() {
-        // console.log(this.state)
         const gallery = this.props.gallery;
         const infoico = this.props.infoico;
         const scaleico = this.props.scaleico;
         const infoicon = gallery.concat(infoico)
         const scaleicon = gallery.concat(scaleico)
+        const mappingProfileEnable = this.props.mappingProfileEnable
+        const choiceOptionsList = this.state.choiceOptionsList
         const { open } = this.state;
-        // const marker = this.state.fieldprops.properties.marker;
         const scale_images = this.state.fieldprops && this.state.fieldprops.properties ? this.state.fieldprops.properties.scale_images : undefined;
         const scale_content = this.state.fieldprops && this.state.fieldprops.properties ? this.state.fieldprops.properties.scale_content : undefined;
         const table_content = this.state.fieldprops && this.state.fieldprops.properties ? this.state.fieldprops.properties.table_content : undefined;
         const scale_length = scale_content ? scale_content.length : 0;
         const scale_len = scale_images ? scale_images.length : "";
-        const boardval = open ? "properties-mmain-tab openbox" : "properties-mmain-tab closebox";
+        const boardval = open ? "properties-mmain-tab drag-options openbox" : "properties-mmain-tab drag-options closebox";
         let alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
         const { msgColor, br, message, MandatoryStyle } = this.state;
         const disabledive = { 'pointerEvents': 'none', opacity: 0.4, 'cursor': "none" }
+        const createChoiceGrpArray = choiceOptionsList.length > 0 ?
+            choiceOptionsList.map((item) => { return { group_id: item.group_id, value: item.value, label: item.label } }) : [];
 
         const info = (
 
@@ -4542,6 +4759,8 @@ class Card extends React.Component {
                                 style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops && this.state.defaultdrops.properties.question === "" ? disabledive : {} : {}}
                             >
                                 <ReactQuill
+                                    onKeyDown={(e) => this.keyPressCapture(e, 1)}
+                                    ref={this.quillRef}
                                     className="quillEditor"
                                     name="inputquestion"
                                     value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""}
@@ -4558,7 +4777,8 @@ class Card extends React.Component {
 
                                         //     return
                                         // }
-                                        if (source === 'user') {
+                                        const find = delta.ops.find((item) => item.insert == "\t")
+                                        if (!find && source === 'user') {
                                             this.inputquestion(html, "inputquestion")
                                         }
                                     }}
@@ -4573,7 +4793,16 @@ class Card extends React.Component {
                             <div className="below-lanbel-body"
                                 style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                             >
-                                <input type="text" name="name" className="mediumfm" value={this.state.fieldprops.label ? this.state.fieldprops.label : ""} onChange={e => this.inputtypename(e, "inputtypename")} onBlur={e => this.onBlurName(e, "onBlurName")} />
+                                <input
+                                    onKeyDown={(e) => this.keyPressCapture(e, 2)}
+                                    ref={this.nameRef}
+                                    type="text"
+                                    name="name"
+                                    className="mediumfm"
+                                    value={this.state.fieldprops.label ? this.state.fieldprops.label : ""}
+                                    onChange={e => this.inputtypename(e, "inputtypename")}
+                                    onBlur={e => this.onBlurName(e, "onBlurName")}
+                                />
                                 <label> Edit your Name </label>
                             </div>
                         </li>
@@ -4584,6 +4813,8 @@ class Card extends React.Component {
                                 style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops === undefined || this.state.defaultdrops.properties.subheading === ("" || null || undefined) ? disabledive : {} : {}}
                             >
                                 <ReactQuill
+                                    onKeyDown={(e) => this.keyPressCapture(e, 3, true)}
+                                    ref={this.subNameRef}
                                     className="quillEditor"
                                     value={this.state.fieldprops.properties.subheading_text ? this.state.fieldprops.properties.subheading_text : this.state.fieldprops.properties.subheading ? this.state.fieldprops.properties.subheading : ""}
                                     inlineStyles="true"
@@ -4596,7 +4827,8 @@ class Card extends React.Component {
                                         //     this.showNotification("Image not allowed. Please use bellow information type image option to add image", "danger")
                                         //     return
                                         // }
-                                        if (source === 'user') {
+                                        const find = delta.ops.find((item) => item.insert == "\t")
+                                        if (!find && source === 'user') {
                                             this.inputsubheading(html, "inputsubheading")
                                         }
                                     }}
@@ -4642,6 +4874,8 @@ class Card extends React.Component {
                                     <h3>Information Content</h3>
                                     <div>
                                         <ReactQuill
+                                            onKeyDown={(e) => this.keyPressCapture(e, 4)}
+                                            ref={this.infoContRef}
                                             className="infocontentQuill"
                                             value={this.state.fieldprops.properties.info_text ? this.state.fieldprops.properties.info_text : ""}
                                             inlineStyles="true"
@@ -4653,7 +4887,8 @@ class Card extends React.Component {
                                                 //     this.showNotification("Image not allowed. Please use bellow information type image option to add image", "danger")
                                                 //     return
                                                 // }
-                                                if (source === 'user') {
+                                                const find = delta.ops.find((item) => item.insert == "\t")
+                                                if (!find && source === 'user') {
                                                     this.info_text(html, "info_text")
                                                 }
                                             }}
@@ -4908,6 +5143,8 @@ class Card extends React.Component {
 
                             >
                                 <ReactQuill
+                                    onKeyDown={(e) => this.keyPressCapture(e, 1)}
+                                    ref={this.quillRef}
                                     className="quillEditor"
                                     value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""}
                                     inlineStyles="true"
@@ -4927,7 +5164,8 @@ class Card extends React.Component {
                                         //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
                                         //     return
                                         // }
-                                        if (source === 'user') {
+                                        const find = delta.ops.find((item) => item.insert == "\t")
+                                        if (!find && source === 'user') {
                                             this.inputquestion(html, "inputquestion")
                                         }
                                     }}
@@ -4959,7 +5197,16 @@ class Card extends React.Component {
                             <div className="below-lanbel-body"
                                 style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                             >
-                                <input type="text" name="name" className="mediumfm" value={this.state.fieldprops.label ? this.state.fieldprops.label : ""} onChange={e => this.inputtypename(e, "inputtypename")} onBlur={e => this.onBlurName(e, "onBlurName")} />
+                                <input
+                                    onKeyDown={(e) => this.keyPressCapture(e, 2)}
+                                    ref={this.nameRef}
+                                    type="text"
+                                    name="name"
+                                    className="mediumfm"
+                                    value={this.state.fieldprops.label ? this.state.fieldprops.label : ""}
+                                    onChange={e => this.inputtypename(e, "inputtypename")}
+                                    onBlur={e => this.onBlurName(e, "onBlurName")}
+                                />
                                 <label> Edit your Name </label>
                             </div>
                         </li>
@@ -4971,6 +5218,8 @@ class Card extends React.Component {
 
                             >
                                 <ReactQuill
+                                    onKeyDown={(e) => this.keyPressCapture(e, 3)}
+                                    ref={this.subNameRef}
                                     className="quillEditor"
                                     value={this.state.fieldprops.properties.subheading_text ? this.state.fieldprops.properties.subheading_text : this.state.fieldprops.properties.subheading ? this.state.fieldprops.properties.subheading : ""}
                                     inlineStyles="true"
@@ -4982,7 +5231,8 @@ class Card extends React.Component {
                                         //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
                                         //     return
                                         // }
-                                        if (source === 'user') {
+                                        const find = delta.ops.find((item) => item.insert == "\t")
+                                        if (!find && source === 'user') {
                                             this.inputsubheading(html, "inputsubheading")
                                             //   this.updateprops(html, "inputsubheading")
                                         }
@@ -5005,16 +5255,15 @@ class Card extends React.Component {
                                     onBlur={(e) => this.ValidateRefCode(e, 'refcodevalidate')}
                                     onChange={e => this.updaterefcode(e, "refcodechange")}
                                 />
-
-
                                 <div className="addmoreimage addmoreimage-big"
                                     onClick={() => this.setState({ disabled: false })}
                                 > Ref Code
-
                                 </div>
                             </div>
+                        </li>
+                        <li style={this.state.currentlanguage.value !== "English" ? disabledive : {}} >
                             <div>
-                                <h3>Product Number</h3>
+                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Product Number</h3>
                                 <Select
                                     placeholder={'select Product Number'}
                                     value={this.state.fieldprops.properties.currentProductNumber}
@@ -5023,7 +5272,7 @@ class Card extends React.Component {
                                     name="productNumber"
                                     className="language_list"
                                 />
-                                <h3>Question Group</h3>
+                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Question Group</h3>
                                 <Select
                                     placeholder={'select Question Group'}
                                     value={this.state.fieldprops.properties.currentQuestionGroup}
@@ -5032,18 +5281,33 @@ class Card extends React.Component {
                                     name="questionGroup"
                                     className="language_list"
                                 />
-                                <h3>Other</h3>
+                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>{`Sub Group 1`}</h3>
                                 <Select
-                                    placeholder={'select Question Group'}
-                                    value={this.state.fieldprops.properties.currentOtherGroup}
-                                    options={this.state.otherGroup}
-                                    onChange={e => this.handleOtherGroupChange(e, "otherGroup")}
-                                    name="otherGroup"
+                                    placeholder={`select Question Sub Group 1`}
+                                    value={this.state.fieldprops.properties.currentQuestionSubGroup1}
+                                    options={this.getSubGroupArray(1)}
+                                    onChange={e => this.handleQuestionSubGroupChange(e, `currentQuestionSubGroup1`)}
+                                    name="currentQuestionSubGroup"
+                                    className="language_list"
+                                />
+                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>{`Sub Group 2`}</h3>
+                                <Select
+                                    placeholder={`select Question Sub Group 2`}
+                                    value={this.state.fieldprops.properties.currentQuestionSubGroup2}
+                                    options={this.getSubGroupArray(2)}
+                                    onChange={e => this.handleQuestionSubGroupChange(e, `currentQuestionSubGroup2`)}
+                                    name="currentQuestionSubGroup"
                                     className="language_list"
                                 />
                                 <h3>Comments</h3>
                                 <div className="below-lanbel-body" style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
-                                    <input type="text" name="productNum" className="mediumfm" value={this.state.fieldprops.properties.productNumber ? this.state.fieldprops.properties.productNumber : ""} onChange={e => this.inputtypeProductNum(e, "inputtypeProductNum")} />
+                                    <input
+                                        type="text"
+                                        name="productNum"
+                                        className="mediumfm"
+                                        value={this.state.fieldprops.properties.productNumber ? this.state.fieldprops.properties.productNumber : ""}
+                                        onChange={e => this.inputtypeProductNum(e, "inputtypeProductNum")}
+                                    />
                                 </div>
                             </div>
                         </li>
@@ -5228,6 +5492,8 @@ class Card extends React.Component {
                             <div className="below-lanbel-body"
                             >
                                 <ReactQuill
+                                    onKeyDown={(e) => this.keyPressCapture(e, 1)}
+                                    ref={this.quillRef}
                                     className="quillEditor"
                                     value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""}
                                     inlineStyles="true"
@@ -5239,7 +5505,8 @@ class Card extends React.Component {
                                         //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
                                         //     return
                                         // }
-                                        if (source === 'user') {
+                                        const find = delta.ops.find((item) => item.insert == "\t")
+                                        if (!find && source === 'user') {
                                             this.inputquestion(html, "inputquestion")
                                         }
                                     }}
@@ -5256,9 +5523,17 @@ class Card extends React.Component {
                             style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                         >
                             <h3>Name</h3>
-                            <div className="below-lanbel-body"
-                            >
-                                <input type="text" name="name" className="mediumfm" value={this.state.fieldprops.label} onChange={e => this.inputtypename(e, "inputtypename")} onBlur={e => this.onBlurName(e, "onBlurName")} />
+                            <div className="below-lanbel-body">
+                                <input
+                                    onKeyDown={(e) => this.keyPressCapture(e, 2)}
+                                    ref={this.nameRef}
+                                    type="text"
+                                    name="name"
+                                    className="mediumfm"
+                                    value={this.state.fieldprops.label ? this.state.fieldprops.label : ""}
+                                    onChange={e => this.inputtypename(e, "inputtypename")}
+                                    onBlur={e => this.onBlurName(e, "onBlurName")}
+                                />
                                 <label> Edit your Name </label>
                             </div>
                         </li>
@@ -5269,6 +5544,8 @@ class Card extends React.Component {
                             <h3>Sub Heading</h3>
                             <div className="below-lanbel-body">
                                 <ReactQuill
+                                    onKeyDown={(e) => this.keyPressCapture(e, 3)}
+                                    ref={this.subNameRef}
                                     className="quillEditor"
                                     value={this.state.fieldprops.properties.subheading_text ? this.state.fieldprops.properties.subheading_text : this.state.fieldprops.properties.subheading ? this.state.fieldprops.properties.subheading : ""}
                                     inlineStyles="true"
@@ -5281,7 +5558,8 @@ class Card extends React.Component {
                                         //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
                                         //     return
                                         // }
-                                        if (source === 'user') {
+                                        const find = delta.ops.find((item) => item.insert == "\t")
+                                        if (!find && source === 'user') {
                                             this.inputsubheading(html, "inputsubheading")
                                         }
                                     }}
@@ -5310,42 +5588,52 @@ class Card extends React.Component {
                                     onClick={() => this.setState({ disabled: false })}
                                 > Ref Code
                                 </div>
-                                <div>
-                                    <h3>Product Number</h3>
-                                    <Select
-                                        placeholder={'select Product Number'}
-                                        value={this.state.fieldprops.properties.currentProductNumber}
-                                        options={this.state.productNumber}
-                                        onChange={e => this.handleProductNumberChange(e, "productNumber")}
-                                        name="productNumber"
-                                        className="language_list"
-                                    />
-                                    <h3>Question Group</h3>
-                                    <Select
-                                        placeholder={'select Question Group'}
-                                        value={this.state.fieldprops.properties.currentQuestionGroup}
-                                        options={this.state.questionGroup}
-                                        onChange={e => this.handleQuestionGroupChange(e, "questionGroup")}
-                                        name="questionGroup"
-                                        className="language_list"
-                                    />
-                                    <h3>Other</h3>
-                                    <Select
-                                        placeholder={'select Question Group'}
-                                        value={this.state.fieldprops.properties.currentOtherGroup}
-                                        options={this.state.otherGroup}
-                                        onChange={e => this.handleOtherGroupChange(e, "otherGroup")}
-                                        name="otherGroup"
-                                        className="language_list"
-                                    />
-                                    <h3>Comments</h3>
-                                    <div className="below-lanbel-body" style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
-                                        <input type="text" name="productNum" className="mediumfm" value={this.state.fieldprops.properties.productNumber ? this.state.fieldprops.properties.productNumber : ""} onChange={e => this.inputtypeProductNum(e, "inputtypeProductNum")} />
-                                    </div>
+                            </div>
+                        </li>
+                        <li style={this.state.currentlanguage.value !== "English" ? disabledive : {}} >
+                            <div>
+                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Product Number</h3>
+                                <Select
+                                    placeholder={'select Product Number'}
+                                    value={this.state.fieldprops.properties.currentProductNumber}
+                                    options={this.state.productNumber}
+                                    onChange={e => this.handleProductNumberChange(e, "productNumber")}
+                                    name="productNumber"
+                                    className="language_list"
+                                />
+                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Question Group</h3>
+                                <Select
+                                    placeholder={'select Question Group'}
+                                    value={this.state.fieldprops.properties.currentQuestionGroup}
+                                    options={this.state.questionGroup}
+                                    onChange={e => this.handleQuestionGroupChange(e, "questionGroup")}
+                                    name="questionGroup"
+                                    className="language_list"
+                                />
+                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>{`Sub Group 1`}</h3>
+                                <Select
+                                    placeholder={`select Question Sub Group 1`}
+                                    value={this.state.fieldprops.properties.currentQuestionSubGroup1}
+                                    options={this.getSubGroupArray(1)}
+                                    onChange={e => this.handleQuestionSubGroupChange(e, `currentQuestionSubGroup1`)}
+                                    name="currentQuestionSubGroup"
+                                    className="language_list"
+                                />
+                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>{`Sub Group 2`}</h3>
+                                <Select
+                                    placeholder={`select Question Sub Group 2`}
+                                    value={this.state.fieldprops.properties.currentQuestionSubGroup2}
+                                    options={this.getSubGroupArray(2)}
+                                    onChange={e => this.handleQuestionSubGroupChange(e, `currentQuestionSubGroup2`)}
+                                    name="currentQuestionSubGroup"
+                                    className="language_list"
+                                />
+                                <h3>Comments</h3>
+                                <div className="below-lanbel-body" style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
+                                    <input type="text" name="productNum" className="mediumfm" value={this.state.fieldprops.properties.productNumber ? this.state.fieldprops.properties.productNumber : ""} onChange={e => this.inputtypeProductNum(e, "inputtypeProductNum")} />
                                 </div>
                             </div>
                         </li>
-
                         <li
                             style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                         >
@@ -5595,6 +5883,8 @@ class Card extends React.Component {
                                 style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops === undefined || this.state.defaultdrops.properties.question === ("" || null || undefined) ? disabledive : {} : {}}
                             >
                                 <ReactQuill
+                                    onKeyDown={(e) => this.keyPressCapture(e, 1)}
+                                    ref={this.quillRef}
                                     className="quillEditor"
                                     value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""}
                                     inlineStyles="true"
@@ -5608,7 +5898,8 @@ class Card extends React.Component {
                                         //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
                                         //     return
                                         // }
-                                        if (source === 'user') {
+                                        const find = delta.ops.find((item) => item.insert == "\t")
+                                        if (!find && source === 'user') {
                                             this.inputquestion(html, "inputquestion")
                                         }
                                     }}
@@ -5623,7 +5914,16 @@ class Card extends React.Component {
                             <div className="below-lanbel-body"
                                 style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                             >
-                                <input type="text" name="name" className="mediumfm" value={this.state.fieldprops.label} onChange={e => this.inputtypename(e, "inputtypename")} onBlur={e => this.onBlurName(e, "onBlurName")} />
+                                <input
+                                    onKeyDown={(e) => this.keyPressCapture(e, 2)}
+                                    ref={this.nameRef}
+                                    type="text"
+                                    name="name"
+                                    className="mediumfm"
+                                    value={this.state.fieldprops.label ? this.state.fieldprops.label : ""}
+                                    onChange={e => this.inputtypename(e, "inputtypename")}
+                                    onBlur={e => this.onBlurName(e, "onBlurName")}
+                                />
                                 <label> Edit Your Name </label>
                             </div>
                         </li>
@@ -5634,6 +5934,8 @@ class Card extends React.Component {
                                 style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops === undefined || this.state.defaultdrops.properties.subheading === ("" || null || undefined) ? disabledive : {} : {}}
                             >
                                 <ReactQuill
+                                    onKeyDown={(e) => this.keyPressCapture(e, 3)}
+                                    ref={this.subNameRef}
                                     className="quillEditor"
                                     value={this.state.fieldprops.properties.subheading_text ? this.state.fieldprops.properties.subheading_text : this.state.fieldprops.properties.subheading ? this.state.fieldprops.properties.subheading : ""}
                                     inlineStyles="true"
@@ -5645,7 +5947,8 @@ class Card extends React.Component {
                                         //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
                                         //     return
                                         // }
-                                        if (source === 'user') {
+                                        const find = delta.ops.find((item) => item.insert == "\t")
+                                        if (!find && source === 'user') {
                                             this.inputsubheading(html, "inputsubheading")
                                         }
                                     }}
@@ -5672,40 +5975,50 @@ class Card extends React.Component {
                                 <div className="addmoreimage addmoreimage-big"
                                     onClick={() => this.setState({ disabled: false })}
                                 > Ref Code
-
                                 </div>
-                                <div>
-                                    <h3>Product Number</h3>
-                                    <Select
-                                        placeholder={'select Product Number'}
-                                        value={this.state.fieldprops.properties.currentProductNumber}
-                                        options={this.state.productNumber}
-                                        onChange={e => this.handleProductNumberChange(e, "productNumber")}
-                                        name="productNumber"
-                                        className="language_list"
-                                    />
-                                    <h3>Question Group</h3>
-                                    <Select
-                                        placeholder={'select Question Group'}
-                                        value={this.state.fieldprops.properties.currentQuestionGroup}
-                                        options={this.state.questionGroup}
-                                        onChange={e => this.handleQuestionGroupChange(e, "questionGroup")}
-                                        name="questionGroup"
-                                        className="language_list"
-                                    />
-                                    <h3>Other</h3>
-                                    <Select
-                                        placeholder={'select Question Group'}
-                                        value={this.state.fieldprops.properties.currentOtherGroup}
-                                        options={this.state.otherGroup}
-                                        onChange={e => this.handleOtherGroupChange(e, "otherGroup")}
-                                        name="otherGroup"
-                                        className="language_list"
-                                    />
-                                    <h3>Comments</h3>
-                                    <div className="below-lanbel-body" style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
-                                        <input type="text" name="productNum" className="mediumfm" value={this.state.fieldprops.properties.productNumber ? this.state.fieldprops.properties.productNumber : ""} onChange={e => this.inputtypeProductNum(e, "inputtypeProductNum")} />
-                                    </div>
+                            </div>
+                        </li>
+                        <li style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
+                            <div>
+                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Product Number</h3>
+                                <Select
+                                    placeholder={'select Product Number'}
+                                    value={this.state.fieldprops.properties.currentProductNumber}
+                                    options={this.state.productNumber}
+                                    onChange={e => this.handleProductNumberChange(e, "productNumber")}
+                                    name="productNumber"
+                                    className="language_list"
+                                />
+                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Question Group</h3>
+                                <Select
+                                    placeholder={'select Question Group'}
+                                    value={this.state.fieldprops.properties.currentQuestionGroup}
+                                    options={this.state.questionGroup}
+                                    onChange={e => this.handleQuestionGroupChange(e, "questionGroup")}
+                                    name="questionGroup"
+                                    className="language_list"
+                                />
+                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>{`Sub Group 1`}</h3>
+                                <Select
+                                    placeholder={`select Question Sub Group 1`}
+                                    value={this.state.fieldprops.properties.currentQuestionSubGroup1}
+                                    options={this.getSubGroupArray(1)}
+                                    onChange={e => this.handleQuestionSubGroupChange(e, `currentQuestionSubGroup1`)}
+                                    name="currentQuestionSubGroup"
+                                    className="language_list"
+                                />
+                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>{`Sub Group 2`}</h3>
+                                <Select
+                                    placeholder={`select Question Sub Group 2`}
+                                    value={this.state.fieldprops.properties.currentQuestionSubGroup2}
+                                    options={this.getSubGroupArray(2)}
+                                    onChange={e => this.handleQuestionSubGroupChange(e, `currentQuestionSubGroup2`)}
+                                    name="currentQuestionSubGroup"
+                                    className="language_list"
+                                />
+                                <h3>Comments</h3>
+                                <div className="below-lanbel-body" style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
+                                    <input type="text" name="productNum" className="mediumfm" value={this.state.fieldprops.properties.productNumber ? this.state.fieldprops.properties.productNumber : ""} onChange={e => this.inputtypeProductNum(e, "inputtypeProductNum")} />
                                 </div>
                             </div>
                         </li>
@@ -5822,11 +6135,9 @@ class Card extends React.Component {
                                     )}
                                 </div>
                             </li>
-                        ) : (
-                            ""
-                        )}
-                        <li
-                        >
+                        ) : ("")}
+
+                        <li>
                             <div className="below-lanbel-body">
                                 <div className="switch-text-boxes switch-text-boxes-mandatory clear"
                                     style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
@@ -5943,6 +6254,8 @@ class Card extends React.Component {
                             <div className="below-lanbel-body"
                             >
                                 <ReactQuill
+                                    onKeyDown={(e) => this.keyPressCapture(e, 1)}
+                                    ref={this.quillRef}
                                     className="quillEditor"
                                     value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""}
                                     inlineStyles="true"
@@ -5956,7 +6269,8 @@ class Card extends React.Component {
                                         //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
                                         //     return
                                         // }
-                                        if (source === 'user') {
+                                        const find = delta.ops.find((item) => item.insert == "\t")
+                                        if (!find && source === 'user') {
                                             this.inputquestion(html, "inputquestion")
                                         }
                                     }}
@@ -5971,7 +6285,16 @@ class Card extends React.Component {
                         >
                             <h3>Name</h3>
                             <div className="below-lanbel-body">
-                                <input type="text" name="name" className="mediumfm" value={this.state.fieldprops.label} onChange={e => this.inputtypename(e, "inputtypename")} onBlur={e => this.onBlurName(e, "onBlurName")} />
+                                <input
+                                    onKeyDown={(e) => this.keyPressCapture(e, 2)}
+                                    ref={this.nameRef}
+                                    type="text"
+                                    name="name"
+                                    className="mediumfm"
+                                    value={this.state.fieldprops.label ? this.state.fieldprops.label : ""}
+                                    onChange={e => this.inputtypename(e, "inputtypename")}
+                                    onBlur={e => this.onBlurName(e, "onBlurName")}
+                                />
                                 <label> Edit Your Name </label>
                             </div>
                         </li>
@@ -5982,6 +6305,8 @@ class Card extends React.Component {
                             <h3>Sub Heading</h3>
                             <div className="below-lanbel-body">
                                 <ReactQuill
+                                    onKeyDown={(e) => this.keyPressCapture(e, 3)}
+                                    ref={this.subNameRef}
                                     className="quillEditor"
                                     value={this.state.fieldprops.properties.subheading_text ? this.state.fieldprops.properties.subheading_text : this.state.fieldprops.properties.subheading ? this.state.fieldprops.properties.subheading : ""}
                                     inlineStyles="true"
@@ -5993,7 +6318,8 @@ class Card extends React.Component {
                                         //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
                                         //     return
                                         // }
-                                        if (source === 'user') {
+                                        const find = delta.ops.find((item) => item.insert == "\t")
+                                        if (!find && source === 'user') {
                                             this.inputsubheading(html, "inputsubheading")
                                         }
                                     }}
@@ -6021,38 +6347,49 @@ class Card extends React.Component {
                                     onClick={() => this.setState({ disabled: false })}
                                 > Ref Code
                                 </div>
-                                <div>
-                                    <h3>Product Number</h3>
-                                    <Select
-                                        placeholder={'select Product Number'}
-                                        value={this.state.fieldprops.properties.currentProductNumber}
-                                        options={this.state.productNumber}
-                                        onChange={e => this.handleProductNumberChange(e, "productNumber")}
-                                        name="productNumber"
-                                        className="language_list"
-                                    />
-                                    <h3>Question Group</h3>
-                                    <Select
-                                        placeholder={'select Question Group'}
-                                        value={this.state.fieldprops.properties.currentQuestionGroup}
-                                        options={this.state.questionGroup}
-                                        onChange={e => this.handleQuestionGroupChange(e, "questionGroup")}
-                                        name="questionGroup"
-                                        className="language_list"
-                                    />
-                                    <h3>Other</h3>
-                                    <Select
-                                        placeholder={'select Question Group'}
-                                        value={this.state.fieldprops.properties.currentOtherGroup}
-                                        options={this.state.otherGroup}
-                                        onChange={e => this.handleOtherGroupChange(e, "otherGroup")}
-                                        name="otherGroup"
-                                        className="language_list"
-                                    />
-                                    <h3>Comments</h3>
-                                    <div className="below-lanbel-body" style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
-                                        <input type="text" name="productNum" className="mediumfm" value={this.state.fieldprops.properties.productNumber ? this.state.fieldprops.properties.productNumber : ""} onChange={e => this.inputtypeProductNum(e, "inputtypeProductNum")} />
-                                    </div>
+                            </div>
+                        </li>
+                        <li style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
+                            <div>
+                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Product Number</h3>
+                                <Select
+                                    placeholder={'select Product Number'}
+                                    value={this.state.fieldprops.properties.currentProductNumber}
+                                    options={this.state.productNumber}
+                                    onChange={e => this.handleProductNumberChange(e, "productNumber")}
+                                    name="productNumber"
+                                    className="language_list"
+                                />
+                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Question Group</h3>
+                                <Select
+                                    placeholder={'select Question Group'}
+                                    value={this.state.fieldprops.properties.currentQuestionGroup}
+                                    options={this.state.questionGroup}
+                                    onChange={e => this.handleQuestionGroupChange(e, "questionGroup")}
+                                    name="questionGroup"
+                                    className="language_list"
+                                />
+                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>{`Sub Group 1`}</h3>
+                                <Select
+                                    placeholder={`select Question Sub Group 1`}
+                                    value={this.state.fieldprops.properties.currentQuestionSubGroup1}
+                                    options={this.getSubGroupArray(1)}
+                                    onChange={e => this.handleQuestionSubGroupChange(e, `currentQuestionSubGroup1`)}
+                                    name="currentQuestionSubGroup"
+                                    className="language_list"
+                                />
+                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>{`Sub Group 2`}</h3>
+                                <Select
+                                    placeholder={`select Question Sub Group 2`}
+                                    value={this.state.fieldprops.properties.currentQuestionSubGroup2}
+                                    options={this.getSubGroupArray(2)}
+                                    onChange={e => this.handleQuestionSubGroupChange(e, `currentQuestionSubGroup2`)}
+                                    name="currentQuestionSubGroup"
+                                    className="language_list"
+                                />
+                                <h3>Comments</h3>
+                                <div className="below-lanbel-body" style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
+                                    <input type="text" name="productNum" className="mediumfm" value={this.state.fieldprops.properties.productNumber ? this.state.fieldprops.properties.productNumber : ""} onChange={e => this.inputtypeProductNum(e, "inputtypeProductNum")} />
                                 </div>
                             </div>
                         </li>
@@ -6620,6 +6957,10 @@ class Card extends React.Component {
 
         );
 
+        const getListStyle = isDraggingOver => ({
+            background: isDraggingOver ? '' : '',
+        });
+
         const choice = (
             <div>
                 <div className={boardval}>
@@ -6645,6 +6986,8 @@ class Card extends React.Component {
                                     style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops === undefined || this.state.defaultdrops.properties.question === ("" || null || undefined) ? disabledive : {} : {}}
                                 >
                                     <ReactQuill
+                                        onKeyDown={(e) => this.keyPressCapture(e, 1)}
+                                        ref={this.quillRef}
                                         className="quillEditor"
                                         value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""}
                                         inlineStyles="true"
@@ -6658,7 +7001,8 @@ class Card extends React.Component {
                                             //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
                                             //     return
                                             // }
-                                            if (source === 'user') {
+                                            const find = delta.ops.find((item) => item.insert == "\t")
+                                            if (!find && source === 'user') {
                                                 this.inputquestion(html, "inputquestion")
                                             }
                                         }}
@@ -6673,7 +7017,16 @@ class Card extends React.Component {
                                 <div className="below-lanbel-body"
                                     style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                                 >
-                                    <input type="text" name="name" className="mediumfm" value={this.state.fieldprops.label} onChange={e => this.inputtypename(e, "inputtypename")} onBlur={e => this.onBlurName(e, "onBlurName")} />
+                                    <input
+                                        onKeyDown={(e) => this.keyPressCapture(e, 2)}
+                                        ref={this.nameRef}
+                                        type="text"
+                                        name="name"
+                                        className="mediumfm"
+                                        value={this.state.fieldprops.label ? this.state.fieldprops.label : ""}
+                                        onChange={e => this.inputtypename(e, "inputtypename")}
+                                        onBlur={e => this.onBlurName(e, "onBlurName")}
+                                    />
                                     <label> Edit your Name </label>
                                 </div>
                             </li>
@@ -6684,6 +7037,8 @@ class Card extends React.Component {
                                     style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops === undefined || this.state.defaultdrops.properties.subheading === ("" || null || undefined) ? disabledive : {} : {}}
                                 >
                                     <ReactQuill
+                                        onKeyDown={(e) => this.keyPressCapture(e, 3)}
+                                        ref={this.subNameRef}
                                         className="quillEditor"
                                         value={this.state.fieldprops.properties.subheading_text ? this.state.fieldprops.properties.subheading_text : this.state.fieldprops.properties.subheading ? this.state.fieldprops.properties.subheading : ""}
                                         inlineStyles="true"
@@ -6695,7 +7050,8 @@ class Card extends React.Component {
                                             //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
                                             //     return
                                             // }
-                                            if (source === 'user') {
+                                            const find = delta.ops.find((item) => item.insert == "\t")
+                                            if (!find && source === 'user') {
                                                 this.inputsubheading(html, "inputsubheading")
                                             }
                                         }}
@@ -6723,38 +7079,49 @@ class Card extends React.Component {
                                         onClick={() => this.setState({ disabled: false })}
                                     > Ref Code
                                     </div>
-                                    <div>
-                                        <h3>Product Number</h3>
-                                        <Select
-                                            placeholder={'select Product Number'}
-                                            value={this.state.fieldprops.properties.currentProductNumber}
-                                            options={this.state.productNumber}
-                                            onChange={e => this.handleProductNumberChange(e, "productNumber")}
-                                            name="productNumber"
-                                            className="language_list"
-                                        />
-                                        <h3>Question Group</h3>
-                                        <Select
-                                            placeholder={'select Question Group'}
-                                            value={this.state.fieldprops.properties.currentQuestionGroup}
-                                            options={this.state.questionGroup}
-                                            onChange={e => this.handleQuestionGroupChange(e, "questionGroup")}
-                                            name="questionGroup"
-                                            className="language_list"
-                                        />
-                                        <h3>Other</h3>
-                                        <Select
-                                            placeholder={'select Question Group'}
-                                            value={this.state.fieldprops.properties.currentOtherGroup}
-                                            options={this.state.otherGroup}
-                                            onChange={e => this.handleOtherGroupChange(e, "otherGroup")}
-                                            name="otherGroup"
-                                            className="language_list"
-                                        />
-                                        <h3>Comments</h3>
-                                        <div className="below-lanbel-body" style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
-                                            <input type="text" name="productNum" className="mediumfm" value={this.state.fieldprops.properties.productNumber ? this.state.fieldprops.properties.productNumber : ""} onChange={e => this.inputtypeProductNum(e, "inputtypeProductNum")} />
-                                        </div>
+                                </div>
+                            </li>
+                            <li style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
+                                <div>
+                                    <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Product Number</h3>
+                                    <Select
+                                        placeholder={'select Product Number'}
+                                        value={this.state.fieldprops.properties.currentProductNumber}
+                                        options={this.state.productNumber}
+                                        onChange={e => this.handleProductNumberChange(e, "productNumber")}
+                                        name="productNumber"
+                                        className="language_list"
+                                    />
+                                    <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Question Group</h3>
+                                    <Select
+                                        placeholder={'select Question Group'}
+                                        value={this.state.fieldprops.properties.currentQuestionGroup}
+                                        options={this.state.questionGroup}
+                                        onChange={e => this.handleQuestionGroupChange(e, "questionGroup")}
+                                        name="questionGroup"
+                                        className="language_list"
+                                    />
+                                    <h3 className={mappingProfileEnable == true ? "required-field" : ""}>{`Sub Group 1`}</h3>
+                                    <Select
+                                        placeholder={`select Question Sub Group 1`}
+                                        value={this.state.fieldprops.properties.currentQuestionSubGroup1}
+                                        options={this.getSubGroupArray(1)}
+                                        onChange={e => this.handleQuestionSubGroupChange(e, `currentQuestionSubGroup1`)}
+                                        name="currentQuestionSubGroup"
+                                        className="language_list"
+                                    />
+                                    <h3 className={mappingProfileEnable == true ? "required-field" : ""}>{`Sub Group 2`}</h3>
+                                    <Select
+                                        placeholder={`select Question Sub Group 2`}
+                                        value={this.state.fieldprops.properties.currentQuestionSubGroup2}
+                                        options={this.getSubGroupArray(2)}
+                                        onChange={e => this.handleQuestionSubGroupChange(e, `currentQuestionSubGroup2`)}
+                                        name="currentQuestionSubGroup"
+                                        className="language_list"
+                                    />
+                                    <h3>Comments</h3>
+                                    <div className="below-lanbel-body" style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
+                                        <input type="text" name="productNum" className="mediumfm" value={this.state.fieldprops.properties.productNumber ? this.state.fieldprops.properties.productNumber : ""} onChange={e => this.inputtypeProductNum(e, "inputtypeProductNum")} />
                                     </div>
                                 </div>
                             </li>
@@ -6786,6 +7153,18 @@ class Card extends React.Component {
                                         </div>
                                     </div>
                                 </div>
+                            </li>
+
+                            <li style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
+                                <h3>Randomize Question Group Number</h3>
+                                <Select
+                                    placeholder={'select Randomize Group Number'}
+                                    value={this.getSelectedRandomizeGroupName(this.state.fieldprops.group_number)}
+                                    options={this.state.randomizedOptions}
+                                    onChange={(e) => this.RandomizeGroupName(e)}
+                                    name="language"
+                                    className="language_list"
+                                />
                             </li>
 
                             <li
@@ -6832,11 +7211,7 @@ class Card extends React.Component {
                                     </div>
                                 </div>
                             </li>
-
-
-                            <li
-                                style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
-                            >
+                            <li style={this.state.currentlanguage.value !== "English" ? disabledive : {}} >
                                 <div className="below-lanbel-body">
                                     <div className="switch-text-boxes switch-text-boxes-mandatory clear">
                                         <h3>Choice Type</h3>
@@ -6919,7 +7294,7 @@ class Card extends React.Component {
                                                                     value={this.state.fieldprops.properties.minlimit}
                                                                     name="setlimitmin"
                                                                     onChange={e => this.setMinLimitOption(e)}
-                                                                />{" "}
+                                                                />
                                                             </p>
                                                             <p className="newtxt">
                                                                 <span style={(this.state.fieldprops.properties.choice_type == "single" || this.state.fieldprops.properties.multilevel == 1) ? disabledive : {}}>MAX</span>
@@ -6930,7 +7305,7 @@ class Card extends React.Component {
                                                                     value={this.state.fieldprops.properties.maxlimit}
                                                                     name="setlimitmax"
                                                                     onChange={e => this.setMaxLimitOption(e)}
-                                                                />{" "}
+                                                                />
                                                             </p>
                                                         </div>
                                                     </div>
@@ -6949,9 +7324,6 @@ class Card extends React.Component {
                                         <h3
                                             style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                                         >Image Size</h3>
-                                        {
-                                            // imagesize
-                                        }
                                         <div className="twocol"
                                             style={this.state.currentlanguage.value !== "English" ?
                                                 disabledive : this.state.fieldprops.properties.multilevel ?
@@ -6994,7 +7366,6 @@ class Card extends React.Component {
                                                 </div>
                                             </div>
                                         </div>
-
                                         <div className="switch-textboxes xtboxestext"
                                             style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                                         >Multilevel</div>
@@ -7003,82 +7374,71 @@ class Card extends React.Component {
                                         >
                                             <div style={this.state.fieldprops.properties.display_type === "dropdown" ? disabledive : null}>
                                                 <Switch checked={Boolean(this.state.fieldprops.properties.multilevel)}
-                                                    onChange={this.multilevel("multilevel")} value="multilevel" color="primary" />
+                                                    onChange={this.multilevel("multilevel")} value="multilevel" color="primary"
+                                                    disabled={this.props.mappingProfileEnable == true}
+                                                />
                                             </div>
                                         </div>
                                         <div className="clearfix" />
-                                        {this.state.fieldprops.properties.options
-                                            ? this.state.fieldprops.properties.options.map(
-                                                function (value, index) {
-                                                    return (
-                                                        <div className="twocol dropboxer" key={index}>
-                                                            <div className="choicedropper dropper">
-                                                                <div className="parentlabel clear clearfix"
-                                                                    style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops.properties.options && this.state.defaultdrops.properties.options[index] && this.state.defaultdrops.properties.options[index].label === "" ? disabledive : {} : {}}
-                                                                >
-                                                                    <span>{alphabet[index]}</span>
-                                                                    <ReactQuill
-                                                                        className={`${this.state.fieldprops.properties.multilevel ? 'multichoicequill' : 'choicequill'} ${'quillEditor'}`}
-                                                                        value={this.state.fieldprops.properties.options[index].label_text ? this.state.fieldprops.properties.options[index].label_text : this.state.fieldprops.properties.options[index].label ? this.state.fieldprops.properties.options[index].label : ""}
-                                                                        inlineStyles="true"
-                                                                        modules={this.modules_minimal}
-                                                                        formats={this.formats}
-                                                                        onChange={(html, delta, source) => {
-                                                                            // const containsImage = html.includes('<img');
-                                                                            // if (containsImage) {
-                                                                            //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
-                                                                            //     return
-                                                                            // }
-                                                                            if (source === 'user') {
-                                                                                this.label(html, "label", index)
-                                                                            }
-                                                                        }}
-                                                                        onBlur={() => this.handleOnBlurData("CHOICELABLE", index)}
-                                                                    //  onChange={e => this.updateprops(e, "label", index)}
-                                                                    />
-                                                                    {this.state.fieldprops.properties.multilevel ?
-                                                                        <img onClick={() => this.showHide(index)} className="expandArrow" src={this.state.show[index] ? ExpandArrow : CollapseArrow} alt="expandArrow" />
-                                                                        : ""}
-                                                                    {/* <input
-                                                                        type="text"
-                                                                        name="name"
-                                                                        className="mediumfm"
-                                                                        placeholder={value.id === 'other' ? 'other' : ''}
-                                                                        value={this.state.fieldprops.properties.options[index].label}
-                                                                        onChange={e => this.updateprops(e, "label", index)}
-                                                                    /> */}
 
-                                                                    <div className="wrap-upload-delete"
-                                                                        style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
+                                        {this.props.mappingProfileEnable == true &&
+                                            <div className="mt-3">
+                                                <h3 className={"required-field"}>Select Group</h3>
+                                                <Select
+                                                    placeholder={'select group'}
+                                                    value={this.state.fieldprops.properties.selectedChoiceGroup}
+                                                    options={createChoiceGrpArray}
+                                                    onChange={e => this.handleselectedChoiceGroup(e, "selectedChoiceGroup")}
+                                                    name="selectedChoiceGroup"
+                                                    className="language_list"
+                                                />
+                                            </div>
+                                        }
+                                        <DragDropContext onDragEnd={(result) => this.onDragEnd(result)}>
+                                            <Droppable droppableId="ChoiceOptionDropable">
+                                                {(provided, snapshot) => (
+                                                    <ul style={getListStyle(snapshot.isDraggingOver)} ref={provided.innerRef} {...provided.droppableProps} className="droppable-area">
+                                                        {this.state.fieldprops.properties.options && this.state.fieldprops.properties.options.length > 0 &&
+                                                            this.state.fieldprops.properties.options.map((value, index) => {
+                                                                const refKey = `input-${index}`;
+                                                                const nextRefKey = `input-${index + 1}`;
+                                                                if (!this.choiceInputRefs[refKey]) {
+                                                                    this.choiceInputRefs[refKey] = React.createRef();
+                                                                }
+                                                                return (
+                                                                    <Draggable
+                                                                        isDragDisabled={this.state.currentlanguage.value !== "English"}
+                                                                        draggableId={value.id.toString()}
+                                                                        key={value.id}
+                                                                        index={index}
                                                                     >
-                                                                        <div style={this.state.fieldprops.properties.display_type === "dropdown" ? disabledive : null}>
-                                                                            <StyledDropZone accept={"image/png, image/gif, image/jpeg, image/*"} children="upload" onDrop={this.onDrop.bind(this, "parenlabel_image", index, "")} />
-                                                                        </div>
-                                                                        <div className="addimgs"
-                                                                            style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
-
-                                                                        >
-                                                                            {(value.id !== 'other' && value.id !== 'noneofabove') ? <i className="fa fa-trash" onClick={() => this.deletefun(index, "parentlabel")} /> : ""}
-                                                                        </div>
-                                                                        {/* <img src={value.label_image} alt="label" width="50" /> */}
-                                                                    </div>
-                                                                </div>
-
-                                                                {this.state.fieldprops.properties.multilevel === 1 ? (
-                                                                    <div className={`${'sublabel'} ${this.state.show[index] ? 'd-none' : 'd-block'}`}>
-
-                                                                        {this.state.fieldprops.properties.options && this.state.fieldprops.properties.options[index].sublabel &&
-                                                                            this.state.fieldprops.properties.options[index].sublabel instanceof Array
-                                                                            ? this.state.fieldprops.properties.options[index].sublabel.map(
-                                                                                function (value, key) {
-                                                                                    return (
-                                                                                        <div className="clear clearfix"
-                                                                                            key={key}
-                                                                                            style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops.properties.options && this.state.defaultdrops.properties.options[index] && this.state.defaultdrops.properties.options[index].sublabel && this.state.defaultdrops.properties.options[index].sublabel[key].sublabel === "" ? disabledive : {} : {}}
+                                                                        {(provided, snapshot) => (
+                                                                            <div
+                                                                                ref={provided.innerRef}
+                                                                                {...provided.draggableProps}
+                                                                                {...provided.dragHandleProps}
+                                                                                style={{
+                                                                                    opacity: snapshot.isDragging ? 0.5 : 1,
+                                                                                    ...provided.draggableProps.style
+                                                                                }}
+                                                                            >
+                                                                                <div
+                                                                                    style={{
+                                                                                        opacity: snapshot.isDragging ? 0.5 : 1,
+                                                                                    }}
+                                                                                    className="twocol dropboxer"
+                                                                                >
+                                                                                    <div className="choicedropper dropper">
+                                                                                        <div className="parentlabel clear clearfix"
+                                                                                            style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops.properties.options && this.state.defaultdrops.properties.options[index] && this.state.defaultdrops.properties.options[index].label === "" ? disabledive : {} : {}}
                                                                                         >
+                                                                                            <span>{alphabet[index]}</span>
                                                                                             <ReactQuill
-                                                                                                className="quillEditor"
-                                                                                                value={this.state.fieldprops.properties.options[index].sublabel[key].sublabel_text ? this.state.fieldprops.properties.options[index].sublabel[key].sublabel_text : this.state.fieldprops.properties.options[index].sublabel[key].sublabel ? this.state.fieldprops.properties.options[index].sublabel[key].sublabel : ""}
+                                                                                                ref={this.choiceInputRefs[refKey]}
+                                                                                                onKeyDown={(e) => this.onOptionTabClick(nextRefKey, e, false)}
+                                                                                                style={this.props.mappingProfileEnable == true ? disabledive : {}}
+                                                                                                className={`${this.state.fieldprops.properties.multilevel ? 'multichoicequill' : 'choicequill'} ${'quillEditor'}`}
+                                                                                                value={this.state.fieldprops.properties.options[index].label_text ? this.state.fieldprops.properties.options[index].label_text : this.state.fieldprops.properties.options[index].label ? this.state.fieldprops.properties.options[index].label : ""}
                                                                                                 inlineStyles="true"
                                                                                                 modules={this.modules_minimal}
                                                                                                 formats={this.formats}
@@ -7088,14 +7448,80 @@ class Card extends React.Component {
                                                                                                     //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
                                                                                                     //     return
                                                                                                     // }
-                                                                                                    if (source === 'user') {
-                                                                                                        this.childlabel(html, "childlabel", index, key)
+                                                                                                    const find = delta.ops.find((item) => item.insert == "\t")
+                                                                                                    if (!find && source === 'user') {
+                                                                                                        this.label(html, "label", index)
                                                                                                     }
                                                                                                 }}
-                                                                                                onBlur={() => this.handleOnBlurData("CHOICESUBLABLE", index, key)}
-                                                                                            // onChange={e => this.updateprops(e, "childlabel", index,key)}
+                                                                                                onBlur={() => this.handleOnBlurData("CHOICELABLE", index)}
+                                                                                            //  onChange={e => this.updateprops(e, "label", index)}
                                                                                             />
+
+                                                                                            {this.state.fieldprops.properties.multilevel ?
+                                                                                                <img onClick={() => this.showHide(index)} className="expandArrow" src={this.state.show[index] ? ExpandArrow : CollapseArrow} alt="expandArrow" />
+                                                                                                : ""}
                                                                                             {/* <input
+                                                                        type="text"
+                                                                        name="name"
+                                                                        className="mediumfm"
+                                                                        placeholder={value.id === 'other' ? 'other' : ''}
+                                                                        value={this.state.fieldprops.properties.options[index].label}
+                                                                        onChange={e => this.updateprops(e, "label", index)}
+                                                                    /> */}
+
+                                                                                            <div className="wrap-upload-delete"
+                                                                                                style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
+                                                                                            >
+                                                                                                <div style={this.state.fieldprops.properties.display_type === "dropdown" ? disabledive : null}>
+                                                                                                    <StyledDropZone accept={"image/png, image/gif, image/jpeg, image/*"} children="upload" onDrop={this.onDrop.bind(this, "parenlabel_image", index, "")} />
+                                                                                                </div>
+                                                                                                <div className="addimgs"
+                                                                                                    style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
+
+                                                                                                >
+                                                                                                    {(value.id !== 'other' && value.id !== 'noneofabove') ? <i className="fa fa-trash" onClick={() => this.deletefun(index, "parentlabel")} /> : ""}
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        {this.state.fieldprops.properties.multilevel === 1 ? (
+                                                                                            <div className={`${'sublabel'} ${this.state.show[index] ? 'd-none' : 'd-block'}`}>
+                                                                                                {this.state.fieldprops.properties.options && this.state.fieldprops.properties.options[index].sublabel &&
+                                                                                                    this.state.fieldprops.properties.options[index].sublabel instanceof Array
+                                                                                                    ? this.state.fieldprops.properties.options[index].sublabel.map(
+                                                                                                        function (value, key) {
+                                                                                                            const refKey = `sub-input-${index}${key}`;
+                                                                                                            const nextRefKey = `sub-input-${index}${key + 1}`;
+                                                                                                            if (!this.choiceSubInputRefs[refKey]) {
+                                                                                                                this.choiceSubInputRefs[refKey] = React.createRef();
+                                                                                                            }
+                                                                                                            return (
+                                                                                                                <div className="clear clearfix"
+                                                                                                                    key={key}
+                                                                                                                    style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops.properties.options && this.state.defaultdrops.properties.options[index] && this.state.defaultdrops.properties.options[index].sublabel && this.state.defaultdrops.properties.options[index].sublabel[key].sublabel === "" ? disabledive : {} : {}}
+                                                                                                                >
+                                                                                                                    <ReactQuill
+                                                                                                                        ref={this.choiceSubInputRefs[refKey]}
+                                                                                                                        onKeyDown={(e) => this.onOptionTabClick(nextRefKey, e, true, this.state.fieldprops.properties.options[index].sublabel, index)}
+                                                                                                                        className="quillEditor"
+                                                                                                                        value={this.state.fieldprops.properties.options[index].sublabel[key].sublabel_text ? this.state.fieldprops.properties.options[index].sublabel[key].sublabel_text : this.state.fieldprops.properties.options[index].sublabel[key].sublabel ? this.state.fieldprops.properties.options[index].sublabel[key].sublabel : ""}
+                                                                                                                        inlineStyles="true"
+                                                                                                                        modules={this.modules_minimal}
+                                                                                                                        formats={this.formats}
+                                                                                                                        onChange={(html, delta, source) => {
+                                                                                                                            // const containsImage = html.includes('<img');
+                                                                                                                            // if (containsImage) {
+                                                                                                                            //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
+                                                                                                                            //     return
+                                                                                                                            // }
+                                                                                                                            const find = delta.ops.find((item) => item.insert == "\t")
+                                                                                                                            if (!find && source === 'user') {
+                                                                                                                                this.childlabel(html, "childlabel", index, key)
+                                                                                                                            }
+                                                                                                                        }}
+                                                                                                                        onBlur={() => this.handleOnBlurData("CHOICESUBLABLE", index, key)}
+                                                                                                                    // onChange={e => this.updateprops(e, "childlabel", index,key)}
+                                                                                                                    />
+                                                                                                                    {/* <input
                                                                                                 type="text"
                                                                                                 name="name"
                                                                                                 className="mediumfm"
@@ -7104,39 +7530,57 @@ class Card extends React.Component {
                                                                                                 onChange={e => this.updateprops(e, "childlabel", index, key)}
                                                                                             /> */}
 
-                                                                                            <div className="wrap-upload-delete"
-                                                                                                style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
-                                                                                            >
-                                                                                                <div style={this.state.fieldprops.properties.display_type === "dropdown" ? disabledive : null}>
-                                                                                                    <StyledDropZone accept={"image/png, image/gif, image/jpeg, image/*"} children="upload" onDrop={this.onDrop.bind(this, "sublabel_image", index, key)} />
-                                                                                                </div>
-                                                                                                <div className="addimgs"
-                                                                                                    style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
+                                                                                                                    <div className="wrap-upload-delete"
+                                                                                                                        style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
+                                                                                                                    >
+                                                                                                                        <div style={this.state.fieldprops.properties.display_type === "dropdown" ? disabledive : null}>
+                                                                                                                            <StyledDropZone accept={"image/png, image/gif, image/jpeg, image/*"} children="upload" onDrop={this.onDrop.bind(this, "sublabel_image", index, key)} />
+                                                                                                                        </div>
+                                                                                                                        <div className="addimgs"
+                                                                                                                            style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
 
-                                                                                                >
-                                                                                                    {(value.id !== 'other' && value.id !== 'noneofabove') ? <i className="fa fa-trash" onClick={() => this.deletefun(index, "childlabel", key)} /> : ""}
-                                                                                                </div>
-                                                                                                {/* <img src={value.label_image} alt="label" width="50" /> */}
+                                                                                                                        >
+                                                                                                                            {(value.id !== 'other' && value.id !== 'noneofabove') ? <i className="fa fa-trash" onClick={() => this.deletefun(index, "childlabel", key)} /> : ""}
+                                                                                                                        </div>
+                                                                                                                        {/* <img src={value.label_image} alt="label" width="50" /> */}
+                                                                                                                    </div>
+                                                                                                                </div>
+                                                                                                            );
+                                                                                                        }.bind(this)
+                                                                                                    )
+                                                                                                    :
+                                                                                                    ""}
+                                                                                                {value.id !== 'other' &&
+                                                                                                    <div className="addmoreimage"
+                                                                                                        style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
+                                                                                                        onClick={() => this.addfun("suboptions", index)}>
+                                                                                                        {" "}
+                                                                                                        <i className="fa fa-plus" /> Add{" "}
+                                                                                                    </div>
+                                                                                                }
                                                                                             </div>
-                                                                                        </div>
-                                                                                    );
-                                                                                }.bind(this)
-                                                                            )
-                                                                            :
-                                                                            ""}
-                                                                        {value.id !== 'other' &&
-                                                                            <div className="addmoreimage"
-                                                                                style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
-                                                                                onClick={() => this.addfun("suboptions", index)}>
-                                                                                {" "}
-                                                                                <i className="fa fa-plus" /> Add{" "}
+                                                                                        ) : (
+                                                                                            ""
+                                                                                        )}
+                                                                                    </div>
+                                                                                </div>
                                                                             </div>
-                                                                        }
-                                                                    </div>
-                                                                ) : (
-                                                                    ""
-                                                                )}
-                                                            </div>
+                                                                        )}
+                                                                    </Draggable>
+                                                                )
+                                                            })}
+                                                        {provided.placeholder}
+                                                    </ul>
+                                                )}
+                                            </Droppable>
+                                        </DragDropContext>
+
+
+                                        {this.state.fieldprops.properties.options
+                                            ? this.state.fieldprops.properties.options.map(
+                                                function (value, index) {
+                                                    return (
+                                                        <div className="twocol dropboxer" key={index}>
                                                         </div>
                                                     );
                                                 }.bind(this)
@@ -7146,7 +7590,6 @@ class Card extends React.Component {
                                             style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                                         >
                                             <div className="addmoreimage addmoreimage-big" onClick={() => this.addfun("options")}>
-                                                {" "}
                                                 <i className="fa fa-plus" /> Add{" "}
                                             </div>
                                         </div>
@@ -7183,12 +7626,10 @@ class Card extends React.Component {
                         </ul>
                     </div>
                 </div>
-            </div>
+            </div >
         );
 
         const barcode = (
-
-
             <div className={boardval}>
                 <div className="properties-main-header clear">
                     <p>Barcode Properties</p>
@@ -7212,6 +7653,8 @@ class Card extends React.Component {
                                 style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops === undefined || this.state.defaultdrops.properties.question === ("" || null || undefined) ? disabledive : {} : {}}
                             >
                                 <ReactQuill
+                                    onKeyDown={(e) => this.keyPressCapture(e, 1)}
+                                    ref={this.quillRef}
                                     className="quillEditor"
                                     value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""}
                                     inlineStyles="true"
@@ -7225,7 +7668,8 @@ class Card extends React.Component {
                                         //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
                                         //     return
                                         // }
-                                        if (source === 'user') {
+                                        const find = delta.ops.find((item) => item.insert == "\t")
+                                        if (!find && source === 'user') {
                                             this.inputquestion(html, "inputquestion")
                                         }
                                     }}
@@ -7240,7 +7684,16 @@ class Card extends React.Component {
                             <div className="below-lanbel-body"
                                 style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                             >
-                                <input type="text" name="name" className="mediumfm" value={this.state.fieldprops.label} onChange={e => this.inputtypename(e, "inputtypename")} onBlur={e => this.onBlurName(e, "onBlurName")} />
+                                <input
+                                    onKeyDown={(e) => this.keyPressCapture(e, 2)}
+                                    ref={this.nameRef}
+                                    type="text"
+                                    name="name"
+                                    className="mediumfm"
+                                    value={this.state.fieldprops.label ? this.state.fieldprops.label : ""}
+                                    onChange={e => this.inputtypename(e, "inputtypename")}
+                                    onBlur={e => this.onBlurName(e, "onBlurName")}
+                                />
                                 <label> Edit Your Name </label>
                             </div>
                         </li>
@@ -7251,6 +7704,8 @@ class Card extends React.Component {
                                 style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops === undefined || this.state.defaultdrops.properties.subheading === ("" || null || undefined) ? disabledive : {} : {}}
                             >
                                 <ReactQuill
+                                    onKeyDown={(e) => this.keyPressCapture(e, 3)}
+                                    ref={this.subNameRef}
                                     className="quillEditor"
                                     value={this.state.fieldprops.properties.subheading_text ? this.state.fieldprops.properties.subheading_text : this.state.fieldprops.properties.subheading ? this.state.fieldprops.properties.subheading : ""}
                                     inlineStyles="true"
@@ -7262,7 +7717,8 @@ class Card extends React.Component {
                                         //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
                                         //     return
                                         // }
-                                        if (source === 'user') {
+                                        const find = delta.ops.find((item) => item.insert == "\t")
+                                        if (!find && source === 'user') {
                                             this.inputsubheading(html, "inputsubheading")
                                         }
                                     }}
@@ -7290,46 +7746,55 @@ class Card extends React.Component {
                                     onClick={() => this.setState({ disabled: false })}
                                 > Ref Code
                                 </div>
-                                <div>
-                                    <h3>Product Number</h3>
-                                    <Select
-                                        placeholder={'select Product Number'}
-                                        value={this.state.fieldprops.properties.currentProductNumber}
-                                        options={this.state.productNumber}
-                                        onChange={e => this.handleProductNumberChange(e, "productNumber")}
-                                        name="productNumber"
-                                        className="language_list"
-                                    />
-                                    <h3>Question Group</h3>
-                                    <Select
-                                        placeholder={'select Question Group'}
-                                        value={this.state.fieldprops.properties.currentQuestionGroup}
-                                        options={this.state.questionGroup}
-                                        onChange={e => this.handleQuestionGroupChange(e, "questionGroup")}
-                                        name="questionGroup"
-                                        className="language_list"
-                                    />
-                                    <h3>Other</h3>
-                                    <Select
-                                        placeholder={'select Question Group'}
-                                        value={this.state.fieldprops.properties.currentOtherGroup}
-                                        options={this.state.otherGroup}
-                                        onChange={e => this.handleOtherGroupChange(e, "otherGroup")}
-                                        name="otherGroup"
-                                        className="language_list"
-                                    />
-                                    <h3>Comments</h3>
-                                    <div className="below-lanbel-body" style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
-                                        <input type="text" name="productNum" className="mediumfm" value={this.state.fieldprops.properties.productNumber ? this.state.fieldprops.properties.productNumber : ""} onChange={e => this.inputtypeProductNum(e, "inputtypeProductNum")} />
-                                    </div>
+                            </div>
+                        </li>
+
+                        <li style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
+                            <div>
+                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Product Number</h3>
+                                <Select
+                                    placeholder={'select Product Number'}
+                                    value={this.state.fieldprops.properties.currentProductNumber}
+                                    options={this.state.productNumber}
+                                    onChange={e => this.handleProductNumberChange(e, "productNumber")}
+                                    name="productNumber"
+                                    className="language_list"
+                                />
+                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>Question Group</h3>
+                                <Select
+                                    placeholder={'select Question Group'}
+                                    value={this.state.fieldprops.properties.currentQuestionGroup}
+                                    options={this.state.questionGroup}
+                                    onChange={e => this.handleQuestionGroupChange(e, "questionGroup")}
+                                    name="questionGroup"
+                                    className="language_list"
+                                />
+                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>{`Sub Group 1`}</h3>
+                                <Select
+                                    placeholder={`select Question Sub Group 1`}
+                                    value={this.state.fieldprops.properties.currentQuestionSubGroup1}
+                                    options={this.getSubGroupArray(1)}
+                                    onChange={e => this.handleQuestionSubGroupChange(e, `currentQuestionSubGroup1`)}
+                                    name="currentQuestionSubGroup"
+                                    className="language_list"
+                                />
+                                <h3 className={mappingProfileEnable == true ? "required-field" : ""}>{`Sub Group 2`}</h3>
+                                <Select
+                                    placeholder={`select Question Sub Group 2`}
+                                    value={this.state.fieldprops.properties.currentQuestionSubGroup2}
+                                    options={this.getSubGroupArray(2)}
+                                    onChange={e => this.handleQuestionSubGroupChange(e, `currentQuestionSubGroup2`)}
+                                    name="currentQuestionSubGroup"
+                                    className="language_list"
+                                />
+                                <h3>Comments</h3>
+                                <div className="below-lanbel-body" style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
+                                    <input type="text" name="productNum" className="mediumfm" value={this.state.fieldprops.properties.productNumber ? this.state.fieldprops.properties.productNumber : ""} onChange={e => this.inputtypeProductNum(e, "inputtypeProductNum")} />
                                 </div>
                             </div>
                         </li>
 
-                        <li
-
-                            style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
-                        >
+                        <li style={this.state.currentlanguage.value !== "English" ? disabledive : {}}>
                             <span className="validateclassradio">
                                 <input
                                     type="radio"
@@ -7482,6 +7947,8 @@ class Card extends React.Component {
                                 style={this.state.currentlanguage.value !== "English" ? this.state.defaultdrops === undefined || this.state.defaultdrops.properties.question === ("" || null || undefined) ? disabledive : {} : {}}
                             >
                                 <ReactQuill
+                                    onKeyDown={(e) => this.keyPressCapture(e, 1)}
+                                    ref={this.quillRef}
                                     className="quillEditor"
                                     value={this.state.fieldprops.properties.question_text ? this.state.fieldprops.properties.question_text : this.state.fieldprops.properties.question ? this.state.fieldprops.properties.question : ""}
                                     inlineStyles="true"
@@ -7495,7 +7962,8 @@ class Card extends React.Component {
                                         //     this.showNotification("Image not allowed here. Please use information element image type to add image with information", "danger")
                                         //     return
                                         // }
-                                        if (source === 'user') {
+                                        const find = delta.ops.find((item) => item.insert == "\t")
+                                        if (!find && source === 'user') {
                                             this.inputquestion(html, "inputquestion")
                                         }
                                     }}
@@ -7509,9 +7977,17 @@ class Card extends React.Component {
                             <h3>Name</h3>
                             <div className="below-lanbel-body"
                                 style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
-
                             >
-                                <input type="text" name="name" className="mediumfm" value={this.state.fieldprops.label} onChange={e => this.inputtypename(e, "inputtypename")} onBlur={e => this.onBlurName(e, "onBlurName")} />
+                                <input
+                                    onKeyDown={(e) => this.keyPressCapture(e, 2, false, true)}
+                                    ref={this.nameRef}
+                                    type="text"
+                                    name="name"
+                                    className="mediumfm"
+                                    value={this.state.fieldprops.label ? this.state.fieldprops.label : ""}
+                                    onChange={e => this.inputtypename(e, "inputtypename")}
+                                    onBlur={e => this.onBlurName(e, "onBlurName")}
+                                />
                                 <label> Edit Your Name </label>
                             </div>
                         </li>
@@ -7615,6 +8091,8 @@ class Card extends React.Component {
                                 <h3>Sub heading</h3>
                                 <div className="below-lanbel-body">
                                     <ReactQuill
+                                        onKeyDown={(e) => this.keyPressCapture(e, 3)}
+                                        ref={this.subNameRef}
                                         className="quillEditor"
                                         value={this.state.fieldprops.properties.subheading_text ? this.state.fieldprops.properties.subheading_text : this.state.fieldprops.properties.subheading ? this.state.fieldprops.properties.subheading : ""}
                                         inlineStyles="true"
@@ -7642,16 +8120,16 @@ class Card extends React.Component {
                         )}
 
                         {/*this.state.fieldprops.properties.gps_stats === "show" ? (
-                                            <li>
-                                                <h3>Sub Label</h3>
-                                                <div className="below-lanbel-body">
-                                                    <input type="text" name="name" value={this.state.fieldprops.properties.sublabel} className="mediumfm" onChange={e => this.updateprops(e, "sublabel")} />
-                                                    <label> Add a small description below the input field. </label>
-                                                </div>
-                                            </li>
-                                        ) : (
-                                            ""
-                                        )*/}
+                            <li>
+                                <h3>Sub Label</h3>
+                                <div className="below-lanbel-body">
+                                    <input type="text" name="name" value={this.state.fieldprops.properties.sublabel} className="mediumfm" onChange={e => this.updateprops(e, "sublabel")} />
+                                    <label> Add a small description below the input field. </label>
+                                </div>
+                            </li>
+                         ) : (
+                            ""
+                        )*/}
                     </ul>
                 </div>
             </div>
@@ -7667,8 +8145,6 @@ class Card extends React.Component {
 
         return (
             <div>{this.state.open === true ? (
-
-
                 <div style={Object.assign({}, style, { opacity })}>
                     {type === "info"
                         ? info
@@ -7690,9 +8166,7 @@ class Card extends React.Component {
                                                         ? gps
                                                         : false}
                 </div>
-
             ) : (
-
                 <div style={Object.assign({}, style, { opacity })}>
                     {type === "info"
                         ? info
@@ -7713,11 +8187,7 @@ class Card extends React.Component {
                                                     : type === "gps"
                                                         ? gps
                                                         : false}
-                </div>
-
-            )
-            }
-
+                </div>)}
                 <Snackbar
                     place="bc"
                     color={msgColor}

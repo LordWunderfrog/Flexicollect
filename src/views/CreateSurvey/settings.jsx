@@ -71,6 +71,21 @@ class Settings extends React.Component {
             projects: [],
             projectSource: [],
             rangeStartElement: [],
+            release_delay_time: [
+                { value: 0, label: 'Immediate Release' },
+                { value: 1, label: '1 HRS' },
+                { value: 2, label: '2 HRS' },
+                { value: 3, label: '3 HRS' },
+                { value: 4, label: '4 HRS' },
+                { value: 5, label: '5 HRS' },
+                { value: 6, label: '6 HRS' },
+                { value: 7, label: '7 HRS' },
+                { value: 8, label: '8 HRS' },
+                { value: 9, label: '9 HRS' },
+                { value: 10, label: '10 HRS' },
+                { value: 11, label: '11 HRS' },
+                { value: 12, label: '12 HRS' },
+            ]
         };
 
         this.addCondtion = this.addCondtion.bind(this);
@@ -161,13 +176,8 @@ class Settings extends React.Component {
         return miss
     }
 
-
-
-    /**
-     * Add New Condition to Array
-     */
+    /* Add New Condition to Array */
     addCondtion() {
-
         let conditions = this.state.conditions;
         let cid = conditions ? conditions.length : 0;
         if (conditions.length === 0) {
@@ -293,10 +303,7 @@ class Settings extends React.Component {
         );
     }
 
-    /*
-    * Used to add the condition inside the conditions.
-    *
-    */
+    /* Used to add the condition inside the conditions. */
     addMultiSource = (index) => {
         const conditions = this.state.conditions;
         let source = {
@@ -309,7 +316,6 @@ class Settings extends React.Component {
 
     /**
      * Delete Condition from Array
-     *
      * @param id
      */
     deleteCondtion(id) {
@@ -319,10 +325,8 @@ class Settings extends React.Component {
         this.setState({ countadd }, this.props.autosave());
     }
 
-
     /**
      * Used to delete the condition inside the conditions.
-     *
      * @param id
      * @param sourceId
      */
@@ -403,8 +407,6 @@ class Settings extends React.Component {
         }
         )
     }
-
-
 
     /**
      * Add new Parameter to the release condition
@@ -653,6 +655,20 @@ class Settings extends React.Component {
                 // newcondtions[conditionid]['target']['mission_label'] = event.label;
                 this.setState({ newcondtions }, this.props.getCondtions(this.state.conditions), this.props.autosave())
             }
+            else if (label === 'delay_time') {
+                let value = event.target.value;
+                let conditionid = drop.condtion_id;
+                let cid = drop.condtion_id;
+                let newcondtions = this.state.conditions;
+                for (let i = 0; i < newcondtions.length; i++) {
+                    if (newcondtions[i].condtion_id === cid) {
+                        conditionid = i;
+                    }
+                }
+                newcondtions[conditionid]['target'][`${label}`] = parseInt(value);
+                // newcondtions[conditionid]['target']['mission_label'] = event.label;
+                this.setState({ newcondtions }, this.props.getCondtions(this.state.conditions), this.props.autosave())
+            }
             else if (event.target && event.target.value && event.target.value === 'release') {
                 let value = event.target.value;
                 let conditionid = drop.condtion_id;
@@ -667,6 +683,7 @@ class Settings extends React.Component {
                 newcondtions[conditionid][`${label}`]['project'] = "";
                 // newcondtions[conditionid][`${label}`]['project_label'] = "";
                 newcondtions[conditionid][`${label}`]['mission'] = "";
+                newcondtions[conditionid][`${label}`]['delay_time'] = 0;
                 delete newcondtions[conditionid][`${label}`].handler
                 // newcondtions[conditionid][`${label}`]['mission_label'] = "";
 
@@ -822,7 +839,6 @@ class Settings extends React.Component {
 
     /* Unused function. */
     errorcheck = e => {
-
         let errorcheck = this.state.drops.filter(sdrop => {
             return e.source.handler === sdrop.handler;
         });
@@ -878,8 +894,6 @@ class Settings extends React.Component {
     /* If user selects valuemultipleany or valuemultipleall in target,returns the choice list to the matched value dropdown. */
     choiceList_release = (conditions, source) => {
         let handler = source.handler;
-
-
         let selectedChoice = this.props.drops.filter(drop => {
             return handler === drop.handler;
         });
@@ -892,13 +906,11 @@ class Settings extends React.Component {
                     label: option.label,
                     options: []
                 }
-
                 if (option.sublabel) {
                     option.sublabel.forEach((suboption, subindex) => {
                         header.options.push({ value: suboption.sublabel, label: suboption.sublabel, id: suboption.id, p_id: option.id });
                     })
                 }
-
                 options.push(header)
 
             });
@@ -917,12 +929,10 @@ class Settings extends React.Component {
     scaleList_valueMultiple = (conditions, source) => {
         let handler = source.handler;
         let options = [];
-
         let selectedChoice = this.props.drops.filter(drop => {
 
             return handler === drop.handler;
         });
-
         if (selectedChoice && selectedChoice[0] && selectedChoice[0].properties.scale_content) {
             selectedChoice[0].properties.scale_content.forEach((option, index) => {
                 options.push({ label: option.value, value: option.value })
@@ -935,12 +945,9 @@ class Settings extends React.Component {
     barcodeList_valueMultiple = (conditions, source) => {
         let handler = source.handler;
         let options = [];
-
         let selectedChoice = this.props.drops.filter(drop => {
-
             return handler === drop.handler;
         });
-
         if (selectedChoice[0].properties.barcode_ids) {
             selectedChoice[0].properties.barcode_ids.forEach((option, index) => {
                 options.push({ label: option, value: option })
@@ -949,19 +956,14 @@ class Settings extends React.Component {
         return options
     };
 
-
     /* If user selects except valuemultipleany or valuemultipleall in target,returns the choice list to the matched value dropdown. */
     choiceList = (conditions, source) => {
-
-
         let matchVal = source.match_value;
         let handler = source.handler;
-        let pid = source.p_id;
-
+        let pid = source.p_id
         let selectedChoice = this.props.drops.filter(drop => {
             return handler === drop.handler;
         });
-
         if (selectedChoice === undefined || selectedChoice[0] === undefined) {
             return
         } else if (selectedChoice[0].properties.multilevel === 1 && selectedChoice[0].properties.options) {
@@ -989,10 +991,7 @@ class Settings extends React.Component {
     scaleList = (conditions, source) => {
         let matchVal = parseInt(source.match_value);
         let handler = source.handler;
-
-
         let selectedChoice = this.props.drops.filter(drop => {
-
             return handler === drop.handler;
         });
 
@@ -1009,13 +1008,9 @@ class Settings extends React.Component {
     barcodeList = (conditions, source) => {
         let matchVal = source.match_value;
         let handler = source.handler;
-
-
         let selectedChoice = this.props.drops.filter(drop => {
-
             return handler === drop.handler;
         });
-
         if (selectedChoice[0].properties.barcode_ids) {
             return selectedChoice[0].properties.barcode_ids.map((option, index) => (
                 <option key={index} selected={matchVal === option ? "selected" : ""} value={option}>
@@ -1029,14 +1024,9 @@ class Settings extends React.Component {
     valueList = (conditions, source) => {
         let matchVal = source.match_value;
         let handler = source.handler;
-
-
         let selectedChoice = this.props.drops.filter(drop => {
-
             return handler === drop.handler;
         });
-
-
         if (selectedChoice && selectedChoice[0] && selectedChoice[0].properties.table_content.table_value) {
             return selectedChoice[0].properties.table_content.table_value.map((option, index) => (
                 <option key={index} selected={matchVal === option.value ? "selected" : ""} value={option.value}>
@@ -1050,12 +1040,9 @@ class Settings extends React.Component {
     optionsList = (conditions, source) => {
         let matchVal = source.match_option;
         let handler = source.handler;
-
         let selectedChoice = this.props.drops.filter(drop => {
-
             return handler === drop.handler;
         });
-
         if (selectedChoice && selectedChoice[0] && selectedChoice[0].properties.table_content.table_options) {
             return selectedChoice[0].properties.table_content.table_options.map((option, index) => (
                 <option key={index} selected={matchVal === option.value ? "selected" : ""} value={option.value}>
@@ -1068,11 +1055,9 @@ class Settings extends React.Component {
     /* Handles single level question -If selection question is scale used to validate the scale question type is scale or table. */
     tableList = (conditions, source) => {
         let handler = source.handler;
-
         let selectedChoice = this.props.drops.filter(drop => {
             return handler === drop.handler;
         });
-
         if (selectedChoice.length === 1) {
             if (selectedChoice[0].properties.scale_type) {
                 return selectedChoice[0].properties.scale_type
@@ -1083,7 +1068,6 @@ class Settings extends React.Component {
     /* Used to return the options based on the question type. */
     selectedElement = (conditions, source) => {
         let handler = source.handler;
-
         let selectedChoice = this.props.drops.filter(drop => {
             return handler === drop.handler;
         });
@@ -1114,7 +1098,6 @@ class Settings extends React.Component {
                 fields.push({ label: drop.label, handler: drop.handler });
             });
         }
-
         return fields
     }
 
@@ -1199,13 +1182,11 @@ class Settings extends React.Component {
             console.log('Outside')
             return;
         }
-
         const items = this.reorder(
             this.state.conditions,
             result.source.index,
             result.destination.index
         );
-
         this.setState({
             conditions: items
         });
@@ -1443,7 +1424,31 @@ class Settings extends React.Component {
                                                                                             </option>
                                                                                         ))}
                                                                                     </select>
+                                                                                </div>
+                                                                            </div>
+                                                                            :
+                                                                            null
+                                                                    }
+                                                                    {
+                                                                        this.state.conditions[index].target.do === "release"
+                                                                            ?
+                                                                            <div className="form-group clear clearfix">
+                                                                                <div className="label-part">Delay Time</div>
+                                                                                <div className="ans-part">
+                                                                                    <select
+                                                                                        className="form-control"
+                                                                                        name="delay_time"
+                                                                                        onChange={e => this.addNewCondtions(e, drop, "delay_time")}>
+                                                                                        <option value="" disabled selected>
+                                                                                            Select Delay Time for release mission
+                                                                                        </option>
 
+                                                                                        {this.state.release_delay_time.map((subdrop, index) => (
+                                                                                            <option key={index} selected={drop.target.delay_time === subdrop.value ? "selected" : ""} value={subdrop.value}>
+                                                                                                {subdrop.label}
+                                                                                            </option>
+                                                                                        ))}
+                                                                                    </select>
                                                                                 </div>
                                                                             </div>
                                                                             :
@@ -1569,9 +1574,7 @@ class Settings extends React.Component {
                                                                                 </div>
                                                                             </div>
                                                                             {source.source_type === "input" || this.selectedElement(drop, source).properties.instruction_enabled === 1 ? (
-                                                                                <div className="form-group clear clearfix"
-
-                                                                                >
+                                                                                <div className="form-group clear clearfix">
                                                                                     <div className="label-part">State</div>
                                                                                     <div className="ans-part">
                                                                                         <select
@@ -1621,12 +1624,9 @@ class Settings extends React.Component {
                                                                                 </div>
                                                                             ) : source.source_type === "choice" || this.selectedElement(drop, source).properties.scale_enabled === 1 ? (
 
-                                                                                <div className="form-group clear clearfix"
-
-                                                                                >
+                                                                                <div className="form-group clear clearfix">
                                                                                     <div className="label-part">State</div>
                                                                                     <div className="ans-part">
-
                                                                                         <select
                                                                                             className="form-control"
                                                                                             name="state"
@@ -1652,9 +1652,7 @@ class Settings extends React.Component {
                                                                                     </div>
                                                                                 </div>
                                                                             ) : this.selectedElement(drop, source).properties.scale_enabled === 1 ? (
-                                                                                <div className="form-group clear clearfix"
-
-                                                                                >
+                                                                                <div className="form-group clear clearfix">
                                                                                     <div className="label-part">State</div>
                                                                                     <div className="ans-part">
                                                                                         <select
@@ -1682,9 +1680,7 @@ class Settings extends React.Component {
                                                                                     </div>
                                                                                 </div>
                                                                             ) : source.source_type === "upload" ? (
-                                                                                <div className="form-group clear clearfix"
-
-                                                                                >
+                                                                                <div className="form-group clear clearfix">
                                                                                     <div className="label-part">State</div>
                                                                                     <div className="ans-part">
                                                                                         <select
@@ -1704,14 +1700,10 @@ class Settings extends React.Component {
                                                                                             </option>
                                                                                         </select>
                                                                                     </div>
-
                                                                                 </div>
                                                                             )
-
                                                                                 : source.source_type === "barcode" && this.selectedElement(drop, source).properties.barcode_enabled === 1 ? (
-                                                                                    <div className="form-group clear clearfix"
-
-                                                                                    >
+                                                                                    <div className="form-group clear clearfix">
                                                                                         <div className="label-part">State</div>
                                                                                         <div className="ans-part">
                                                                                             <select
@@ -1737,14 +1729,10 @@ class Settings extends React.Component {
                                                                                                 </option>
                                                                                             </select>
                                                                                         </div>
-
                                                                                     </div>
                                                                                 )
-
                                                                                     : source.source_type === "barcode" && !this.selectedElement(drop, source).properties.barcode_enabled ? (
-                                                                                        <div className="form-group clear clearfix"
-
-                                                                                        >
+                                                                                        <div className="form-group clear clearfix">
                                                                                             <div className="label-part">State</div>
                                                                                             <div className="ans-part">
                                                                                                 <select
@@ -1791,13 +1779,8 @@ class Settings extends React.Component {
                                                                                             </div>
                                                                                         </div>
                                                                                     )
-
                                                                                         : source.source_type === "scale" ? (
-
-                                                                                            <div
-
-                                                                                            >
-
+                                                                                            <div>
                                                                                                 {this.tableList(drop, source) === "table" ?
                                                                                                     <div className="form-group clear clearfix">
                                                                                                         <div className="label-part">State</div>
@@ -1857,14 +1840,11 @@ class Settings extends React.Component {
                                                                                                 }
                                                                                             </div>
                                                                                         )
-
                                                                                             : (
                                                                                                 ""
                                                                                             )}
                                                                             {this.tableList(drop, source) === "table" && source.state !== "empty" && source.state !== "filled" ? (
-                                                                                <div
-
-                                                                                >
+                                                                                <div>
                                                                                     <div className="form-group clear clearfix">
                                                                                         <div className="label-part">Value</div>
                                                                                         <div className="ans-part">
@@ -1896,9 +1876,7 @@ class Settings extends React.Component {
                                                                                 ""
                                                                             ) : (
                                                                                 <div>
-                                                                                    <div className="form-group clear clearfix"
-
-                                                                                    >
+                                                                                    <div className="form-group clear clearfix">
                                                                                         <div className="label-part">Target</div>
                                                                                         <div className="ans-part">
                                                                                             <select className="form-control" name="target" onChange={e => this.addNewCondtions(e, drop, "source", idx)}>
@@ -1939,8 +1917,7 @@ class Settings extends React.Component {
                                                                                         </div>
                                                                                     </div>
                                                                                     {source.target === "value" && source.source_type !== "scale" && source.source_type !== "choice" && source.source_type !== "barcode" && this.selectedElement(drop, source).properties.scale_enabled !== 1 ? (
-                                                                                        <div className="form-group clear clearfix"
-                                                                                        >
+                                                                                        <div className="form-group clear clearfix">
                                                                                             <div className="label-part">Value</div>
                                                                                             <div className="ans-part">
                                                                                                 <input
@@ -1955,11 +1932,8 @@ class Settings extends React.Component {
                                                                                             </div>
                                                                                         </div>
                                                                                     ) :
-
                                                                                         (source.target === "value" && source.source_type === "barcode" && this.selectedElement(drop, source).properties.barcode_enabled === 1) ? (
-                                                                                            <div className="form-group clear clearfix"
-
-                                                                                            >
+                                                                                            <div className="form-group clear clearfix">
                                                                                                 <div className="label-part">Value</div>
                                                                                                 <div className="ans-part">
                                                                                                     <select className="form-control" name="match_value" onChange={e => this.addNewCondtions(e, drop, "source", idx)}>
@@ -1972,10 +1946,7 @@ class Settings extends React.Component {
                                                                                             </div>
                                                                                         ) : ((source.target === "Value_Multiple_Any" || source.target === "Value_Multiple_All") && source.source_type === "barcode" && this.selectedElement(drop, source).properties.barcode_enabled === 1) ?
                                                                                             (
-                                                                                                <div className="form-group clear clearfix"
-
-                                                                                                >
-
+                                                                                                <div className="form-group clear clearfix">
                                                                                                     <div className="label-part">Value</div>
                                                                                                     <div className="ans-part">
                                                                                                         <Select
@@ -1992,10 +1963,8 @@ class Settings extends React.Component {
                                                                                                 </div>
                                                                                             )
                                                                                             :
-
                                                                                             (source.target === "value" && source.source_type === "barcode" && !this.selectedElement(drop, source).properties.barcode_enabled) ? (
-                                                                                                <div className="form-group clear clearfix"
-                                                                                                >
+                                                                                                <div className="form-group clear clearfix">
                                                                                                     <div className="label-part">Value</div>
                                                                                                     <div className="ans-part">
                                                                                                         <input
@@ -2010,11 +1979,8 @@ class Settings extends React.Component {
                                                                                                     </div>
                                                                                                 </div>
                                                                                             ) :
-
                                                                                                 (source.target === "value" && this.selectedElement(drop, source).properties.scale_enabled === 1) && !this.selectedElement(drop, source).properties.instruction_enabled ? (
-                                                                                                    <div className="form-group clear clearfix"
-
-                                                                                                    >
+                                                                                                    <div className="form-group clear clearfix">
                                                                                                         <div className="label-part">Value</div>
                                                                                                         <div className="ans-part">
                                                                                                             <select className="form-control" name="match_value" onChange={e => this.addNewCondtions(e, drop, "source", idx)}>
@@ -2030,7 +1996,6 @@ class Settings extends React.Component {
                                                                                                         </div>
                                                                                                     </div>
                                                                                                 ) :
-
                                                                                                     source.target === "value" && this.selectedElement(drop, source).properties.instruction_enabled === 1 ? (
                                                                                                         <div className="form-group clear clearfix">
                                                                                                             <div className="label-part">Value</div>
@@ -2049,9 +2014,7 @@ class Settings extends React.Component {
                                                                                                     ) :
 
                                                                                                         source.target === "value" && source.source_type === "choice" ? (
-                                                                                                            <div className="form-group clear clearfix"
-
-                                                                                                            >
+                                                                                                            <div className="form-group clear clearfix">
                                                                                                                 <div className="label-part">Value</div>
                                                                                                                 <div className="ans-part">
                                                                                                                     <select className="form-control" name="match_value" onChange={e => this.addNewCondtions(e, drop, "source", idx)}>
@@ -2065,9 +2028,7 @@ class Settings extends React.Component {
                                                                                                         ) :
 
                                                                                                             source.target === "scale_value" ? (
-                                                                                                                <div className="form-group clear clearfix"
-
-                                                                                                                >
+                                                                                                                <div className="form-group clear clearfix">
                                                                                                                     <div className="label-part">Value</div>
 
                                                                                                                     <div className="ans-part">
@@ -2084,15 +2045,8 @@ class Settings extends React.Component {
                                                                                                                     </div>
                                                                                                                 </div>
                                                                                                             ) :
-
-
-
-
-
                                                                                                                 (source.target === "value" && source.source_type === "scale") ? (
-                                                                                                                    <div className="form-group clear clearfix"
-
-                                                                                                                    >
+                                                                                                                    <div className="form-group clear clearfix">
                                                                                                                         <div className="label-part">Value</div>
                                                                                                                         <div className="ans-part">
                                                                                                                             <select className="form-control" name="match_value" onChange={e => this.addNewCondtions(e, drop, "source", idx)}>
@@ -2104,14 +2058,10 @@ class Settings extends React.Component {
                                                                                                                         </div>
                                                                                                                     </div>
                                                                                                                 ) :
-
                                                                                                                     (((source.target === "Value_Multiple_Any" ||
                                                                                                                         source.target === "Value_Multiple_All") && source.source_type === "choice") ? (
-                                                                                                                        <div className="form-group clear clearfix"
-
-                                                                                                                        >
+                                                                                                                        <div className="form-group clear clearfix">
                                                                                                                             <div className="label-part">Value</div>
-
                                                                                                                             <div className="ans-part">
                                                                                                                                 <Select
                                                                                                                                     name="match_value"
@@ -2128,11 +2078,8 @@ class Settings extends React.Component {
                                                                                                                     ) : (
                                                                                                                         ((source.target === "Value_Multiple_Any" ||
                                                                                                                             source.target === "Value_Multiple_All") && source.source_type === "scale") ? (
-                                                                                                                            <div className="form-group clear clearfix"
-
-                                                                                                                            >
+                                                                                                                            <div className="form-group clear clearfix">
                                                                                                                                 <div className="label-part">Value</div>
-
                                                                                                                                 <div className="ans-part">
                                                                                                                                     <Select
                                                                                                                                         isMulti
@@ -2150,9 +2097,7 @@ class Settings extends React.Component {
                                                                                                                     ))
                                                                                     }
                                                                                     {source.target === "field" ? (
-                                                                                        <div className="form-group clear clearfix"
-
-                                                                                        >
+                                                                                        <div className="form-group clear clearfix">
                                                                                             <div className="label-part">Field</div>
                                                                                             <div className="ans-part">
                                                                                                 <select className="form-control" name="matchid" onChange={e => this.addNewCondtions(e, drop, "source", idx)}>
@@ -2172,7 +2117,6 @@ class Settings extends React.Component {
                                                                                     )}
                                                                                 </div>
                                                                             )}
-
                                                                         </div>
                                                                     ))
                                                                 }
@@ -2228,9 +2172,8 @@ class Settings extends React.Component {
                         </DragDropContext>
                         {(this.state.validate === 1) ? <p className="conditionerror"> <i className="fa fa-exclamation-triangle" aria-hidden="true"></i>  Kindly Fill all the Fields to add more Conditions</p> : ""}
                         <div className="plus plus-btns" onClick={this.addCondtion}>
-                            <i className="fa fa-plus-circle" />{" "}
+                            <i className="fa fa-plus-circle" />
                         </div>
-                        {/*  <div className="" onClick={this.saveCondition}>Save</div> */}
                     </div>
                 </div>
                 <Snackbar

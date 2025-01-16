@@ -238,6 +238,7 @@ class AgMissionResponse extends React.Component {
 
       /* Ag grid values. */
       columnDefs: [],
+      columnDefs_backup: [],
       quickFilterText: '',
       column_order: {},
 
@@ -458,7 +459,6 @@ class AgMissionResponse extends React.Component {
     });
   };
 
-
   /* Handles this function to update the selected project. */
   SelectedProject = () => {
     if (this.props.location.state && this.props.location.state.detail) {
@@ -494,7 +494,6 @@ class AgMissionResponse extends React.Component {
     }
   }
 
-
   /* Handles the project selection from dropdown and to update the mission list from the selected project. */
   handleProjectChange = e => {
     let miss = [];
@@ -512,7 +511,9 @@ class AgMissionResponse extends React.Component {
           selectedMission: "",
           selectedproj: e,
           paymentEnableDetails: e.value,
-          paymentProjName: e.label
+          paymentProjName: e.label,
+          listItems: [],
+          pagecount: 0
         });
         localStorage.removeItem("defaultfilterState")
       })
@@ -588,7 +589,6 @@ class AgMissionResponse extends React.Component {
     );
   };
 
-
   /* Handle the close event of payment popup. */
   closePay = () => {
     this.setState({ pay: false });
@@ -616,8 +616,6 @@ class AgMissionResponse extends React.Component {
     this.api.resetRowHeights();
     this.columnApi = params.columnApi;
   };
-
-
 
   /* Handles the export ag grid data to excel. */
   exportCsv = () => {
@@ -718,7 +716,6 @@ class AgMissionResponse extends React.Component {
 
       })
   }
-
 
   /*  Handles the event to validate the column type and calls the api to update the answer. */
   onCellValueChanged = event => {
@@ -1010,8 +1007,6 @@ class AgMissionResponse extends React.Component {
         event.colDef.queType === "scale" ||
         event.colDef.queType === "input" ||
         event.colDef.queType === "choice"
-
-
       ) {
         this.getSelectedQuestion(event);
         this.getSelectedAnswer(event);
@@ -1024,14 +1019,15 @@ class AgMissionResponse extends React.Component {
       }
 
       else if (event.colDef.queType === "upload") {
-
-        if (event.value.length === 0 || event.value[event.value.length - 1] === undefined) {
-          this.setState({ openPopup: false })
-        } else if (event.colDef.mediaType && (event.colDef.mediaType === 'video' || event.colDef.mediaType === 'audio')) {
-          // skip audio video clicks		
+        if (event.colDef.mediaType && (event.colDef.mediaType === 'video' || event.colDef.mediaType === 'audio')) {
+          // skip audio video clicks
+        } else if (event.value.length === 0 || event.value[event.value.length - 1] === undefined) {
+          this.getAllRows();
+          this.getPhotoEditorQuestion(event);
+          this.setState({ openPopup: true });
         } else {
-          this.getAllRows()
-          this.getPhotoEditorQuestion(event)
+          this.getAllRows();
+          this.getPhotoEditorQuestion(event);
 
           this.setState({
             customer_id: event.data.customer_id,
@@ -1056,11 +1052,12 @@ class AgMissionResponse extends React.Component {
       }
       else if (event.colDef.queType === "capture" && !event.colDef.field.includes("-C_instext") && !event.colDef.field.includes("-C_scale")) {
         if (event.value === "" || event.value === undefined) {
-          this.setState({ openPopup: false })
+          this.getAllRows()
+          this.getPhotoEditorQuestion(event)
+          this.setState({ openPopup: true })
         } else {
           this.getAllRows()
           this.getPhotoEditorQuestion(event)
-
           this.setState({
             customer_id: event.data.customer_id,
             survey_tag_id: event.data.survey_tag_id
@@ -1130,6 +1127,7 @@ class AgMissionResponse extends React.Component {
       }
 
     })
+    // console.log("currentdetails" , currentdetails)
     this.setState({
       imageEdit: currentdetails,
       selectedQuestion: selectedQuestion,
@@ -1399,8 +1397,6 @@ class AgMissionResponse extends React.Component {
         }
       }
     }
-
-
   };
 
 
@@ -1593,6 +1589,12 @@ class AgMissionResponse extends React.Component {
       this.state.imageData = imageData;
       if (background_update === 'save') {
         this.state.updatedAnswer.image = dataURL;
+        this.state.updatedAnswer.is_deleted = false;
+        this.setState({ loading: true, openPopup: false });
+      }
+      else if (background_update === 'delete') {
+        this.state.updatedAnswer.image = dataURL;
+        this.state.updatedAnswer.is_deleted = true;
         this.setState({ loading: true, openPopup: false });
       }
       else if (background_update === 'hide_close') {
@@ -1615,6 +1617,14 @@ class AgMissionResponse extends React.Component {
         this.state.updatedAnswer.media = dataURL.split(',')[1];
         this.state.updatedAnswer.media_type = "image";
         this.state.updatedAnswer.media_format = "png";
+        this.state.updatedAnswer.is_deleted = false;
+        this.setState({ loading: true, openPopup: false });
+      }
+      else if (background_update === 'delete') {
+        this.state.updatedAnswer.media = dataURL.split(',')[1];
+        this.state.updatedAnswer.media_type = "image";
+        this.state.updatedAnswer.media_format = "png";
+        this.state.updatedAnswer.is_deleted = true;
         this.setState({ loading: true, openPopup: false });
       }
       else if (background_update === 'hide_close') {
@@ -1630,7 +1640,6 @@ class AgMissionResponse extends React.Component {
     if (this.state.selectedQuestion.type === "barcode" || this.state.selectedQuestion.type === "capture" || this.state.selectedQuestion.type === "upload") {
       if (this.Editor.current.getdataURL() && this.Editor.current.getdataURL().length > 0) {
         this.updateImageAnswerData(this.Editor.current.getImageData(), this.Editor.current.getdataURL(), background_update);
-
         let newData = {
           consumer_id: this.state.imageData.customer_id,
           answer: this.state.updatedAnswer,
@@ -1661,6 +1670,7 @@ class AgMissionResponse extends React.Component {
             }
           })
           .catch(error => {
+            console.log("ERROR : : -- >> ", error)
             if (!background_update) {
               this.setState({ openModal: false, openPopup: false });
             }
@@ -1773,11 +1783,55 @@ class AgMissionResponse extends React.Component {
       }
     }
   };
-  handleDeleteImage = () => {
-    // For delete image 
-    // Call edit survey answer api over here but its not allowing blank image object to remove image and edit anwer. 
-    // So we need API change for that
-  }
+
+  /* Handles the api to submit the answer data to the server.*/
+  handleDeleteImage = (handleChange) => {
+    let background_update = ''
+    if (handleChange !== undefined && handleChange !== null) { background_update = handleChange }
+    if (this.Editor.current.getdataURL() && this.Editor.current.getdataURL().length > 0) {
+      this.updateImageAnswerData(this.Editor.current.getImageData(), this.Editor.current.getdataURL(), background_update);
+      let newData = {
+        consumer_id: this.state.imageData.customer_id,
+        answer: this.state.updatedAnswer,
+        mission_id: this.state.missionId,
+        survey_id: this.state.survey_id,
+        question_id: this.state.imageData.question_id,
+        survey_answer_tag_id: this.state.imageData.survey_tag_id,
+        question_type: this.state.imageData.type
+      };
+      if (this.state.imageData.loop_number) {
+        newData.loop_number = this.state.imageData.loop_number
+        newData.loop_set = this.state.imageData.loop_set
+        newData.loop_triggered_qid = this.state.imageData.loop_triggered_qid
+      }
+      api2
+        .delete("/web_survey_answers", { data: newData })
+        .then(resp => {
+          this.onEditAnswerRefresh(this.state.selectedlanguage.value)
+          this.setState({
+            openModal: false,
+            openPopup: false,
+            selectedAnswer: {},
+            answer_id: "",
+            selectedQuestion: {},
+            updatedAnswer: {}
+          });
+        })
+        .catch(error => {
+          if (!background_update) {
+            this.setState({ openModal: false, openPopup: false });
+          }
+          console.error(error);
+          this.setState({
+            selectedAnswer: {},
+            answer_id: "",
+            selectedQuestion: {},
+            updatedAnswer: {}
+          });
+        });
+    };
+  };
+
   /** Delete survey Answer
    *  TO delete answer edited survey answer and called edit survey 
    *  answer api to remove cell answer with passing blank/not selected
@@ -2599,8 +2653,17 @@ class AgMissionResponse extends React.Component {
     else {
       updatedColumnDefs = columnDefs;
     }
+
+    const _columnDefs = updatedColumnDefs.map((item) => {
+      return {
+        ...item,
+        filter: false
+      }
+    });
+
     await this.setState({
-      columnDefs: updatedColumnDefs,
+      columnDefs_backup: updatedColumnDefs,
+      columnDefs: this.state.totalrecords < this.state.rowsPerPage ? updatedColumnDefs : _columnDefs,
       tableFields: tableFields
     });
     let sepMission = [];
@@ -2794,6 +2857,7 @@ class AgMissionResponse extends React.Component {
       this.getMissionResponsepage(this.state.selectedlanguage.value, page)
     } else {
       this.setState({
+        columnDefs: this.state.columnDefs_backup,
         listItems: loadedlistItems,
         datapagecount: loadedlistItems.length
       }, () => { this.api.resetRowHeights() })
@@ -2827,7 +2891,10 @@ class AgMissionResponse extends React.Component {
           }
         }
         else if (ans != {} && ans.type && ans.type === 'upload' && ans.answers && ans.answers.media_type && ans.answers.media_type === 'image' && ans.answers.media) {
-          if (c.field.includes('-U_oimage')) {
+          if (ans.answers && ans.answers.is_deleted && ans.answers.is_deleted) { // if image is deleted ( is_deleted == true )
+            arr[c.field] = ["", ""]
+          }
+          else if (c.field.includes('-U_oimage')) {
             arr[c.field] = [0, ans.answers.image_orig ? (ans.answers.image_orig + '?thumbnail=yes') : (ans.answers.media + '?thumbnail=yes'), ans.answers.image_orig ? ans.answers.image_orig : ans.answers.media]
           }
           else {
@@ -3831,6 +3898,7 @@ class AgMissionResponse extends React.Component {
       })
     }
   };
+
   render() {
     const { classes } = this.props;
     const { msgColor, br, message, page, pagecount, rowsPerPage } = this.state;
@@ -3878,6 +3946,7 @@ class AgMissionResponse extends React.Component {
                     value={this.state.selectedproj}
                     options={this.state.projects}
                     onChange={this.handleProjectChange}
+                    isDisabled={this.state.selectedMission !== "" && this.state.listItems.length < this.state.totalrecords}
                   />
                 </GridItem>
               </div>
@@ -3888,6 +3957,7 @@ class AgMissionResponse extends React.Component {
                     value={this.state.selectedMission}
                     options={this.state.missions}
                     onChange={this.handleMissionChange}
+                    isDisabled={this.state.selectedMission !== "" && this.state.listItems.length < this.state.totalrecords}
                   />
                 </GridItem>
               </div>
@@ -4126,6 +4196,7 @@ class AgMissionResponse extends React.Component {
                             onFilterChanged={this.onFilterChangedGrid}
                             suppressPaginationPanel={true}
                             enableBrowserTooltips={true}
+                            gridOptions={{ suppressHorizontalScroll: false }}
                           />
                         </div>
                         <div style={{ display: 'flex', float: 'right', }}>
@@ -4243,6 +4314,7 @@ class AgMissionResponse extends React.Component {
                         onFilterChanged={this.onFilterChangedGrid}
                         suppressPaginationPanel={true}
                         enableBrowserTooltips={true}
+                        gridOptions={{ suppressHorizontalScroll: false }}
                       />
                     </div>
                     <div style={{ display: 'flex', float: 'right', }}>
@@ -4382,7 +4454,7 @@ class AgMissionResponse extends React.Component {
               <PhotoEditor
                 ref={this.Editor}
                 FilterRowData={this.state.FilterRowData}
-                //handleDeleteImage={this.handleDeleteImage}
+                handleDeleteImage={() => this.handleDeleteImage("delete")}
                 selectedAnswer={this.state.imageEdit}
                 questions={this.state.questions}
                 colDef={this.state.columnDefs}

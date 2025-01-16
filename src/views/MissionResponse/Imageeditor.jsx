@@ -66,11 +66,23 @@ class PhotoEditor extends React.Component {
       filteredMissions: [],
       FilterRowData: [],
       onChange: false,
+      saveDiabled : true,
+      editTimeCount : 0,
       alertDisplay: false
     }
   }
 
   componentDidMount() {
+    setTimeout(()=>{
+      if(this.editorRef && this.editorRef.current){
+        const editorInstance = this.editorRef.current.getInstance();
+        editorInstance.on('objectAdded', ()=>this.handleEdit(1));
+        editorInstance.on('objectModified', ()=>this.handleEdit(2));
+        editorInstance.on('objectRemoved', ()=>this.handleEdit(3));
+        editorInstance.on('undoStackChanged', this.handleUndoStackChange);
+      }
+    }, 1000);
+
     this.setState({
       questions: this.props.questions,
       filteredMissions: this.props.filteredMissions,
@@ -79,6 +91,15 @@ class PhotoEditor extends React.Component {
     }, () => { this.CurrentImage() })
   }
 
+  handleEdit = (number) => {
+    // this.setState({ saveDiabled: false});
+  };
+
+  handleUndoStackChange = () => {
+    const editorInstance = this.editorRef.current.getInstance();
+    const undoStackLength = editorInstance._invoker._undoStack.length;
+      this.setState({ editTimeCount: undoStackLength });
+  };
 
   /* 
   * This function gets invoked when tui editor component gets mounted.  
@@ -104,19 +125,38 @@ class PhotoEditor extends React.Component {
     if (selectedAnswer.queType === "barcode" || selectedAnswer.queType === "upload" || selectedAnswer.queType === "capture") {
       if (selectedAnswer.field.includes('B_oimage') || selectedAnswer.field.includes('U_oimage') || selectedAnswer.field.includes('C_oimage')) { disable = true; }
     }
-    this.state.filteredMissions[selectedAnswer.column_index].responses.forEach((r, index) => {
+   
+    const selectedimagedata = this.state.filteredMissions.find((item)=>item.survey_tag_id ==selectedAnswer.survey_tag_id);
+    // Check if answer is not null or {}
+    const isAnswerExists = selectedimagedata.responses.find((item)=>(selectedAnswer.loop_set && selectedAnswer.loop_set != null && selectedAnswer.loop_set > 0) ?
+      selectedAnswer.loop_triggered_qid === item.loop_triggered_qid && selectedAnswer.loop_set === item.loop_set &&
+      selectedAnswer.loop_number === item.loop_number && item.question_id === selectedAnswer.question_id
+      : (!item.loop_triggered_qid && item.question_id === this.props.selectedAnswer.question_id));
+  
+    if(isAnswerExists){
+      selectedimagedata && selectedimagedata.responses.forEach((r, index) => {
       if ((selectedAnswer.loop_set && selectedAnswer.loop_set != null && selectedAnswer.loop_set > 0) ?
-        selectedAnswer.loop_triggered_qid === r.loop_triggered_qid && selectedAnswer.loop_set === r.loop_set &&
-        selectedAnswer.loop_number === r.loop_number && r.question_id === selectedAnswer.question_id
-        :
-        (!r.loop_triggered_qid && r.question_id === this.props.selectedAnswer.question_id)
-      ) {
+      selectedAnswer.loop_triggered_qid === r.loop_triggered_qid && selectedAnswer.loop_set === r.loop_set &&
+      selectedAnswer.loop_number === r.loop_number && r.question_id === selectedAnswer.question_id
+      :
+      (!r.loop_triggered_qid && r.question_id === this.props.selectedAnswer.question_id)
+    ) {
         if (r.answers.image || r.answers.media) {
           if (selectedAnswer.queType === "barcode" || selectedAnswer.queType === "capture") {
-            Column.image = disable ? r.answers.image_orig ? r.answers.image_orig : r.answers.image : r.answers.image
+            if(r.answers && r.answers.is_deleted && r.answers.is_deleted == true){
+              Column.image = ""
+            }
+            else{
+              Column.image = disable ? r.answers.image_orig ? r.answers.image_orig : r.answers.media : r.answers.media
+            }
           }
           else if (selectedAnswer.queType === "upload") {
-            Column.image = disable ? r.answers.image_orig ? r.answers.image_orig : r.answers.media : r.answers.media
+            if(r.answers && r.answers.is_deleted && r.answers.is_deleted == true){
+              Column.image = ""
+            }
+            else{
+              Column.image = disable ? r.answers.image_orig ? r.answers.image_orig : r.answers.media : r.answers.media
+            }
           }
           Column.title = selectedAnswer.headerName
           Column.question_id = selectedAnswer.question_id
@@ -135,8 +175,31 @@ class PhotoEditor extends React.Component {
           }
         }
       }
-    })
-
+      })
+    }
+    else{
+      if (selectedAnswer.queType === "barcode" || selectedAnswer.queType === "capture") {
+          Column.image = ""
+      }
+      else if (selectedAnswer.queType === "upload") {
+          Column.image = ""
+      }
+      Column.title = selectedAnswer.headerName
+      Column.question_id = selectedAnswer.question_id
+      Column.survey_tag_id = selectedAnswer.survey_tag_id
+      Column.answers = {}
+      Column.type = selectedAnswer.queType
+      Column.index = selectedAnswer.column_index
+      Column.rowindex = selectedAnswer.row_index
+      Column.selected_index = selected_index
+      Column.customer_id = this.state.filteredMissions[selectedAnswer.column_index].customer_id
+      Column.disable = disable
+      if (selectedAnswer.loop_set && selectedAnswer.loop_set != null && selectedAnswer.loop_set > 0) {
+        Column.loop_set = selectedAnswer.loop_set;
+        Column.loop_number = selectedAnswer.loop_number;
+        Column.loop_triggered_qid = selectedAnswer.loop_triggered_qid;
+      }
+    }
     this.setState({
       imageData: Column,
       open: true
@@ -514,8 +577,6 @@ class PhotoEditor extends React.Component {
     //npm install file-saver --save
     var FileSaver = require('file-saver');
     const editorInstance = this.editorRef.current.getInstance();
-    console.log(editorInstance.dataUrl);
-    console.log('editor instance')
     FileSaver.saveAs(editorInstance.toDataURL({ quality: 0.8 }), 'image.jpg')
   };
 
@@ -533,10 +594,16 @@ class PhotoEditor extends React.Component {
       let imageData = this.state.imageData;
       imageData.image = data;
       const editorInstance = this.editorRef.current.getInstance();
+      let dataURL = editorInstance.toDataURL({ quality: 0.8 });
       this.setState({
         dataURL: data,
         imageData: imageData,
-      }, () => { editorInstance.loadImageFromURL(imageData.image, imageData.title) })
+        saveDiabled : false,
+      }, () => { 
+          editorInstance
+            .loadImageFromURL(imageData.image, imageData.title)
+            .then((result) => {editorInstance.ui.activeMenuEvent()}); 
+          })
     })
   }
 
@@ -571,16 +638,22 @@ class PhotoEditor extends React.Component {
       dataURL: dataURL,
       imageData: imageData,
       onChange: true,
+      saveDiabled : false,
     }, () => { this.props.updateAnswer('hide') })
   }
 
   handleClickDelete = () => {
     this.setState({ alertDisplay: true })
   }
+ 
+  /** Delete alert modal close and API call here */
   handleAlertClose = deleteImage => event => {
+    const editorInstance = this.editorRef.current.getInstance();
+    let dataURL = editorInstance.toDataURL({ quality: 0.8 });
     if (deleteImage) {
-      // Call this method in Agmissionresponse screen to delete image
-      this.props.handleDeleteImage()
+      this.setState({
+        dataURL: dataURL
+      }, () => { this.props.handleDeleteImage() })
     }
     this.setState({ alertDisplay: false });
   };
@@ -633,7 +706,7 @@ class PhotoEditor extends React.Component {
                       cursor: 'pointer'
                     }}
                   >&times;</div>
-                  {/* <button
+                  <button
                     className="tui-image-editor__apply-btn"
                     onClick={this.handleClickDelete}
                     href=''
@@ -647,7 +720,7 @@ class PhotoEditor extends React.Component {
                       background: "#074e9e",
                       color: "#fff"
                     }}
-                  > Delete</button> */}
+                  > Delete</button>
 
                   <button
                     className="tui-image-editor__apply-btn"
@@ -670,10 +743,11 @@ class PhotoEditor extends React.Component {
                       <button
                         className="tui-image-editor__apply-btn"
                         onClick={this.handleClickSave}
+                        disabled={this.state.saveDiabled && this.state.editTimeCount == 0}
                         style={{
                           border: "none",
                           padding: "8px 20px",
-                          cursor: "pointer",
+                          cursor: this.state.saveDiabled && this.state.editTimeCount == 0 ? "default" : "pointer",
                           float: "right",
                           margin: "10px",
                           borderRadius: "5px",
@@ -721,7 +795,7 @@ class PhotoEditor extends React.Component {
                         <Switchlimit color='primary' value="hide"
                           // checked={(this.state.imageData.length > 0 && this.state.imageData.answers.hide) ?
                           //   this.state.imageData.answers.hide === 1 ? true : false : false}
-                          checked={(this.state.imageData && this.state.imageData.answers.hasOwnProperty("hide") && this.state.imageData.answers.hide === 1) ? true : false}
+                          checked={(this.state.imageData && this.state.imageData.answers &&this.state.imageData.answers.hasOwnProperty("hide") && this.state.imageData.answers.hide === 1) ? true : false}
                           onChange={this.handleChange()} />
                       </MuiThemeProvider>
                     </div>
@@ -787,12 +861,12 @@ class PhotoEditor extends React.Component {
               </div>
             </div>
 
-            {/* <AlertDialog
+            <AlertDialog
               title={"Delete"}
               description="Are you sure you want to delete this image? Once deleted it cannot be retrieved"
               open={this.state.alertDisplay}
               handleDialogClose={this.handleAlertClose}
-            /> */}
+            />
 
           </div>
         ) : ("")}

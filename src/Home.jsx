@@ -120,7 +120,6 @@ class Home extends React.Component {
 
   render() {
 
-    console.log(this.state);
     //if (this.state.test == "test") {
     //  return < Redirect to="/home/image-viewer/asdasd" />;
     //}
