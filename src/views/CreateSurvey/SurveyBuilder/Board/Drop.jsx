@@ -4679,10 +4679,10 @@ class Card extends React.Component {
                     this.addfun("suboptions", optionId);
                 }
                 setTimeout(() => {
-                    this.choiceSubInputRefs[key] 
-                    && this.choiceSubInputRefs[key].current 
-                    && this.choiceSubInputRefs[key].current.editor
-                    && this.choiceSubInputRefs[key].current.editor.focus();
+                    this.choiceSubInputRefs[key]
+                        && this.choiceSubInputRefs[key].current
+                        && this.choiceSubInputRefs[key].current.editor
+                        && this.choiceSubInputRefs[key].current.editor.focus();
                 }, 100)
             }
             else if (this.choiceSubInputRefs[key] && this.choiceSubInputRefs[key].current) {
@@ -4700,10 +4700,10 @@ class Card extends React.Component {
                         this.addfun("options");
                     }
                     setTimeout(() => {
-                        this.choiceInputRefs[key] 
-                        && this.choiceInputRefs[key].current 
-                        && this.choiceInputRefs[key].current.editor
-                        && this.choiceInputRefs[key].current.editor.focus();
+                        this.choiceInputRefs[key]
+                            && this.choiceInputRefs[key].current
+                            && this.choiceInputRefs[key].current.editor
+                            && this.choiceInputRefs[key].current.editor.focus();
                     }, 100)
                 }
                 else if (this.choiceInputRefs[key] && this.choiceInputRefs[key].current) {
@@ -7587,7 +7587,7 @@ class Card extends React.Component {
                                             )
                                             : ""}
                                         <div className="options"
-                                            style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
+                                            style={this.state.currentlanguage.value !== "English" || this.props.mappingProfileEnable == true ? disabledive : {}}
                                         >
                                             <div className="addmoreimage addmoreimage-big" onClick={() => this.addfun("options")}>
                                                 <i className="fa fa-plus" /> Add{" "}
