@@ -334,7 +334,7 @@ class Card extends React.Component {
             this.setGroupQuestionAnswers(this.state.allQuestionGroupArray);
         } else {
             api2
-                .get("questions_of_client?id=" + (selectedProfile.id || 1))
+                .get("questions_of_client?client_id=" + (selectedProfile.id || 1))
                 .then(resp => {
                     if (resp.status === 200) {
                         this.setState({
@@ -1887,11 +1887,41 @@ class Card extends React.Component {
                 languages_drop[a.label].content[this.props.index].label = evalue;
             }
         })
+        this.checkConditionMultifieldValue(evalue);
         this.setState({
             fieldprops
         });
         // this.props.updateProperties(this.state.fieldprops)this.props.updateProperties(this.state.fieldprops)
     }
+
+    checkConditionMultifieldValue = (evalue) => {
+        const temp_condition = this.state.conditions.map((c_item) => {
+            if (c_item.target.hasOwnProperty('multifield') && c_item.target.multifield.length > 0) {
+                const multifield = c_item.target.multifield.map((m_item) => {
+                    if (m_item.value == this.state.fieldprops.handler) {
+                        return {
+                            ...m_item,
+                            label: evalue
+                        }
+                    }
+                    else {
+                        return m_item;
+                    }
+                });
+                return {
+                    ...c_item,
+                    target: {
+                        ...c_item.target,
+                        multifield: multifield
+                    }
+                };
+            }
+            else {
+                return c_item;
+            }
+        });
+        this.props.updateCondition(temp_condition);
+    };
 
     /** Randomise some set of question based on group selected. 
      *  for example - if selected group 1 in four choice question then 
@@ -3937,9 +3967,9 @@ class Card extends React.Component {
                         }
                         oldprops.options.push({
                             id: 'other',
-                            label: "others",
+                            label: "Other, please specify",
                             label_image: "",
-                            label_text: '<p>others</p>'
+                            label_text: '<p>Other, please specify</p>'
                         })
                         selectedlanguage.forEach((a, b) => {
                             if (a.label !== 'English') {
@@ -3948,9 +3978,9 @@ class Card extends React.Component {
                                 }
                                 languages_drop[a.label].content[this.props.index].properties.options.push({
                                     id: 'other',
-                                    label: "others",
+                                    label: "Other, please specify",
                                     label_image: "",
-                                    label_text: '<p>others</p>'
+                                    label_text: '<p>Other, please specify</p>'
                                 })
                             }
                         })
@@ -3984,14 +4014,14 @@ class Card extends React.Component {
                         }
                         oldprops.options.push({
                             id: 'other',
-                            label: "others",
+                            label: "Other, please specify",
                             label_image: "",
-                            label_text: '<p>others</p>',
+                            label_text: '<p>Other, please specify</p>',
                             sublabel: [{
                                 id: 'other',
                                 label_image: "",
-                                sublabel: "others",
-                                sublabel_text: '<p>others</p>'
+                                sublabel: "Other, please specify",
+                                sublabel_text: '<p>Other, please specify</p>'
                             }]
                         })
                         selectedlanguage.forEach((a, b) => {
@@ -4001,14 +4031,14 @@ class Card extends React.Component {
                                 }
                                 languages_drop[a.label].content[this.props.index].properties.options.push({
                                     id: 'other',
-                                    label: "others",
+                                    label: "Other, please specify",
                                     label_image: "",
-                                    label_text: '<p>others</p>',
+                                    label_text: '<p>Other, please specify</p>',
                                     sublabel: [{
                                         id: 'other',
                                         label_image: "",
-                                        sublabel: "others",
-                                        sublabel_text: '<p>others</p>'
+                                        sublabel: "Other, please specify",
+                                        sublabel_text: '<p>Other, please specify</p>'
                                     }]
                                 })
                             }
@@ -4045,9 +4075,9 @@ class Card extends React.Component {
                         }
                         oldprops.options.push({
                             id: 'other',
-                            label: "others",
+                            label: "Other, please specify",
                             label_image: "",
-                            label_text: '<p>others</p>',
+                            label_text: '<p>Other, please specify</p>',
                         })
                         selectedlanguage.forEach((a, b) => {
                             if (a.label !== 'English') {
@@ -4056,9 +4086,9 @@ class Card extends React.Component {
                                 }
                                 languages_drop[a.label].content[this.props.index].properties.options.push({
                                     id: 'other',
-                                    label: "others",
+                                    label: "Other, please specify",
                                     label_image: "",
-                                    label_text: '<p>others</p>',
+                                    label_text: '<p>Other, please specify</p>',
                                 })
                             }
                         })
@@ -7171,7 +7201,10 @@ class Card extends React.Component {
                                 style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
                             >
                                 <div className="below-lanbel-body">
-                                    <div className="switch-text-boxes switch-text-boxes-mandatory clear">
+                                    <div
+                                        style={this.state.fieldprops.properties.display_type === "dropdown" || mappingProfileEnable == true ? disabledive : null}
+                                        className="switch-text-boxes switch-text-boxes-mandatory clear"
+                                    >
                                         <div className="switch-textboxes xtboxestext">Display Other Option</div>
                                         {/* {this.state.fieldprops.properties.other!==undefined?
                                         <div className="switches-boxes" style={this.state.fieldprops.properties.display_type==="dropdown"?disabledive:null}>
@@ -7235,7 +7268,10 @@ class Card extends React.Component {
 
                             <li>
                                 <div className="below-lanbel-body">
-                                    <div className="switch-text-boxes switch-text-boxes-mandatory clear">
+                                    <div
+                                        style={mappingProfileEnable == true ? disabledive : null}
+                                        className="switch-text-boxes switch-text-boxes-mandatory clear"
+                                    >
                                         <div className="switch-textboxes xtboxestext"
                                             style={(this.state.currentlanguage.value !== "English" || this.state.fieldprops.properties.display_type === "dropdown") ? disabledive : {}}
                                         >Random Options</div>
@@ -7382,7 +7418,10 @@ class Card extends React.Component {
                                         <div className="clearfix" />
 
                                         {this.props.mappingProfileEnable == true &&
-                                            <div className="mt-3">
+                                            <div
+                                                style={(this.state.currentlanguage.value !== "English") ? disabledive : {}}
+                                                className="mt-3"
+                                            >
                                                 <h3 className={"required-field"}>Select Group</h3>
                                                 <Select
                                                     placeholder={'select group'}

@@ -147,6 +147,7 @@ class CreateSurvey extends React.Component {
         this.elementsbar = this.showAddElements.bind(this);
         this.settingsbar = this.settingsOptions.bind(this);
         this.addCondtions = this.addCondtions.bind(this);
+        this.updateConditionMultifield = this.updateConditionMultifield.bind(this);
         this.ShowNotification = this.ShowNotification.bind(this);
     }
 
@@ -1909,6 +1910,14 @@ class CreateSurvey extends React.Component {
         });
     }
 
+    /* Handles the events to update condition multifield names if edited. */
+    updateConditionMultifield(event) {
+        this.setState({
+            conditions: event,
+            defaultconditions: cloneDeep(event),
+        });
+    }
+
     /* Handles the events to add new survey. */
     addSurvey(dname, dauto, check) {
         const mydate = new Date();
@@ -2214,7 +2223,8 @@ class CreateSurvey extends React.Component {
             downArrowFuncLanguage,
             upArrowFuncLanguage,
             updateconlanguage,
-            handledeletelanguage
+            handledeletelanguage,
+            updateConditionMultifield
         ) {
             switch (stepIndex) {
                 case 0:
@@ -2272,6 +2282,7 @@ class CreateSurvey extends React.Component {
                             downArrowFuncLanguage={downArrowFuncLanguage}
                             upArrowFuncLanguage={upArrowFuncLanguage}
                             selectedProfile={selectedProfile}
+                            updateCondition={updateConditionMultifield}
                         />
                     );
                 case 2:
@@ -2390,7 +2401,8 @@ class CreateSurvey extends React.Component {
                                                     this.downArrowFuncLanguage,
                                                     this.upArrowFuncLanguage,
                                                     this.updateconlanguage,
-                                                    this.handledeletelanguage
+                                                    this.handledeletelanguage,
+                                                    this.updateConditionMultifield
                                                 )}
                                             </div>
                                         </div>

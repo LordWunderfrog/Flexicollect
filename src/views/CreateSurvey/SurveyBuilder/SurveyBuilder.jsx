@@ -127,6 +127,7 @@ class SurveyBuilder extends React.Component {
           upArrowFuncLanguage={this.props.upArrowFuncLanguage}
           languages_drop={this.props.languages_drop}
           selectedProfile={this.props.selectedProfile}
+          updateCondition={this.props.updateCondition}
         />
       </div>
     );
