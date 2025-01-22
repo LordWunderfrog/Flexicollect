@@ -1559,7 +1559,7 @@ class WebLink extends React.Component {
         else if (matchedField && que.question.properties[keyname] && que.question.properties[keyname] == 'show') {
           return {
             ...que,
-            isHide: existInTarget ? que.isHide : true
+            isHide: existInTarget ? que.isHide : false
           }
         }
         else {
@@ -2163,11 +2163,11 @@ class WebLink extends React.Component {
             });
         }
         else {
-          this.executeConditions(this.state.selectedQuestion.conditions, this.state.selectedAnswer, this.state.selectedQuestion.type, this.state.selectedQuestion.properties);
+          this.executeConditions(this.state.selectedQuestion.conditions, answer, this.state.selectedQuestion.type, this.state.selectedQuestion.properties);
         }
       }
       else {
-        this.executeConditions(this.state.selectedQuestion.conditions, this.state.selectedAnswer, this.state.selectedQuestion.type, this.state.selectedQuestion.properties);
+        this.executeConditions(this.state.selectedQuestion.conditions, answer, this.state.selectedQuestion.type, this.state.selectedQuestion.properties);
       }
 
     }
@@ -3307,7 +3307,14 @@ class WebLink extends React.Component {
       }
     }
     if (check) {
-      if ((answer && Object.keys(answer).length > 0) || (type === 'input')) {
+      if (
+        (answer && Object.keys(answer).length > 0 && type === "choice"
+          ? answer.choice_type == "multiple"
+            ? answer.selected_option && answer.selected_option.length > 0
+            : (answer && Object.keys(answer).length > 0)
+          : (answer && Object.keys(answer).length > 0))
+        || (type == 'input')
+      ){
         if (type === "input") {
           this.inputConditionalTarget(conditions, answer, target, unMetTarget);
         } else if (type === 'choice') {
@@ -3321,8 +3328,17 @@ class WebLink extends React.Component {
         }
       } else {
         for (let j = 0; j < conditions.length; j++) {
-          if (conditions[j].target.do !== 'release') {
-            unMetTarget.push(conditions[j].target);
+          for (let s = 0; s < conditions[j].source.length; s++) {
+            if (conditions[j].source[s].state == "notequal" && conditions[j].source[s].match_value !== "") {
+              target.push(conditions[j].target);
+            }
+            else {
+              for (let j = 0; j < conditions.length; j++) {
+                if (conditions[j].target.do !== 'release') {
+                  unMetTarget.push(conditions[j].target);
+                }
+              }
+            }
           }
         }
       }

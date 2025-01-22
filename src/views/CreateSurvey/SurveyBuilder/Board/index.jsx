@@ -2505,6 +2505,7 @@ class Board extends Component {
                   updateProperties={() => this.updateProperties()}
                   mappingProfileEnable={this.props.mappingProfileEnable}
                   selectedProfile={this.props.selectedProfile}
+                  updateCondition={this.props.updateCondition}
                 />
               </div> : ""}
 
