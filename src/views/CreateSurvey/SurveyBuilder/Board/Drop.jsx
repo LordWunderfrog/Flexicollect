@@ -348,7 +348,7 @@ class Card extends React.Component {
                     console.error(error);
                 });
             api2
-                .get("dropdown?client_id=" + (selectedProfile.id || 1))
+                .get("dropdown?client_id=" + (selectedProfile.id || 1) + "&language=" + this.state.currentlanguage.value)
                 .then(resp => {
                     if (resp.status === 200) {
                         this.setState({
@@ -360,6 +360,36 @@ class Card extends React.Component {
                     console.error(error);
                 });
         }
+    };
+
+    /* Fetch question of client's group options of different language */
+    fetchGroupOptions = (selectedProfile , language , language_fieldprops) => {
+        api2
+        .get("dropdown?client_id=" + (selectedProfile.id || 1) + "&language=" + language)
+        .then(resp => {
+            if (resp.status === 200) {
+                const optionList = resp.data.data;
+                if(language_fieldprops.properties.selectedChoiceGroup){
+                    const selectedChoiceGroupOptions = optionList.length > 0 ?
+                    optionList.find((item) => { 
+                        return item.group_id == language_fieldprops.properties.selectedChoiceGroup.group_id 
+                    }).options : [];
+                    const newOptions = selectedChoiceGroupOptions && selectedChoiceGroupOptions.length > 0 ?
+                    selectedChoiceGroupOptions.map((item, index) => {
+                        return {
+                            id: item.id,
+                            label: item.label,
+                            label_text: `<p>${item.label}</p>`,
+                            label_image: ""
+                        }
+                    }) : []
+                    language_fieldprops.properties.options = newOptions;
+                }
+            }
+        })
+        .catch(error => {
+            console.error(error);
+        });
     };
 
     /* Handles the event to update the question props. */
@@ -1976,6 +2006,13 @@ class Card extends React.Component {
         this.setState({
             fieldprops
         });
+        let selectedlanguage = this.props.selectedlanguage;
+        let languages_drop = this.props.languages_drop;
+        selectedlanguage.forEach((a, b) => {
+            if (a.label !== 'English') {
+                 languages_drop[a.label].content[this.props.index].properties.currentProductNumber = e;
+            }
+        })
         this.props.autosave()
     }
 
@@ -1987,7 +2024,7 @@ class Card extends React.Component {
         const newOptions = selectedChoiceGroupOptions && selectedChoiceGroupOptions.length > 0 ?
             selectedChoiceGroupOptions.map((item, index) => {
                 return {
-                    id: index,
+                    id: item.id,
                     label: item.label,
                     label_text: `<p>${item.label}</p>`,
                     label_image: ""
@@ -1997,9 +2034,18 @@ class Card extends React.Component {
         fieldprops.properties.options = newOptions
         this.setState({
             fieldprops
+        } , ()=>{
+            let selectedlanguage = this.props.selectedlanguage;
+            let languages_drop = this.props.languages_drop;
+            selectedlanguage.forEach((a, b) => {
+                if (a.label !== 'English') {
+                    languages_drop[a.label].content[this.props.index].properties.selectedChoiceGroup = e
+                    this.fetchGroupOptions(this.props.selectedProfile , a.label , languages_drop[a.label].content[this.props.index]);
+                }
+            })
         });
-        this.props.autosave()
-    }
+        this.props.autosave();
+    };
 
     handleSetQuestionGroupData = (e, index) => {
         let groupArray = this.state.allQuestionGroupArray.length > 0 && this.state.allQuestionGroupArray.find((item, id) => { return item.group.value == e.value });
@@ -2016,19 +2062,40 @@ class Card extends React.Component {
         this.setState({
             fieldprops
         });
-        // this.props.autosave();
+        let selectedlanguage = this.props.selectedlanguage;
+        let languages_drop = this.props.languages_drop;
+        selectedlanguage.forEach((a, b) => {
+            if (a.label !== 'English') {
+                 languages_drop[a.label].content[this.props.index].properties.currentQuestionGroup = e;
+                 languages_drop[a.label].content[this.props.index].properties.currentQuestionSubGroup1 = { value: "", label: "" };
+                 languages_drop[a.label].content[this.props.index].properties.currentQuestionSubGroup2 = { value: "", label: "" };
+            }
+        })
         this.handleSetQuestionGroupData(e, index)
     }
     handleQuestionSubGroupChange = (e, i, index, key) => {
         let fieldprops = this.state.fieldprops;
+        let selectedlanguage = this.props.selectedlanguage;
+        let languages_drop = this.props.languages_drop;
         const val = { value: e.value, label: e.label }
         if (i == 'currentQuestionSubGroup1') {
-            fieldprops.properties.currentQuestionSubGroup2 = { value: "", label: "" }
+            fieldprops.properties.currentQuestionSubGroup2 = { value: "", label: "" };
+            
+            selectedlanguage.forEach((a, b) => {
+                if (a.label !== 'English') {
+                    languages_drop[a.label].content[this.props.index].properties.currentQuestionSubGroup2 = { value: "", label: "" };
+                }
+            })
         }
         fieldprops.properties[i] = val
         this.setState({
             fieldprops
         });
+        selectedlanguage.forEach((a, b) => {
+            if (a.label !== 'English') {
+                 languages_drop[a.label].content[this.props.index].properties[i] = val;
+            }
+        })
         this.props.autosave()
     }
 
