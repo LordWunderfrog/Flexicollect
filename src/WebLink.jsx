@@ -1732,7 +1732,7 @@ class WebLink extends React.Component {
     }
     else {
       if (this.state.selectedQuestion.properties.hasOwnProperty('noreturn') && this.state.selectedQuestion.properties.noreturn === 1) {
-        this.validateNoReturn();
+        this.validateNoReturn([]);
       }
       else {
         this.moveToNext()
@@ -1849,13 +1849,33 @@ class WebLink extends React.Component {
   }
 
   /* Used to remove the hidden questions from the question array. */
-  removeHiddenQuestion(questionsArray) {
+  removeHiddenQuestion(questionsArray , target) {
     let questions = []
     const nextConditionIndex = questionsArray.findIndex((item) => item.question.conditions.length > 0)
     for (let i = 0; i < questionsArray.length; i++) {
 
       if (nextConditionIndex >= 0 && i >= nextConditionIndex) {
-        questions.push(questionsArray[i])
+        let exist = false;
+        target && target.map((item)=>{
+          if(item.do == "hide" || item.do == "show"){
+            if(item.handler == questionsArray[i].question.handler){
+              exist = true
+            }
+          }
+          else if((item.do == "hide_multiple" || item.do == "show_multiple")){
+            if(item.multifield && item.multifield.length>0){
+              for(let m = 0 ; m < item.multifield.length ; m++){
+                if(item.multifield[m].value == questionsArray[i].question.handler){
+                  exist = true
+                }
+              }
+            }
+          }
+        })
+        if(exist == false){
+          //Only push those question that are not in target
+          questions.push(questionsArray[i])
+        }
       }
       else if (
         !questionsArray[i].isHide || questionsArray[i].isHide === false
@@ -1864,7 +1884,7 @@ class WebLink extends React.Component {
       }
     }
     return questions
-  }
+  };
 
   /** store no return hidden questions to localstorage with "isFromHiddenStorage" key true to identify*/
   setHiddenQuestionsToAsync(hiddenQuestionArr){
@@ -1890,7 +1910,7 @@ class WebLink extends React.Component {
 
   /* Validate the current question property.
   * If the property noreturn is true user not able to move to previous questions . */
-  validateNoReturn = () => {
+  validateNoReturn = (target) => {
     let question = this.state.questions[this.state.index];
     const getHiddenQuestion = this.getHiddenQuestionsFromAsync();
     let setHiddenQuestion = [];
@@ -1907,8 +1927,9 @@ class WebLink extends React.Component {
       }
     }).then(resp => {
       if (resp.data.status === 200) {
+        console.log("this.state.questions" , this.state.questions)
         let newQuestion = this.state.questions.slice(this.state.index + 1);
-        let filteredQuestions = this.removeHiddenQuestion(newQuestion);
+        let filteredQuestions = this.removeHiddenQuestion(newQuestion , target);
         for (let i = 0; i < this.state.questions.length; i++) {
           const find = filteredQuestions.find((item) => item.question.handler === this.state.questions[i].question.handler);
           if (find) {
@@ -2651,7 +2672,7 @@ class WebLink extends React.Component {
       }
     }
     if (this.state.selectedQuestion.properties.hasOwnProperty('noreturn') && this.state.selectedQuestion.properties.noreturn === 1) {
-      this.validateNoReturn();
+      this.validateNoReturn(target);
     }
     else {
       this.moveToNext();
