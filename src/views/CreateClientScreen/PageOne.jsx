@@ -799,6 +799,12 @@ class PageOne extends Component {
         field: "surveyTagUpdated",
         type: "g",
         editable: false
+      },
+      {
+        headerName: "Created Date",
+        field: "createdDate",
+        type: "g",
+        editable: false
       }
 
 
@@ -913,6 +919,7 @@ class PageOne extends Component {
         let address = "";
         let device = "";
         let surveyTagUpdated = "";
+        let createdDate = missResp.created_on;
         let surveyTagCreated = "";
         let reviewed = missResp.reviewed;
 
@@ -953,6 +960,7 @@ class PageOne extends Component {
           device: device,
           status: this.getStatusName(status),
           surveyTagUpdated: new Date(surveyTagUpdated).toLocaleString(),
+          createdDate: new Date(createdDate).toLocaleString(),
 
           // response fields
           actualTime: status >= 2 ? Math.floor(((Date.parse(surveyTagUpdated) - Date.parse(surveyTagCreated)) / 1000) / 60) : "",
