@@ -112,6 +112,22 @@ class DropList extends React.Component {
     /* Handles element delete*/
     handleReset = event => {
         let condtions = this.state.conditions;
+        condtions = this.state.conditions.map((item , index)=>{
+            if(item.target && item.target.multifield && item.target.multifield.length>0){
+                let m_item = item.target.multifield
+                m_item = m_item.filter((m)=>{return (m.value !== event.handler)})
+                return {
+                    ...item,
+                    target : {
+                        ...item.target,
+                        multifield : m_item
+                    }
+                }
+            }
+            else{
+                return item
+            }
+        })
         event.conditions.forEach((condition, index) => {
             condtions.map((original, i) => (original.condtion_id === condition.condtion_id ? (original.error = 1) : ""));
         });
@@ -119,6 +135,9 @@ class DropList extends React.Component {
             condtions
         });
         this.props.deleteddrops(this.props.question_id);
+        setTimeout(()=>{
+            this.props.updateCondition(condtions);
+        } , 1000)
     };
 
     /* Handles the event to validate the value and return boolean value. */
@@ -346,7 +365,7 @@ class DropList extends React.Component {
             <span>
                 {conditions.length === 0 ?
                     <span>
-                        <i className="fa fa-trash" onClick={e => this.handleDelete(e)} />
+                        <i className="fa fa-trash" onClick={e => this.handleDelete(e , this.state.fieldprops)} />
                     </span>
                     :
                     <span>
@@ -358,7 +377,7 @@ class DropList extends React.Component {
                             </span>
                         ) : (
                             <span>
-                                <i className="fa fa-trash" onClick={e => this.handleDelete(e)} />
+                                <i className="fa fa-trash" onClick={e => this.handleDelete(e , this.state.fieldprops)} />
                             </span>
                         )}
                     </span>
@@ -367,8 +386,30 @@ class DropList extends React.Component {
     }
 
     /* Handles the event to update the element id to parent to handle delete.     */
-    handleDelete(e) {
+    handleDelete(e , fieldProps) {
+        let condition = this.state.conditions.map((item , index)=>{
+            if(item.target && item.target.multifield && item.target.multifield.length>0){
+                let m_item = item.target.multifield
+                m_item = m_item.filter((m)=>{return (m.value !== fieldProps.handler)})
+                return {
+                    ...item,
+                    target : {
+                        ...item.target,
+                        multifield : m_item
+                    }
+                }
+            }
+            else{
+                return item
+            }
+        })
+        this.setState({
+            condtions : condition
+        });
         this.props.deleteddrops(this.props.question_id);
+        setTimeout(()=>{
+            this.props.updateCondition(condition);
+        } , 1000)
     }
 
     /* Handle the event to clone button */

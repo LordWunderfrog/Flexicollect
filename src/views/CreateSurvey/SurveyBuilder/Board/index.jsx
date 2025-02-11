@@ -2011,7 +2011,7 @@ class Board extends Component {
     } else if (type === 1) {
       type = "input"
 
-    }else if (type === 2) {
+    } else if (type === 2) {
       type = "gps"
 
     } else if (type === 3) {
@@ -2452,6 +2452,7 @@ class Board extends Component {
                             languages_drop={this.props.languages_drop}
                             downArrowFuncLanguage={this.props.downArrowFuncLanguage}
                             upArrowFuncLanguage={this.props.upArrowFuncLanguage}
+                            updateCondition={this.props.updateCondition}
                           />
                         </div>
                       )}
