@@ -2627,6 +2627,13 @@ class AgMissionResponse extends React.Component {
         type: "g",
         editable: false,
         headerTooltip: "Last Accessed Time",
+      },
+      {
+        headerName: "Created Date",
+        field: "createdDate",
+        type: "g",
+        editable: false,
+        headerTooltip: "Created Date",
       }
     ]);
     let updatedColumnDefs = [];
@@ -2685,6 +2692,7 @@ class AgMissionResponse extends React.Component {
         let address = "";
         let device = "";
         let surveyTagUpdated = "";
+        let createdDate = missResp.created_on;
         let surveyTagCreated = "";
         let reviewed = missResp.reviewed;
         missResp.responses.forEach(x => {
@@ -2725,6 +2733,7 @@ class AgMissionResponse extends React.Component {
           device: device,
           status: this.getStatusName(status),
           surveyTagUpdated: new Date(surveyTagUpdated === "" ? missResp.updated_on : surveyTagUpdated).toLocaleString(),
+          createdDate: new Date(createdDate).toLocaleString(),
           // response fields
           actualTime: status >= 2 ? Math.floor(((Date.parse(surveyTagUpdated === "" ? missResp.updated_on : surveyTagUpdated) - Date.parse(surveyTagCreated === "" ? missResp.created_on : surveyTagCreated)) / 1000) / 60) : "",
           customer_id: missResp.customer_id,
@@ -2782,6 +2791,7 @@ class AgMissionResponse extends React.Component {
         let address = "";
         let device = "";
         let surveyTagUpdated = "";
+        let createdDate = missResp.created_on;
         let surveyTagCreated = "";
         let reviewed = missResp.reviewed;
         missResp.responses.forEach(x => {
@@ -2824,6 +2834,7 @@ class AgMissionResponse extends React.Component {
           device: device,
           status: this.getStatusName(status),
           surveyTagUpdated: new Date(surveyTagUpdated === "" ? missResp.updated_on : surveyTagUpdated).toLocaleString(),
+          createdDate: createdDate.toLocaleString(),
           // response fields
           actualTime: status >= 2 ? Math.floor(((Date.parse(surveyTagUpdated === "" ? missResp.updated_on : surveyTagUpdated) - Date.parse(surveyTagCreated === "" ? missResp.created_on : surveyTagCreated)) / 1000) / 60) : "",
           customer_id: missResp.customer_id,

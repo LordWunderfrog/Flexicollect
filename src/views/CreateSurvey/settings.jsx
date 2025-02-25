@@ -511,7 +511,7 @@ class Settings extends React.Component {
                                 if (this.state.drops[i].properties.options.length > 0) {
                                     let options = this.state.drops[i].properties.options;
                                     for (let j = 0; j < options.length; j++) {
-                                        if (options[j].label === value) {
+                                        if (options[j].label === event.target.value) {
                                             newcondtions[conditionid].source[sourceIdx]['id'] = options[j].id;
                                             break;
                                         }
@@ -536,7 +536,7 @@ class Settings extends React.Component {
                                             let sublabel = this.state.drops[i].properties.options[k].sublabel;
                                             let label_id = this.state.drops[i].properties.options[k].id;
                                             for (let m = 0; m < sublabel.length; m++) {
-                                                if ((option_pid !== null && option_pid === label_id && sublabel[m].sublabel === value) || (option_pid === null && sublabel[m].sublabel === value)) {
+                                                if ((option_pid !== null && option_pid === label_id && sublabel[m].sublabel === event.target.value) || (option_pid === null && sublabel[m].sublabel === event.target.value)) {
                                                     newcondtions[conditionid].source[sourceIdx]['p_id'] = label_id;
                                                     newcondtions[conditionid].source[sourceIdx]['id'] = sublabel[m].id;
                                                     break;
