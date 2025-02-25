@@ -287,10 +287,14 @@ class ModalPopUp extends Component {
                 otheroptiontextbox = true;
               }
               defaultSelection = true;
-              selectedChoiceOptions.push({
+              let obj = {
                 id: question.id,
                 label: question.label
-              })
+              }
+              if(this.state.selectedQuestion.properties.multiPreference && this.state.selectedQuestion.properties.multiPreference == 1){
+                obj = {...obj , preference_order : answer.preference_order ? answer.preference_order : this.state.selectedAnswer.selected_option.length+1}
+              }
+              selectedChoiceOptions.push(obj)
             }
 
           })
@@ -328,15 +332,18 @@ class ModalPopUp extends Component {
                 if (question.id === 'other') {
                   otheroptiontextbox = true;
                 }
-                selectedChoiceOptions.push({
+                let obj = {
                   id: question.id,
                   label: question.label,
                   label_image: question.label_image,
                   sublabel: questionsublabel.sublabel,
                   sub_label_image: questionsublabel.label_image,
                   sublabel_id: questionsublabel.id
-
-                })
+                }
+                if(this.state.selectedQuestion.properties.multiPreference && this.state.selectedQuestion.properties.multiPreference == 1){
+                  obj = {...obj , preference_order : answer.preference_order ? answer.preference_order : this.state.selectedAnswer.selected_option.length+1}
+                }
+                selectedChoiceOptions.push(obj)
                 subLabelItem.push({
                   id: questionsublabel.id,
                   label_image: questionsublabel.label_image,
@@ -375,6 +382,13 @@ class ModalPopUp extends Component {
     if (this.state.selectedAnswer.other_value) {
       otheroptionvalue = this.state.selectedAnswer.other_value;
     }
+    if(this.state.selectedQuestion.properties.multiPreference && this.state.selectedQuestion.properties.multiPreference == 1){
+      selectedChoiceOptions.sort((a, b) => a.preference_order - b.preference_order);
+      selectedChoiceOptions = selectedChoiceOptions.map((item, index) => ({
+        ...item,
+        preference_order: index + 1
+      }));
+    }
     this.setState({
       updatedChoiceOptions: updatedChoiceOptions,
       selectedChoiceOptions: selectedChoiceOptions,
@@ -386,17 +400,34 @@ class ModalPopUp extends Component {
   /* Handles the event to validate the choice type and renders the choice options in the modal popup. */
   onChoiceClick(value, e) {
     let selectedChoiceOptions = this.state.selectedChoiceOptions;
+    let updatedChoiceOptions = this.state.updatedChoiceOptions;
     let otheroptiontextbox = false;
     if (value.id === 'other' && e.target.checked === true) {
       otheroptiontextbox = true;
     }
     if (this.state.selectedQuestion.properties.choice_type === "multiple") {
+      updatedChoiceOptions = updatedChoiceOptions.map((item)=>{
+        if(item.id == value.id){
+          return {...item , defaultValue : e.target.checked}
+        }
+        else return item
+      })
       if (value.defaultValue === false) {
-        selectedChoiceOptions.push({
+        let obj = {
           id: value.id,
           label: value.label,
           label_image: value.label_image
-        })
+        }
+        if(this.state.selectedQuestion.properties.multiPreference && this.state.selectedQuestion.properties.multiPreference == 1){
+          obj = {...obj, preference_order : value.preference_order ? value.preference_order : this.state.selectedChoiceOptions.length + 1}
+        }
+
+        if(e.target.checked == true ){
+          selectedChoiceOptions.push(obj)
+        }
+        else{
+          selectedChoiceOptions = selectedChoiceOptions.filter((item) => item.id !== value.id)
+        }
       }
       else {
         for (var i = 0; i < selectedChoiceOptions.length; i++) {
@@ -417,10 +448,17 @@ class ModalPopUp extends Component {
       })
 
     }
-
+    if(this.state.selectedQuestion.properties.multiPreference && this.state.selectedQuestion.properties.multiPreference == 1){
+      selectedChoiceOptions.sort((a, b) => a.preference_order - b.preference_order);
+      selectedChoiceOptions = selectedChoiceOptions.map((item, index) => ({
+        ...item,
+        preference_order: index + 1
+      }));
+    }
     this.setState({
       selectedChoiceOptions: selectedChoiceOptions,
-      otheroptiontextbox: otheroptiontextbox
+      otheroptiontextbox: otheroptiontextbox,
+      updatedChoiceOptions : updatedChoiceOptions
     })
 
   }
@@ -432,17 +470,46 @@ class ModalPopUp extends Component {
       otheroptiontextbox = true;
     }
     let selectedChoiceOptions = this.state.selectedChoiceOptions
+    let updatedChoiceOptions = this.state.updatedChoiceOptions
     if (this.state.selectedQuestion.properties.choice_type === "multiple") {
+      updatedChoiceOptions = updatedChoiceOptions.map(item => {
+        if (item.id === parent.id) {
+            return {
+                ...item,
+                sublabel: item.sublabel.map(sub_item => {
+                  if(sub_item.id === subvalue.id) {
+                    return { ...sub_item, defaultValue: e.target.checked }
+                  }
+                  else {
+                    return sub_item
+                  }
+                })
+            };
+        }
+        else return item;
+      });
       if (subvalue.defaultValue === false) {
-        selectedChoiceOptions.push({
-          id: parent.id,
-          label: parent.label,
-          sublabel: subvalue.sublabel,
-          sublabel_id: subvalue.id,
-          label_image: parent.label_image,
-          sub_label_image: subvalue.label_image
+        if (e.target.checked == true) {
+          let obj = {
+            id: parent.id,
+            label: parent.label,
+            label_image: parent.label_image,
+            sub_label_image: subvalue.label_image,
+            sublabel: subvalue.sublabel,
+            sublabel_id: subvalue.id,
+          }
 
-        })
+          if (this.state.selectedQuestion.properties.multiPreference && this.state.selectedQuestion.properties.multiPreference == 1) {
+              obj.preference_order = subvalue.preference_order 
+                  ? subvalue.preference_order 
+                  : selectedChoiceOptions.length + 1;
+          }
+          selectedChoiceOptions.push(obj);
+      } else {
+          selectedChoiceOptions = selectedChoiceOptions.filter(
+              item => !(item.id === parent.id && item.sublabel_id === subvalue.id)
+          );
+      }
       }
       else {
         for (var i = 0; i < selectedChoiceOptions.length; i++) {
@@ -466,10 +533,17 @@ class ModalPopUp extends Component {
 
       })
     }
-
+    if(this.state.selectedQuestion.properties.multiPreference && this.state.selectedQuestion.properties.multiPreference == 1){
+      selectedChoiceOptions.sort((a, b) => a.preference_order - b.preference_order);
+      selectedChoiceOptions = selectedChoiceOptions.map((item, index) => ({
+        ...item,
+        preference_order: index + 1
+      }));
+    }
     this.setState({
       selectedChoiceOptions: selectedChoiceOptions,
-      otheroptiontextbox: otheroptiontextbox
+      otheroptiontextbox: otheroptiontextbox,
+      updatedChoiceOptions: updatedChoiceOptions
     })
   }
 
@@ -1174,6 +1248,8 @@ class ModalPopUp extends Component {
                 <ul className="clear">
                   {updatedChoiceOptions.map(
                     function (value, index) {
+                      const find = this.state.selectedChoiceOptions.length > 0 
+                      && this.state.selectedChoiceOptions.find((element)=>element.id == value.id);
                       return (
                         <li
                           key={index}
@@ -1202,14 +1278,38 @@ class ModalPopUp extends Component {
                               : ""
                           }
                           <label htmlFor={index}>{value.label}</label>
-                          {value.label_image && value.label_image.length > 0 &&
-                            <img src={value.label_image}
-                              alt="label"
-                              style={{
-                                position: "absolute",
-                                right: 0
-                              }}
-                            />}
+                          <div style={{display : "flex" , flexDirection : "row" , justifyContent : "flex-end"}}>
+                            {
+                              this.state.selectedQuestion.properties.multiPreference && this.state.selectedQuestion.properties.multiPreference == 1 
+                              && find && this.state.selectedQuestion.properties.multilevel == 0
+                              && (
+                                  <div style={{
+                                      display:"flex",
+                                      borderRadius : 30,
+                                      backgroundColor : '#FF8C00',
+                                      borderColor : '#FF8C00',
+                                      borderWidth : 1,
+                                      height : 25,
+                                      width : 25,
+                                      justifyContent : "center",
+                                      alignItems : "center",
+                                      color : "#FFF"
+                                    }}
+                                  >
+                                    {find.preference_order}
+                                  </div>
+                              )
+                            }
+                            {value.label_image && value.label_image.length > 0 &&
+                              <img src={value.label_image}
+                                alt="label"
+                                style={{
+                                // position: "absolute",
+                                // right: 0
+                                }}
+                              />
+                            }
+                          </div>
                           {selectedQuestion.properties.multilevel === 0 && value.id === "other" &&
                             <TextField style={{
                               display: "flex"
@@ -1230,23 +1330,68 @@ class ModalPopUp extends Component {
                             {value.sublabel
                               ? value.sublabel.map(
                                 function (subval, key) {
+                                  const sub_find = this.state.selectedChoiceOptions.length > 0 
+                                  && this.state.selectedChoiceOptions.find((element)=>element.id == value.id && element.sublabel_id == subval.id);
                                   increasingIndex = increasingIndex + 1
                                   return (
                                     <div
+                                    className="d-flex align-items-center justify-content-between"
                                       style={{
                                         position: "relative"
                                       }}
                                     >
-                                      {selectedQuestion.properties.choice_type === "single" ? <input name="choice" id={increasingIndex} type="radio" defaultChecked={subval.defaultValue} onChange={(e) => this.onSubChoiceClick(value, subval, e)} /> : <input type="checkbox" id={increasingIndex} defaultChecked={subval.defaultValue} onChange={(e) => this.onSubChoiceClick(value, subval, e)} />}
-                                      {subval.label_image && subval.label_image.length > 0 &&
-                                        <img src={subval.label_image}
-                                          alt="label"
-                                          style={{
-                                            position: "absolute",
-                                            right: 0
-                                          }}
-                                        />}
-                                      <label htmlFor={increasingIndex}>{subval.sublabel}</label>
+                                      <div className="d-flex align-items-center">
+                                      {selectedQuestion.properties.choice_type === "single" ? 
+                                        <input 
+                                          name="choice"
+                                          id={increasingIndex}
+                                          type="radio"
+                                          defaultChecked={subval.defaultValue}
+                                          onChange={(e) => this.onSubChoiceClick(value, subval, e)} 
+                                        /> : 
+                                        <input
+                                          type="checkbox"
+                                          id={increasingIndex}
+                                          defaultChecked={subval.defaultValue}
+                                          onChange={(e) => this.onSubChoiceClick(value, subval, e)}
+                                        />
+                                      }
+                                       <label className="mb-0" htmlFor={increasingIndex}>{subval.sublabel}</label>
+                                       </div>
+                                       <div className="d-flex align-items-center">  
+                                       {
+                                          this.state.selectedQuestion.properties.multiPreference && this.state.selectedQuestion.properties.multiPreference == 1 
+                                          && sub_find
+                                          && this.state.selectedQuestion.properties.multilevel == 1
+                                          && (
+                                              <div style={{
+                                                  display:"flex",
+                                                  borderRadius : 30,
+                                                  backgroundColor : '#FF8C00',
+                                                  borderColor : '#FF8C00',
+                                                  borderWidth : 1,
+                                                  height : 25,
+                                                  width : 25,
+                                                  justifyContent : "center",
+                                                  alignItems : "center",
+                                                  color : "#FFF"
+                                                }}
+                                              >
+                                                {sub_find.preference_order}
+                                              </div>
+                                          )
+                                        }
+                                        {subval.label_image && subval.label_image.length > 0 &&
+                                          <img src={subval.label_image}
+                                            alt="label"
+                                            style={{
+                                            //   position: "absolute",
+                                            //   right: 0
+                                            }}
+                                          />}
+                                        </div>
+                                       
+                                     
                                       {selectedQuestion.properties.multilevel === 1 && subval.id === "other" &&
                                         <TextField style={{
                                           display: "flex"
