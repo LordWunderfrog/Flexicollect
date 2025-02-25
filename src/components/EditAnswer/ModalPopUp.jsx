@@ -289,7 +289,8 @@ class ModalPopUp extends Component {
               defaultSelection = true;
               let obj = {
                 id: question.id,
-                label: question.label
+                label: question.label,
+                label_image : question.label_image
               }
               if(this.state.selectedQuestion.properties.multiPreference && this.state.selectedQuestion.properties.multiPreference == 1){
                 obj = {...obj , preference_order : answer.preference_order ? answer.preference_order : this.state.selectedAnswer.selected_option.length+1}
@@ -307,7 +308,8 @@ class ModalPopUp extends Component {
             defaultSelection = true;
             selectedChoiceOptions.push({
               id: question.id,
-              label: question.label
+              label: question.label,
+              label_image : question.label_image
             })
           }
         }
@@ -540,6 +542,8 @@ class ModalPopUp extends Component {
         preference_order: index + 1
       }));
     }
+    console.log("this.state.selectedQuestion.properties" , this.state.selectedQuestion.properties)
+    console.log("selectedChoiceOptions" , selectedChoiceOptions)
     this.setState({
       selectedChoiceOptions: selectedChoiceOptions,
       otheroptiontextbox: otheroptiontextbox,
@@ -1281,8 +1285,9 @@ class ModalPopUp extends Component {
                           <div style={{display : "flex" , flexDirection : "row" , justifyContent : "flex-end"}}>
                             {
                               this.state.selectedQuestion.properties.multiPreference && this.state.selectedQuestion.properties.multiPreference == 1 
-                              && find && this.state.selectedQuestion.properties.multilevel == 0
-                              && (
+                              && find 
+                              && this.state.selectedQuestion.properties.multilevel == 0
+                              ? (
                                   <div style={{
                                       display:"flex",
                                       borderRadius : 30,
@@ -1298,7 +1303,7 @@ class ModalPopUp extends Component {
                                   >
                                     {find.preference_order}
                                   </div>
-                              )
+                              ) : ""
                             }
                             {value.label_image && value.label_image.length > 0 &&
                               <img src={value.label_image}
@@ -1363,7 +1368,7 @@ class ModalPopUp extends Component {
                                           this.state.selectedQuestion.properties.multiPreference && this.state.selectedQuestion.properties.multiPreference == 1 
                                           && sub_find
                                           && this.state.selectedQuestion.properties.multilevel == 1
-                                          && (
+                                          ? (
                                               <div style={{
                                                   display:"flex",
                                                   borderRadius : 30,
@@ -1379,7 +1384,7 @@ class ModalPopUp extends Component {
                                               >
                                                 {sub_find.preference_order}
                                               </div>
-                                          )
+                                          ) : ""
                                         }
                                         {subval.label_image && subval.label_image.length > 0 &&
                                           <img src={subval.label_image}
@@ -1389,7 +1394,7 @@ class ModalPopUp extends Component {
                                             //   right: 0
                                             }}
                                           />}
-                                        </div>
+                                      </div>
                                        
                                      
                                       {selectedQuestion.properties.multilevel === 1 && subval.id === "other" &&
