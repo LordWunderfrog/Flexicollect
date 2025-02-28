@@ -416,12 +416,16 @@ class WebLink extends React.Component {
                 otheroptiontextbox = true;
               }
               defaultSelection = true;
-              selectedChoiceOptions.push({
+              let obj = {
                 id: question.id,
                 label: question.label,
                 label_text: question.label_text,
                 label_image: question.label_image
-              });
+              }
+              if(this.state.selectedQuestion.properties.multiPreference && this.state.selectedQuestion.properties.multiPreference == 1){
+                obj = {...obj , preference_order : answer.preference_order ? answer.preference_order : this.state.selectedAnswer.selected_option.length+1}
+              }
+              selectedChoiceOptions.push(obj)
             }
           });
         } else {
@@ -469,7 +473,7 @@ class WebLink extends React.Component {
                 if (question.id === 'other') {
                   otheroptiontextbox = true;
                 }
-                selectedChoiceOptions.push({
+                let obj = {
                   id: question.id,
                   label: question.label,
                   label_text: question.label_text,
@@ -478,7 +482,11 @@ class WebLink extends React.Component {
                   sublabel_text: questionsublabel.sublabel_text,
                   sub_label_image: questionsublabel.label_image,
                   sublabel_id: questionsublabel.id
-                });
+                }
+                if(this.state.selectedQuestion.properties.multiPreference && this.state.selectedQuestion.properties.multiPreference == 1){
+                  obj = {...obj , preference_order : answer.preference_order ? answer.preference_order : this.state.selectedAnswer.selected_option.length+1}
+                }
+                selectedChoiceOptions.push(obj)
                 subLabelItem.push({
                   id: questionsublabel.id,
                   label_image: questionsublabel.label_image,
@@ -558,7 +566,13 @@ class WebLink extends React.Component {
         }
       });
     }
-
+    if(this.state.selectedQuestion.properties.multiPreference && this.state.selectedQuestion.properties.multiPreference == 1){
+      selectedChoiceOptions.sort((a, b) => a.preference_order - b.preference_order);
+      selectedChoiceOptions = selectedChoiceOptions.map((item, index) => ({
+        ...item,
+        preference_order: index + 1
+      }));
+    }
     this.setState({
       updatedChoiceOptions: updatedChoiceOptions,
       selectedChoiceOptions: selectedChoiceOptions,
@@ -603,12 +617,24 @@ class WebLink extends React.Component {
 
     if (this.state.selectedQuestion.properties.choice_type === "multiple") {
       if (value.defaultValue === false) {
-        selectedChoiceOptions.push({
+        let obj = {
           id: value.id,
           label: value.label,
           label_text: value.label_text,
           label_image: value.label_image
-        });
+        }
+        
+        if(this.state.selectedQuestion.properties.multiPreference && this.state.selectedQuestion.properties.multiPreference == 1){
+          obj = {...obj , preference_order : value.preference_order ? value.preference_order : this.state.selectedChoiceOptions.length + 1}
+        }
+        
+        if(e.target.checked == true){
+          selectedChoiceOptions.push(obj);
+        }
+        else{
+          selectedChoiceOptions = selectedChoiceOptions.filter((item) => item.id !== value.id)
+        }
+
       } else {
         for (var i = 0; i < selectedChoiceOptions.length; i++) {
           if (selectedChoiceOptions[i].id === value.id) {
@@ -683,7 +709,13 @@ class WebLink extends React.Component {
         })
       }
     }
-
+    if(this.state.selectedQuestion.properties.multiPreference && this.state.selectedQuestion.properties.multiPreference == 1){
+      selectedChoiceOptions.sort((a, b) => a.preference_order - b.preference_order);
+      selectedChoiceOptions = selectedChoiceOptions.map((item, index) => ({
+        ...item,
+        preference_order: index + 1
+      }));
+    }
     this.setState({
       selectedChoiceOptions: selectedChoiceOptions,
       updatedChoiceOptions: updatedChoiceOptions,
@@ -701,7 +733,7 @@ class WebLink extends React.Component {
     }
     if (this.state.selectedQuestion.properties.choice_type === "multiple") {
       if (subvalue.defaultValue === false) {
-        selectedChoiceOptions.push({
+        let obj = {
           id: parent.id,
           label: parent.label,
           label_text: parent.label_text,
@@ -710,7 +742,13 @@ class WebLink extends React.Component {
           sublabel_id: subvalue.id,
           label_image: parent.label_image,
           sub_label_image: subvalue.label_image
-        });
+        }
+        if (this.state.selectedQuestion.properties.multiPreference && this.state.selectedQuestion.properties.multiPreference == 1) {
+            obj.preference_order = subvalue.preference_order 
+                ? subvalue.preference_order 
+                : selectedChoiceOptions.length + 1;
+        }
+        selectedChoiceOptions.push(obj);
       } else {
         for (let i = 0; i < selectedChoiceOptions.length; i++) {
           if (
@@ -773,7 +811,13 @@ class WebLink extends React.Component {
         })
       }
     }
-
+    if(this.state.selectedQuestion.properties.multiPreference && this.state.selectedQuestion.properties.multiPreference == 1){
+      selectedChoiceOptions.sort((a, b) => a.preference_order - b.preference_order);
+      selectedChoiceOptions = selectedChoiceOptions.map((item, index) => ({
+        ...item,
+        preference_order: index + 1
+      }));
+    }
     this.setState({
       selectedChoiceOptions: selectedChoiceOptions,
       updatedChoiceOptions: updatedChoiceOptions,
@@ -4919,6 +4963,8 @@ class WebLink extends React.Component {
                           >
                             {this.state.updatedChoiceOptions.map(
                               function (value, index) {
+                                const find = this.state.selectedChoiceOptions.length > 0 
+                                && this.state.selectedChoiceOptions.find((element)=>element.id == value.id);
                                 return (
                                   <li
                                     key={index}
@@ -4997,8 +5043,31 @@ class WebLink extends React.Component {
                                           /> : ('')
                                         }
                                       </div>
-
-                                      <div style={{ width: "50%" }}>
+                                      <div style={{ width: "50%" , display : "flex", flexDirection: "row" , justifyContent : "flex-end"}}>
+                                        <div style={{height : 25 , width : 25}}>
+                                          {
+                                              this.state.selectedQuestion.properties.multiPreference && this.state.selectedQuestion.properties.multiPreference == 1 
+                                              && find
+                                              && this.state.selectedQuestion.properties.multilevel == 0
+                                              ? (
+                                                  <div style={{
+                                                      display:"flex",
+                                                      borderRadius : 30,
+                                                      backgroundColor : '#FF8C00',
+                                                      borderColor : '#FF8C00',
+                                                      borderWidth : 1,
+                                                      height : 25,
+                                                      width : 25,
+                                                      justifyContent : "center",
+                                                      alignItems : "center",
+                                                      color : "#FFF"
+                                                    }}
+                                                  >
+                                                    {find.preference_order}
+                                                  </div>
+                                              ) : ""
+                                          }
+                                        </div>
                                         {value.label_image &&
                                           value.label_image.length > 0 && (
                                             selectedQuestion.properties.multilevel === 0 && selectedQuestion.properties.image_size == "large" ?
@@ -5064,6 +5133,8 @@ class WebLink extends React.Component {
                                       {value.sublabel
                                         ? value.sublabel.map(
                                           function (subval, key) {
+                                            const sub_find = this.state.selectedChoiceOptions.length > 0 
+                                              && this.state.selectedChoiceOptions.find((element)=>element.id == value.id && element.sublabel_id == subval.id);
                                             increasingIndex = increasingIndex + 1
                                             return (
                                               <div
@@ -5077,63 +5148,94 @@ class WebLink extends React.Component {
                                                   padding: 15
                                                 }}
                                               >
-                                                {selectedQuestion.properties
-                                                  .choice_type === "single" ? (
-                                                  <input
-                                                    name="choice"
-                                                    id={increasingIndex}
-                                                    type="radio"
-                                                    defaultChecked={
-                                                      subval.defaultValue
-                                                    }
-                                                    onChange={(e) =>
-                                                      this.onSubChoiceClick(
-                                                        value,
-                                                        subval,
-                                                        e
-                                                      )
-                                                    }
-                                                  />
-                                                ) : (
-                                                  <input
-                                                    type="checkbox"
-                                                    id={increasingIndex}
-                                                    // defaultChecked={
-                                                    //   subval.defaultValue
-                                                    // }
-                                                    checked={subval.defaultValue}
-                                                    onChange={(e) =>
-                                                      this.onSubChoiceClick(
-                                                        value,
-                                                        subval,
-                                                        e
-                                                      )
-                                                    }
-                                                  />
-                                                )}
-                                                {subval.label_image &&
-                                                  subval.label_image.length > 0 && (
-                                                    <img
-                                                      alt="label"
-                                                      src={subval.label_image}
-                                                      style={{
-                                                        position: "absolute",
-                                                        right: 5,
-                                                        width: "20%",
-                                                        height: "30px",
-                                                        objectFit: "contain",
-                                                      }}
-                                                    />
-                                                  )}{" "}
-                                                {/* <label htmlFor={increasingIndex}>{subval.sublabel}</label> */}
-                                                <label htmlFor={increasingIndex}>
-                                                  {React.createElement("div", {
-                                                    dangerouslySetInnerHTML: {
-                                                      __html: subval.sublabel_text ? subval.sublabel_text : subval.sublabel
-                                                    }
-                                                  })}
-                                                </label>
-
+                                                <div style={{display : "flex" , flexDirection :"row" , justifyContent : "space-between" , alignItems : "start"}}>
+                                                  <div style={{display : "flex" , flexDirection :"row" , justifyContent : "flex-start" , alignItems : "start"}}>
+                                                    <>
+                                                      {selectedQuestion.properties
+                                                        .choice_type === "single" ? (
+                                                        <input
+                                                          name="choice"
+                                                          id={increasingIndex}
+                                                          type="radio"
+                                                          defaultChecked={
+                                                            subval.defaultValue
+                                                          }
+                                                          onChange={(e) =>
+                                                            this.onSubChoiceClick(
+                                                              value,
+                                                              subval,
+                                                              e
+                                                            )
+                                                          }
+                                                        />
+                                                      ) : (
+                                                        <input
+                                                          type="checkbox"
+                                                          id={increasingIndex}
+                                                          // defaultChecked={
+                                                          //   subval.defaultValue
+                                                          // }
+                                                          checked={subval.defaultValue}
+                                                          onChange={(e) =>
+                                                            this.onSubChoiceClick(
+                                                              value,
+                                                              subval,
+                                                              e
+                                                            )
+                                                          }
+                                                        />
+                                                      )}
+                                                    </>
+                                                    {/* <label htmlFor={increasingIndex}>{subval.sublabel}</label> */}
+                                                    <label htmlFor={increasingIndex}>
+                                                      {React.createElement("div", {
+                                                        dangerouslySetInnerHTML: {
+                                                          __html: subval.sublabel_text ? subval.sublabel_text : subval.sublabel
+                                                        }
+                                                      })}
+                                                    </label>
+                                                  </div>
+                                                  <div style={{display : "flex" , flexDirection :"row" , justifyContent : "flex-end" , alignItems : "center"}}>
+                                                    <div style={{height : 25 , width : 25}}>
+                                                      {
+                                                          this.state.selectedQuestion.properties.multiPreference && this.state.selectedQuestion.properties.multiPreference == 1 
+                                                          && sub_find
+                                                          && this.state.selectedQuestion.properties.multilevel == 1
+                                                          ? (
+                                                            <div style={{
+                                                                display:"flex",
+                                                                borderRadius : 30,
+                                                                backgroundColor : '#FF8C00',
+                                                                borderColor : '#FF8C00',
+                                                                borderWidth : 1,
+                                                                height : 25,
+                                                                width : 25,
+                                                                justifyContent : "center",
+                                                                alignItems : "center",
+                                                                color : "#FFF"
+                                                              }}
+                                                            >
+                                                              {sub_find.preference_order}
+                                                            </div>
+                                                          ) : ""
+                                                      }
+                                                    </div>
+                                                    {subval.label_image &&
+                                                      subval.label_image.length > 0 && (
+                                                        <img
+                                                          alt="label"
+                                                          src={subval.label_image}
+                                                          style={{
+                                                            // position: "absolute",
+                                                            // right: 5,
+                                                            width: "60%",
+                                                            height: "60px",
+                                                            objectFit: "contain",
+                                                          }}
+                                                        />
+                                                      )}{" "}
+                                                  </div>
+                                                </div>
                                                 {selectedQuestion.properties.multilevel === 1 && subval.id === "other" &&
                                                   <TextField style={{
                                                     display: "flex"
