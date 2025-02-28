@@ -3852,11 +3852,6 @@ class Card extends React.Component {
         event.target.checked === true ? (checkval = 1) : (checkval = 0);
         let fieldprops = this.state.fieldprops;
         fieldprops.properties[name] = checkval;
-        if(checkval == 1){
-            this.radioChange("multiple")
-        }else{
-            this.radioChange("single")
-        }
         this.setState({
             fieldprops
         }, this.props.autosave()
@@ -3865,9 +3860,16 @@ class Card extends React.Component {
         let languages_drop = this.props.languages_drop;
         selectedlanguage.forEach((a, b) => {
             if (a.label !== 'English') {
-                languages_drop[a.label].content[this.props.index].properties.choice_type = checkval;
+                languages_drop[a.label].content[this.props.index].properties[name] = checkval;
             }
         })
+        setTimeout(()=>{
+            if(checkval == 1){
+                this.radioChange("multiple")
+            }else{
+                this.radioChange("single")
+            }
+        } , 200)
     }
 
     noreturn = name => event => {

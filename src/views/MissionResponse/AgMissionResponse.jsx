@@ -2661,16 +2661,17 @@ class AgMissionResponse extends React.Component {
       updatedColumnDefs = columnDefs;
     }
 
+    let isAnyFilterPresent = this.api.isAnyFilterPresent();
     const _columnDefs = updatedColumnDefs.map((item) => {
       return {
         ...item,
-        filter: false
+        filter: isAnyFilterPresent ? true : false
       }
     });
 
     await this.setState({
       columnDefs_backup: updatedColumnDefs,
-      columnDefs: this.state.totalrecords < this.state.rowsPerPage ? updatedColumnDefs : _columnDefs,
+      columnDefs: this.state.totalrecords == this.state.datapagecount ? updatedColumnDefs : _columnDefs,
       tableFields: tableFields
     });
     let sepMission = [];
