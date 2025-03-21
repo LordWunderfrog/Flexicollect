@@ -289,6 +289,11 @@ class Card extends React.Component {
         const mappingProfileEnable = this.props.mappingProfileEnable;
         if (mappingProfileEnable && selectedProfile) {
             this.fetchClientesQuestion(this.props.selectedProfile);
+            this.props.selectedlanguage.forEach((a, b) => {
+                if (a.label !== 'English') {
+                    this.fetchGroupOptions(this.props.selectedProfile , a.label , this.props.languages_drop[a.label].content[this.props.index]);
+                }
+            });
         }
         let fieldprops = this.props.oldprop;
         if (fieldprops.type === "choice") {

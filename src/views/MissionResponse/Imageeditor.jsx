@@ -674,6 +674,12 @@ class PhotoEditor extends React.Component {
   }
 
   render() {
+    const image_url = this.state.imageData && this.state.imageData.image 
+      ? this.state.imageData.image 
+      : this.state.imageData && this.state.imageData.answers 
+      && this.state.imageData.answers.image;
+
+      console.log("this.state.imageData" , this.state.imageData)
     return (
       <>
         {this.state.open === true ? (
@@ -811,7 +817,7 @@ class PhotoEditor extends React.Component {
                       theme: blackTheme,
                       menu: ['shape', 'flip', 'rotate'],
                       loadImage: {
-                        path: this.state.imageData.image + "?editor=yes",
+                        path: image_url + "?editor=yes",
                         name: 'SampleImage'
                       },
 
