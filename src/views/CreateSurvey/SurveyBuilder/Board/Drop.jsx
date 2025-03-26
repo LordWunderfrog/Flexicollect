@@ -51,6 +51,7 @@ class Card extends React.Component {
             option: [{ id: 1, value: "option 1" }],
             open: false,
             mandatory: false,
+            multiPreference: false,
             scale_popup: [],
             limitchar: false,
             fieldlabel: "",
@@ -70,6 +71,7 @@ class Card extends React.Component {
                     image_size: "",
                     productNumber: 0,
                     ReportTag: '',
+                    multiPreference: false,
                     currentQuestionGroup: '',
                     currentQuestionSubGroup1: { value: "", label: "" },
                     currentQuestionSubGroup2: { value: "", label: "" },
@@ -287,6 +289,11 @@ class Card extends React.Component {
         const mappingProfileEnable = this.props.mappingProfileEnable;
         if (mappingProfileEnable && selectedProfile) {
             this.fetchClientesQuestion(this.props.selectedProfile);
+            this.props.selectedlanguage.forEach((a, b) => {
+                if (a.label !== 'English') {
+                    this.fetchGroupOptions(this.props.selectedProfile , a.label , this.props.languages_drop[a.label].content[this.props.index]);
+                }
+            });
         }
         let fieldprops = this.props.oldprop;
         if (fieldprops.type === "choice") {
@@ -2715,10 +2722,9 @@ class Card extends React.Component {
     };
 
     /* Handles the event to update the value.   */
-    radioChange = event => {
-
+    radioChange = value => {
         let fieldprops = this.state.fieldprops;
-        fieldprops.properties.choice_type = event.target.value;
+        fieldprops.properties.choice_type = value;
         this.setState({
             fieldprops
         }, this.props.autosave()
@@ -2727,7 +2733,7 @@ class Card extends React.Component {
         let languages_drop = this.props.languages_drop;
         selectedlanguage.forEach((a, b) => {
             if (a.label !== 'English') {
-                languages_drop[a.label].content[this.props.index].properties.choice_type = event.target.value;
+                languages_drop[a.label].content[this.props.index].properties.choice_type = value;
             }
         })
     };
@@ -3843,6 +3849,32 @@ class Card extends React.Component {
                 }
             );
         }
+    }
+
+    multiPreference = name => event => {
+        updateProperties = true;
+        let checkval;
+        event.target.checked === true ? (checkval = 1) : (checkval = 0);
+        let fieldprops = this.state.fieldprops;
+        fieldprops.properties[name] = checkval;
+        this.setState({
+            fieldprops
+        }, this.props.autosave()
+        );
+        let selectedlanguage = this.props.selectedlanguage
+        let languages_drop = this.props.languages_drop;
+        selectedlanguage.forEach((a, b) => {
+            if (a.label !== 'English') {
+                languages_drop[a.label].content[this.props.index].properties[name] = checkval;
+            }
+        })
+        setTimeout(()=>{
+            if(checkval == 1){
+                this.radioChange("multiple")
+            }else{
+                this.radioChange("single")
+            }
+        } , 200)
     }
 
     noreturn = name => event => {
@@ -7311,20 +7343,20 @@ class Card extends React.Component {
                                     </div>
                                 </div>
                             </li>
-                            <li style={this.state.currentlanguage.value !== "English" ? disabledive : {}} >
+                            <li style={this.state.currentlanguage.value !== "English" || this.state.fieldprops.properties.multiPreference == 1 ? disabledive : {}} >
                                 <div className="below-lanbel-body">
                                     <div className="switch-text-boxes switch-text-boxes-mandatory clear">
                                         <h3>Choice Type</h3>
                                         <div className="twocol" style={this.state.fieldprops.properties.display_type === "dropdown" ? disabledive : null}>
                                             <div className="switch-textboxes">
                                                 <div className="radio-box">
-                                                    <input type="radio" value="single" checked={this.state.fieldprops.properties.choice_type === "single"} onChange={this.radioChange} />
+                                                    <input type="radio" value="single" checked={this.state.fieldprops.properties.choice_type === "single"} onChange={()=>this.radioChange("single")} />
                                                     <label>Single</label>
                                                 </div>
                                             </div>
                                             <div className="switch-textboxes">
                                                 <div className="radio-box">
-                                                    <input type="radio" value="multiple" checked={this.state.fieldprops.properties.choice_type === "multiple"} onChange={this.radioChange} />
+                                                    <input type="radio" value="multiple" checked={this.state.fieldprops.properties.choice_type === "multiple"} onChange={()=>this.radioChange("multiple")} />
                                                     <label>Multiple</label>
                                                 </div>
                                             </div>
@@ -7416,6 +7448,25 @@ class Card extends React.Component {
                                             </div>
                                         ) : ""}
                                     </div>
+                                </div>
+                            </li>
+                            <li
+                                style={this.state.currentlanguage.value !== "English" ? disabledive : {}}
+                            >
+                                <div className="below-lanbel-body">
+                                    <div className="switch-text-boxes switch-text-boxes-mandatory clear">
+                                        <div className="switch-textboxes xtboxestext">Multi Preference</div>
+                                        <div className="switches-boxes">
+                                            <Switch 
+                                                checked={Boolean(this.state.fieldprops.properties.multiPreference)} 
+                                                onChange={this.multiPreference("multiPreference")} 
+                                                value="multiPreference" 
+                                                color="primary" 
+                                            />
+                                        </div>
+                                    </div>
+                                    {/* <label> Enable multiple preference selections by choosing first, second, and third priority from the available options. </label> */}
+                                    <label> Enable ranked selection. </label>
                                 </div>
                             </li>
                             <li>

@@ -436,8 +436,9 @@ class DropList extends React.Component {
               : "";
        
         /** Question text to display default if fieldprop quesiton is empty  */
-        const question_text_value = this.state.fieldprops && this.state.fieldprops.properties.question_text == "<p></p>" ||
-            this.state.fieldprops && this.state.fieldprops.properties.question_text == "<p><br></p>" 
+        const fieldName = ["<p>Type a question</p>" , "<p>Type the message</p>" , "<p>Type Information</p>" , "" , "<p></p>" , "<p><br></p>"]
+        const question_text_value = this.state.fieldprops && fieldName.includes(this.state.fieldprops.properties.question_text) ||
+            this.state.fieldprops && fieldName.includes(this.state.fieldprops.properties.question_text) 
             ?  this.state.fieldprops.question_id + '_' + (this.state.defaultdrops && this.state.defaultdrops.properties && this.state.defaultdrops.properties.question_text)
               : this.state.fieldprops.properties.question_text
             ? this.state.fieldprops.question_id + '_' + this.state.fieldprops.properties.question_text
@@ -694,21 +695,31 @@ class DropList extends React.Component {
                                     <ul className="clear">
                                         {this.state.fieldprops.properties.options.map(
                                             function (value, index) {
-                                                return (
-                                                    <li key={index}>
+                                                const val = value.label == "" && value.label_text == "" 
+                                                    ? this.state.defaultdrops.properties.options[index].label 
+                                                    : value.label_text 
+                                                    ? value.label_text 
+                                                    : value.label;
+                                                    return (
+                                                        <li key={index}>
                                                         {this.state.fieldprops.properties.choice_type === "multiple" ? <input type="checkbox" /> : <input name="choice" type="radio" />}{" "}
                                                         <img src={value.label_image} alt="label" />
-                                                        {React.createElement("div", { className: 'choicelabel', dangerouslySetInnerHTML: { __html: value.label_text ? value.label_text : value.label } })}
+                                                        {React.createElement("div", { className: 'choicelabel', dangerouslySetInnerHTML: { __html: val } })}
 
                                                         <div className="parent-of-child-class clear">
                                                             {value.sublabel && value.sublabel instanceof Array
                                                                 ? value.sublabel.map(
                                                                     function (subval, key) {
+                                                                        const sub_val = subval.sublabel == "" && (!value.sublabel_text || value.sublabel_text == "" )
+                                                                            ? this.state.defaultdrops.properties.options[index].sublabel[key].sublabel
+                                                                            : subval.sublabel_text 
+                                                                            ? subval.sublabel_text 
+                                                                            : subval.sublabel;
                                                                         return (
                                                                             <div key={key}>
                                                                                 {this.state.fieldprops.properties.choice_type === "multiple" ? <input type="checkbox" /> : <input name="choice" type="radio" />}{" "}
                                                                                 <img src={subval.label_image} alt="label" />
-                                                                                {React.createElement("div", { className: 'choicelabel', dangerouslySetInnerHTML: { __html: subval.sublabel_text ? subval.sublabel_text : subval.sublabel } })}
+                                                                                {React.createElement("div", { className: 'choicelabel', dangerouslySetInnerHTML: { __html: sub_val } })}
                                                                             </div>
                                                                         );
                                                                     }.bind(this)
