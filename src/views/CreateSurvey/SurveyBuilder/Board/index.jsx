@@ -1784,6 +1784,7 @@ class Board extends Component {
     }, () => {
       this.addrefcodeForClonedQuestion(newDropsArray);
       this.props.ondraglick(newDropsArray, true);
+      this.checkDroppedQuesitonHideRange()
     });
 
 
