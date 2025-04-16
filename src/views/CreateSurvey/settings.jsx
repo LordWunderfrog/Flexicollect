@@ -714,12 +714,18 @@ class Settings extends React.Component {
                         newcondtions[conditionid][`${label}`][`${event.target.name}`] = 'hide_multiple'
                     }
                     else {
-                        newcondtions[conditionid][`${label}`]['uniqueID'] = ''
-                        newcondtions[conditionid][`${label}`][`${event.target.name}`] = value;
+                        if(value == "loop_range"){
+                            newcondtions[conditionid][`${label}`]['uniqueID'] = 'loop_range'
+                            newcondtions[conditionid][`${label}`][`${event.target.name}`] = 'loop';
+                        }
+                        else{
+                            newcondtions[conditionid][`${label}`]['uniqueID'] = ''
+                            newcondtions[conditionid][`${label}`][`${event.target.name}`] = value;
+                        }
                     }
                 }
-
-                if (event.target.value === "hide_multiple" || event.target.value === "show_multiple" || event.target.value === "loop"
+                
+                if (event.target.value === "hide_multiple" || event.target.value === "show_multiple" || event.target.value === "loop" || event.target.value === "loop_range"
                     || event.target.value === "loop_set" || event.target.value === "hide_range") {
                     delete newcondtions[conditionid].target["handler"];
 
@@ -749,7 +755,7 @@ class Settings extends React.Component {
      * @param label
      */
 
-    addNewCondtionsMulti(event, drop, property, label, param) {
+    addNewCondtionsMulti(event, drop, property, label, param , loop_range) {
         let conditionid = drop.condtion_id;
         let newcondtions = this.state.conditions
         let match = true;
@@ -767,7 +773,7 @@ class Settings extends React.Component {
                 })
             }
             else {
-                let multipleDrops = this.multiList(drop)
+                let multipleDrops = this.multiList(drop , loop_range);
                 if (multipleDrops.length > 0) {
                     var startIndex = multipleDrops.findIndex(p => p.value == (this.state.rangeStartElement.length > 0 && this.state.rangeStartElement[0].value));
                     var endIndex = multipleDrops.findIndex(p => p.value == event.value);
@@ -1102,14 +1108,14 @@ class Settings extends React.Component {
     }
 
     /* If user selects hidemultiple/showmultiple in the do list, user can able to select multiple question in the field list. */
-    multiList = conditions => {
+    multiList = (conditions , loop_range) => {
         let fields = []
         if (conditions.source && conditions.source.length > 0) {
             this.props.drops.forEach(drop => {
                 let match = false;
                 conditions.source.forEach(shandler => {
                     if (shandler.handler === drop.handler) {
-                        match = true;
+                        match = loop_range && loop_range == "loop_range" ? false : true;
                     }
                 })
                 if (!match) {
@@ -1266,9 +1272,13 @@ class Settings extends React.Component {
                                                                                     <option selected={(drop.target.do === "hide_multiple" && drop.target.uniqueID === "hide_range") ? "selected" : ""} value="hide_range">
                                                                                         Hide Range
                                                                                     </option>
-                                                                                    <option selected={drop.target.do === "loop" ? "selected" : ""}
+                                                                                    <option selected={drop.target.do === "loop" && drop.target.uniqueID !== "loop_range" ? "selected" : ""}
                                                                                         value='loop'>
                                                                                         Loop
+                                                                                    </option>
+                                                                                    <option selected={drop.target.do === "loop" && drop.target.uniqueID === "loop_range" ? "selected" : ""}
+                                                                                        value='loop_range'>
+                                                                                        Loop Range
                                                                                     </option>
                                                                                     <option selected={drop.target.do === "loop_set" ? "selected" : ""} value="loop_set">
                                                                                         Loop Set
@@ -1294,7 +1304,8 @@ class Settings extends React.Component {
                                                                             <div className="form-group clear clearfix">
                                                                                 {this.state.conditions[index].target.do === "loop_set" ?
                                                                                     <div className="label-part">No.of Loops</div> :
-                                                                                    this.state.conditions[index].target.uniqueID === "hide_range" ?
+                                                                                    this.state.conditions[index].target.uniqueID === "hide_range" ||
+                                                                                    this.state.conditions[index].target.uniqueID === "loop_range" ?
                                                                                         <div className="label-part">From Field</div> :
                                                                                         this.state.conditions[index].target.do === "release" ?
                                                                                             <div className="label-part">Project</div> :
@@ -1355,9 +1366,8 @@ class Settings extends React.Component {
                                                                                                             onChange={e => this.addNewCondtions(e, drop, "num_loop")}
                                                                                                         />
                                                                                                         :
-                                                                                                        this.state.conditions[index].target.do && this.state.conditions[index].target.do === "loop"
-                                                                                                            ?
-                                                                                                            <Select
+                                                                                                        this.state.conditions[index].target.do && this.state.conditions[index].target.do === "loop" && this.state.conditions[index].target.uniqueID !== "loop_range"
+                                                                                                        ? <Select
                                                                                                                 isMulti
                                                                                                                 name="multifield"
                                                                                                                 options={this.loopset(index, 'loop')}
@@ -1368,8 +1378,25 @@ class Settings extends React.Component {
                                                                                                                 onBlur={e => this.change_field_order(e, drop, index, "multifield", "target")}
                                                                                                                 onChange={e => this.addNewCondtionsMulti(e, drop, "multifield", "target")}
                                                                                                             />
-                                                                                                            :
-                                                                                                            this.state.conditions[index].target.do === "loop_input"
+                                                                                                        :
+                                                                                                        this.state.conditions[index].target.do && this.state.conditions[index].target.do === "loop" && this.state.conditions[index].target.uniqueID === "loop_range"
+                                                                                                            ? <Select
+                                                                                                                styles={{
+                                                                                                                    control: (baseStyles, state) => ({
+                                                                                                                        ...baseStyles,
+                                                                                                                        fontSize: 14,
+                                                                                                                    }),
+                                                                                                                }}
+                                                                                                                isMulti={false}
+                                                                                                                name="FromField"
+                                                                                                                options={this.loopset(index, 'loop')}
+                                                                                                                // options={this.multiList(drop)}
+                                                                                                                value={drop.target.multifield && drop.target.multifield[0]}
+                                                                                                                className="basic-single"
+                                                                                                                classNamePrefix="select"
+                                                                                                                onChange={e => this.addNewCondtionsMulti(e, drop, "multifield", "target", "FromField" , "loop_range")}
+                                                                                                            />
+                                                                                                            : this.state.conditions[index].target.do === "loop_input"
                                                                                                                 ?
                                                                                                                 <Select
                                                                                                                     isMulti
@@ -1497,6 +1524,32 @@ class Settings extends React.Component {
                                                                                         className="basic-single"
                                                                                         classNamePrefix="select"
                                                                                         onChange={e => this.addNewCondtionsMulti(e, drop, "multifield", "target", "ToField")}
+                                                                                    />
+                                                                                </div>
+                                                                            </div>
+                                                                            :
+                                                                            null
+                                                                    }
+                                                                    {
+                                                                        this.state.conditions[index].target.do && this.state.conditions[index].target.do === "loop" && this.state.conditions[index].target.uniqueID === "loop_range"
+                                                                            ?
+                                                                            <div className="form-group clear clearfix">
+                                                                                <div className="label-part">To Field</div>
+                                                                                <div className="ans-part">
+                                                                                    <Select
+                                                                                        styles={{
+                                                                                            control: (baseStyles, state) => ({
+                                                                                                ...baseStyles,
+                                                                                                fontSize: 14,
+                                                                                            }),
+                                                                                        }}
+                                                                                        name="ToField"
+                                                                                        options={this.loopset(index, 'loop')}
+                                                                                        // options={this.multiList(drop)}
+                                                                                        value={drop.target.multifield && drop.target.multifield[drop.target.multifield.length - 1] || ""}
+                                                                                        className="basic-single"
+                                                                                        classNamePrefix="select"
+                                                                                        onChange={e => this.addNewCondtionsMulti(e, drop, "multifield", "target", "ToField" , "loop_range")}
                                                                                     />
                                                                                 </div>
                                                                             </div>

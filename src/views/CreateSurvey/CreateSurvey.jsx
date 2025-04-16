@@ -1704,6 +1704,9 @@ class CreateSurvey extends React.Component {
                     if (condition.target.do === 'hide_multiple' || condition.target.do === 'show_multiple') {
                         return condition.target.multifield === undefined || (condition.target.multifield && condition.target.multifield.length <= 0)
                     }
+                    if(condition.target.do == "loop" && condition.target.uniqueID == "loop_range"){
+                        return condition.target.multifield === undefined || (condition.target.multifield && condition.target.multifield.length <= 0)
+                    }
                 })
                 if (targetmultifieldcheck && targetmultifieldcheck.length >= 1) {
                     validatecheck.push(validatecheck.length)
