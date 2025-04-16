@@ -1278,7 +1278,8 @@ class CreateSurvey extends React.Component {
                     question: "",
                     question_id: q.question_id,
                     rightStatus: q.rightStatus,
-                    type: q.type
+                    type: q.type,
+                    group_number: q.group_number
                 }
                 return question.push(content)
             }
@@ -1704,7 +1705,7 @@ class CreateSurvey extends React.Component {
                     if (condition.target.do === 'hide_multiple' || condition.target.do === 'show_multiple') {
                         return condition.target.multifield === undefined || (condition.target.multifield && condition.target.multifield.length <= 0)
                     }
-                    if(condition.target.do == "loop" && condition.target.uniqueID == "loop_range"){
+                    if (condition.target.do == "loop" && condition.target.uniqueID == "loop_range") {
                         return condition.target.multifield === undefined || (condition.target.multifield && condition.target.multifield.length <= 0)
                     }
                 })
