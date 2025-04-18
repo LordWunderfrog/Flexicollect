@@ -1784,6 +1784,7 @@ class Board extends Component {
     }, () => {
       this.addrefcodeForClonedQuestion(newDropsArray);
       this.props.ondraglick(newDropsArray, true);
+      this.checkDroppedQuesitonRange();
     });
 
 
@@ -2176,7 +2177,7 @@ class Board extends Component {
       }, () => {
         this.props.ondraglick(this.state.drops, true);
         this.props.updatelanguagedrop("reorder", destination.index, source.index);
-        this.checkDroppedQuesitonHideRange();
+        this.checkDroppedQuesitonRange();
       })
     }
     else if ((source.droppableId === 'droppable') && (destination && destination.droppableId === 'droppable2')) {
@@ -2214,7 +2215,7 @@ class Board extends Component {
           this.state.dropAction = "reorder";
           this.checkrefcode();
           this.props.ondraglick(this.state.drops, true);
-          this.checkDroppedQuesitonHideRange();
+          this.checkDroppedQuesitonRange();
           // this.props.autosave();
         })
       })
@@ -2237,13 +2238,13 @@ class Board extends Component {
     }
   };
 
-  /** Check Dropped indexes are available in hide range conditions or not */
-  checkDroppedQuesitonHideRange = () => {
+  /** Check Dropped indexes are available in hide range/loop range conditions or not */
+  checkDroppedQuesitonRange = () => {
     const tempArray = this.state.drops;
-    const findHideRangeCondition = this.findHideRangeCondition();
-    for (let i = 0; i < findHideRangeCondition.length; i++) {
-      if (findHideRangeCondition[i].target.multifield && findHideRangeCondition[i].target.multifield.length > 0) {
-        const multiField = findHideRangeCondition[i].target.multifield;
+    const findRangeCondition = this.findRangeCondition();
+    for (let i = 0; i < findRangeCondition.length; i++) {
+      if (findRangeCondition[i].target.multifield && findRangeCondition[i].target.multifield.length > 0) {
+        const multiField = findRangeCondition[i].target.multifield;
 
         const findFirstIndex = tempArray.findIndex(item => item.handler === multiField[0].value);
         const findLastIndex = tempArray.findIndex(item => item.handler === multiField[multiField.length - 1].value);
@@ -2253,7 +2254,7 @@ class Board extends Component {
 
         if (!this.arraysMatch(multiField, tempArr)) {
           const condition = this.props.oldconditions;
-          const condition_index = condition.findIndex((item) => item.condtion_id == findHideRangeCondition[i].condtion_id)
+          const condition_index = condition.findIndex((item) => item.condtion_id == findRangeCondition[i].condtion_id)
           condition[condition_index]['target']['multifield'] = tempArr;
           this.autoSave();
         }
@@ -2271,10 +2272,10 @@ class Board extends Component {
   };
 
 
-  findHideRangeCondition = () => {
+  findRangeCondition = () => {
     let findHideRangeTemp = [];
     this.props.oldconditions.map((condition) => {
-      if (condition.target.uniqueID !== "" && condition.target.uniqueID == "hide_range") {
+      if (condition.target.uniqueID !== "" && (condition.target.uniqueID == "hide_range" || condition.target.uniqueID == "loop_range")) {
         findHideRangeTemp.push(condition)
       }
     })
