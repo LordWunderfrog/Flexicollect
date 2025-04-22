@@ -387,15 +387,19 @@ class Card extends React.Component {
                             id: item.id,
                             label: item.label,
                             label_text: `<p>${item.label}</p>`,
-                            label_image: ""
+                            label_image: this.state.defaultdrops.properties.options[index] && this.state.defaultdrops.properties.options[index].label_image || ""
                         }
-                    }) : []
+                    }) : this.state.defaultdrops.properties.options;
                     language_fieldprops.properties.options = newOptions;
                 }
+            }
+            else{
+                language_fieldprops.properties.options = this.state.defaultdrops.properties.options;
             }
         })
         .catch(error => {
             console.error(error);
+            language_fieldprops.properties.options = this.state.defaultdrops.properties.options;
         });
     };
 
@@ -4529,6 +4533,9 @@ class Card extends React.Component {
                             }
                         }
                     }
+                    // if(languages_drop[a.label].content[this.props.index].properties[`${e}`].length > fieldprops.properties.options.length){
+                    //     languages_drop[a.label].content[this.props.index].properties[`${e}`].pop()
+                    // }
                 }
             })
         }
