@@ -226,7 +226,13 @@ class PhotoEditor extends React.Component {
     var z = a === "loop" ? b : selected_index + 1
     let disable = false
     if (this.state.FilterRowData.length > z) {
-      let i = this.state.FilterRowData[z].column_index
+      let i = 0;
+      if(this.props.FilterRowData.length < this.state.filteredMissions.length){
+        i = this.state.filteredMissions.findIndex((item)=>item.survey_tag_id == this.state.FilterRowData[z].survey_tag_id)
+      }
+      else{
+        i = this.state.FilterRowData[z].column_index
+      }
       let match = false;
       let Column = []
       let filteredMissions = this.state.filteredMissions;
@@ -308,7 +314,13 @@ class PhotoEditor extends React.Component {
     var z = a === "loop" ? b : selected_index - 1
     let disable = false
     if (z >= 0 && this.state.FilterRowData.length > z) {
-      let i = this.state.FilterRowData[z].column_index
+      let i = 0;
+      if(this.props.FilterRowData.length < this.state.filteredMissions.length){
+        i = this.state.filteredMissions.findIndex((item)=>item.survey_tag_id == this.state.FilterRowData[z].survey_tag_id)
+      }
+      else{
+        i = this.state.FilterRowData[z].column_index
+      }
       let match = false;
       let Column = []
 
@@ -387,7 +399,7 @@ class PhotoEditor extends React.Component {
     let image = this.state.imageData
     let i = a === "loop" ? b : image.rowindex + 1
     //  i = image.rowindex + 1
-    let ci = image.index
+    let ci = this.state.filteredMissions.findIndex((item)=>item.survey_tag_id == image.survey_tag_id);
     let Column = []
     let no_match = false;
     let value_exists = false;
@@ -487,7 +499,7 @@ class PhotoEditor extends React.Component {
   LeftClick = (a, b) => {
     let image = this.state.imageData
     let i = a === "loop" ? b : image.rowindex - 1
-    let ci = image.index
+    let ci = this.state.filteredMissions.findIndex((item)=>item.survey_tag_id == image.survey_tag_id);
     let Column = [];
     let colDef = this.state.colDef
     let no_match = false;
@@ -679,7 +691,6 @@ class PhotoEditor extends React.Component {
       : this.state.imageData && this.state.imageData.answers 
       && this.state.imageData.answers.image;
 
-      console.log("this.state.imageData" , this.state.imageData)
     return (
       <>
         {this.state.open === true ? (

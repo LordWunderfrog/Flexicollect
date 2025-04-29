@@ -4738,7 +4738,7 @@ export class CreateVideoSpan extends React.Component {
         {
           this.state.value !== "" && this.state.type === 'video'
             ?
-            <video width="250" height="150" controls preload='metadata' controlsList="nodownload" disablePictureInPicture={true}
+            <video width="250" height="150" controls preload='none' controlsList="nodownload" disablePictureInPicture={true}
               style={{
                 minHeight: "150px",
                 minWidth: "250px",
