@@ -1663,57 +1663,56 @@ class CreateSurvey extends React.Component {
             const { conditions, drops } = this.state;
             let validatecheck = []
             if (conditions.length > 0) {
+                for (let c = 0; c < conditions.length; c++) { //for loop implemented to validate all condition instead of only last
+                    let lastcondition = conditions[c]
 
-                let lastcondition = conditions[conditions.length - 1]
+                    for (var j = 0; j < lastcondition.source.length; j++) {
+                        if (lastcondition.source[j].handler === "" || lastcondition.source[j].state === "" || lastcondition.target.do === "" || lastcondition.target.handler === "") {
+                            if (lastcondition.target.do === "loop_set" && lastcondition.target.multifield && lastcondition.target.multifield.length > 0) {
+                                let matchques = []
+                                drops.forEach((field, index) => {
+                                    lastcondition.target.multifield.forEach((c, cindex) => {
+                                        if (c.value === field.handler) {
+                                            matchques.push(index)
+                                        }
+                                    })
+                                });
+                                lastcondition.source[j].handler = drops[matchques[matchques.length - 1]].handler
 
-                for (var j = 0; j < lastcondition.source.length; j++) {
-                    if (lastcondition.source[j].handler === "" || lastcondition.source[j].state === "" || lastcondition.target.do === "" || lastcondition.target.handler === "") {
-                        if (lastcondition.target.do === "loop_set" && lastcondition.target.multifield && lastcondition.target.multifield.length > 0) {
-                            let matchques = []
-                            drops.forEach((field, index) => {
-                                lastcondition.target.multifield.forEach((c, cindex) => {
-                                    if (c.value === field.handler) {
-                                        matchques.push(index)
-                                    }
-                                })
-                            });
-                            lastcondition.source[j].handler = drops[matchques[matchques.length - 1]].handler
-
-                            // }
-                        } else {
-                            validatecheck.push(validatecheck.length);
+                                // }
+                            } else {
+                                validatecheck.push(validatecheck.length);
+                            }
+                        }
+                        else if (lastcondition.source[j].state !== "empty" && lastcondition.source[j].state !== "filled" && lastcondition.source[j].state !== "loop_input") {
+                            if (lastcondition.source[j].target === "") {
+                                validatecheck.push(validatecheck.length)
+                            }
+                            if (lastcondition.source[j].target === "value" && lastcondition.source[j].match_option === "") {
+                                validatecheck.push(validatecheck.length)
+                            }
+                            if (lastcondition.source[j].target === "value" && (lastcondition.source[j].match_value === "" || (!lastcondition.source[j].match_value))) {
+                                validatecheck.push(validatecheck.length)
+                            }
+                            if (lastcondition.source[j].target === "field" && (lastcondition.source[j].matchid === "" || (!lastcondition.source[j].matchid))) {
+                                validatecheck.push(validatecheck.length)
+                            }
                         }
                     }
-                    else if (lastcondition.source[j].state !== "empty" && lastcondition.source[j].state !== "filled" && lastcondition.source[j].state !== "loop_input") {
 
-                        if (lastcondition.source[j].target === "") {
-                            validatecheck.push(validatecheck.length)
+                    let targetmultifieldcheck = conditions.filter((condition) => {
+                        if (condition.target.do === 'hide_multiple' || condition.target.do === 'show_multiple') {
+                            return condition.target.multifield === undefined || (condition.target.multifield && condition.target.multifield.length <= 0)
                         }
-                        if (lastcondition.source[j].target === "value" && lastcondition.source[j].match_option === "") {
-                            validatecheck.push(validatecheck.length)
+                        if (condition.target.do == "loop" && condition.target.uniqueID == "loop_range") {
+                            return condition.target.multifield === undefined || (condition.target.multifield && condition.target.multifield.length <= 0)
                         }
-                        if (lastcondition.source[j].target === "value" && (lastcondition.source[j].match_value === "" || (!lastcondition.source[j].match_value))) {
-                            validatecheck.push(validatecheck.length)
-                        }
-                        if (lastcondition.source[j].target === "field" && (lastcondition.source[j].matchid === "" || (!lastcondition.source[j].matchid))) {
-                            validatecheck.push(validatecheck.length)
-                        }
+                    })
+                    if (targetmultifieldcheck && targetmultifieldcheck.length >= 1) {
+                        validatecheck.push(validatecheck.length)
                     }
-                }
-
-                let targetmultifieldcheck = conditions.filter((condition) => {
-                    if (condition.target.do === 'hide_multiple' || condition.target.do === 'show_multiple') {
-                        return condition.target.multifield === undefined || (condition.target.multifield && condition.target.multifield.length <= 0)
-                    }
-                    if (condition.target.do == "loop" && condition.target.uniqueID == "loop_range") {
-                        return condition.target.multifield === undefined || (condition.target.multifield && condition.target.multifield.length <= 0)
-                    }
-                })
-                if (targetmultifieldcheck && targetmultifieldcheck.length >= 1) {
-                    validatecheck.push(validatecheck.length)
                 }
             }
-
             if (validatecheck.length > 0) {
                 this.setState({
                     validate: 1

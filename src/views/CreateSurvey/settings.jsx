@@ -1379,7 +1379,7 @@ class Settings extends React.Component {
             });
         }
         if (from !== "show_multiple" || loop_range) {
-            fields.pop();
+            fields[fields.length - 1] = { ...fields[fields.length - 1], isDisabled: true }
         }
         return fields
     }
@@ -1433,7 +1433,7 @@ class Settings extends React.Component {
                 }
             });
         }
-        multifields.pop();
+        multifields[multifields.length - 1] = { ...multifields[multifields.length - 1], isDisabled: true }
         return multifields
     }
     onDragEnd(result) {
