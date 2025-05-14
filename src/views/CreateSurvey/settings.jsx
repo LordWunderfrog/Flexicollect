@@ -158,18 +158,23 @@ class Settings extends React.Component {
 
     /** Validates conditions by removing perticular selected option (id and value) with matching source[0].handler  */
     checkConditionVlidation = (source, drop, index, newcondtions) => {
-        let selectedChoice = this.props.drops.filter(drop => {
+        let sourceHandlerQuestion = this.props.drops.filter(drop => {
             return source.handler === drop.handler;
         }) || [];
         const isArray = Array.isArray(source.match_value);
         const _options = this.choiceList(drop, source, index, true, true, newcondtions);
         let tempObj = { ...newcondtions[index].source[0] };
-        if (selectedChoice.length > 0 && selectedChoice[0].properties.multilevel === 1 && selectedChoice[0].properties.options) {
-            for (let s = 0; s < selectedChoice[0].properties.options.length; s++) {
-                const option = selectedChoice[0].properties.options[s];
-                const _id = s;
-                if (option.sublabel) {
-                    const checkSame = _options && _options[_id].sublabel && _options[_id].sublabel.find((_sub) => {
+        if(sourceHandlerQuestion[0].type=="choice"){
+            if (sourceHandlerQuestion.length > 0 && sourceHandlerQuestion[0].properties.multilevel === 1 && sourceHandlerQuestion[0].properties.options) {
+
+                // Flatten all sublabels from each option into a single array
+                let subLabelArray = [];
+                for(let sb = 0 ; sb < _options.length ; sb++){
+                    _options[sb].sublabel.map((item)=>subLabelArray.push(item))
+                }
+
+                if (subLabelArray && subLabelArray.length > 0) {
+                    const checkSame = subLabelArray &&  subLabelArray.find((_sub) => {
                         if (isArray) return source.match_value.find((_s) => _sub.sublabel == _s.label)
                         else return _sub.sublabel == source.match_value
                     });
@@ -185,22 +190,23 @@ class Settings extends React.Component {
                         }
                     }
                 }
+
             }
-        }
-        else {
-            const find_ = _options && _options.find((item) => {
-                if (isArray) return source.match_value.find((_s) => item.label == _s.label)
-                else return item.label == source.match_value
-            });
-            if (!find_) {
-                if (newcondtions[index].source[0].hasOwnProperty("id")) {
-                    delete tempObj.id
-                }
-                if (newcondtions[index].source[0].hasOwnProperty("p_id")) {
-                    delete tempObj.p_id
-                }
-                if (newcondtions[index].source[0].hasOwnProperty("match_value")) {
-                    delete tempObj.match_value
+            else {
+                const find_ = _options && _options.find((item) => {
+                    if (isArray) return source.match_value.find((_s) => item.label == _s.label)
+                    else return item.label == source.match_value
+                });
+                if (!find_) {
+                    if (newcondtions[index].source[0].hasOwnProperty("id")) {
+                        delete tempObj.id
+                    }
+                    if (newcondtions[index].source[0].hasOwnProperty("p_id")) {
+                        delete tempObj.p_id
+                    }
+                    if (newcondtions[index].source[0].hasOwnProperty("match_value")) {
+                        delete tempObj.match_value
+                    }
                 }
             }
         }
