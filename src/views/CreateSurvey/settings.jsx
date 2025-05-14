@@ -85,7 +85,8 @@ class Settings extends React.Component {
                 { value: 10, label: '10 HRS' },
                 { value: 11, label: '11 HRS' },
                 { value: 12, label: '12 HRS' },
-            ]
+            ],
+            tempConditionSource: []
         };
 
         this.addCondtion = this.addCondtion.bind(this);
@@ -108,6 +109,13 @@ class Settings extends React.Component {
                 conditions[i].source = sourceArray;
             }
 
+        }
+        for (var i = 0; i < conditions.length; i++) {
+            let source = conditions[i].source;
+            this.checkConditionVlidation(source[0], conditions[i], i, conditions);
+        }
+        for (let k = 0; k < this.state.tempConditionSource.length; k++) {
+            conditions[k].source[0] = this.state.tempConditionSource[k];
         }
         this.setState({
             conditions: conditions,
@@ -148,6 +156,59 @@ class Settings extends React.Component {
     }
 
 
+    /** Validates conditions by removing perticular selected option (id and value) with matching source[0].handler  */
+    checkConditionVlidation = (source, drop, index, newcondtions) => {
+        let selectedChoice = this.props.drops.filter(drop => {
+            return source.handler === drop.handler;
+        }) || [];
+        const isArray = Array.isArray(source.match_value);
+        const _options = this.choiceList(drop, source, index, true, true, newcondtions);
+        let tempObj = { ...newcondtions[index].source[0] };
+        if (selectedChoice.length > 0 && selectedChoice[0].properties.multilevel === 1 && selectedChoice[0].properties.options) {
+            for (let s = 0; s < selectedChoice[0].properties.options.length; s++) {
+                const option = selectedChoice[0].properties.options[s];
+                const _id = s;
+                if (option.sublabel) {
+                    const checkSame = _options && _options[_id].sublabel && _options[_id].sublabel.find((_sub) => {
+                        if (isArray) return source.match_value.find((_s) => _sub.sublabel == _s.label)
+                        else return _sub.sublabel == source.match_value
+                    });
+                    if (!checkSame) {
+                        if (newcondtions[index].source[0].hasOwnProperty("id")) {
+                            delete tempObj.id
+                        }
+                        if (newcondtions[index].source[0].hasOwnProperty("p_id")) {
+                            delete tempObj.p_id
+                        }
+                        if (newcondtions[index].source[0].hasOwnProperty("match_value")) {
+                            delete tempObj.match_value
+                        }
+                    }
+                }
+            }
+        }
+        else {
+            const find_ = _options && _options.find((item) => {
+                if (isArray) return source.match_value.find((_s) => item.label == _s.label)
+                else return item.label == source.match_value
+            });
+            if (!find_) {
+                if (newcondtions[index].source[0].hasOwnProperty("id")) {
+                    delete tempObj.id
+                }
+                if (newcondtions[index].source[0].hasOwnProperty("p_id")) {
+                    delete tempObj.p_id
+                }
+                if (newcondtions[index].source[0].hasOwnProperty("match_value")) {
+                    delete tempObj.match_value
+                }
+            }
+        }
+        console.log("tempObj", tempObj)
+        this.setState({
+            tempConditionSource: this.state.tempConditionSource.push(tempObj)
+        })
+    };
 
     handleProjectChange(name, e) {
 
@@ -364,7 +425,7 @@ class Settings extends React.Component {
     /* Reorder the selected questions it includes the self question in the list. */
     reorder_field = (event, drop) => {
         if (drop.target.multifield && drop.target.multifield.length && drop.target.multifield.length > 0
-            && drop.source[0].handler !== '') {
+            && drop.source.length > 0 && drop.source[0].handler !== '') {
             if (drop.target.do === 'loop' || drop.target.do === 'loop_set') {
                 let update = drop.target.multifield;
                 let triger_ques = null;
@@ -495,11 +556,14 @@ class Settings extends React.Component {
             });
             if (newcondtions[conditionid] && newcondtions[conditionid].source[sourceIdx]) {
                 newcondtions[conditionid].source[sourceIdx][`${event.target.name}`] = value;
-                if (newcondtions[conditionid].source[sourceIdx]['id']) {
+                if (newcondtions[conditionid].source[sourceIdx].hasOwnProperty('id')) {
                     delete newcondtions[conditionid].source[sourceIdx]['id']
                 }
-                if (newcondtions[conditionid].source[sourceIdx]['p_id']) {
+                if (newcondtions[conditionid].source[sourceIdx].hasOwnProperty('p_id')) {
                     delete newcondtions[conditionid].source[sourceIdx]['p_id']
+                }
+                if (newcondtions[conditionid].source[sourceIdx].hasOwnProperty('match_value')) {
+                    delete newcondtions[conditionid].source[sourceIdx]['match_value']
                 }
                 for (let i = 0; i < this.state.drops.length; i++) {
                     if (newcondtions[conditionid].source[sourceIdx].handler === this.state.drops[i].handler) {
@@ -714,17 +778,17 @@ class Settings extends React.Component {
                         newcondtions[conditionid][`${label}`][`${event.target.name}`] = 'hide_multiple'
                     }
                     else {
-                        if(value == "loop_range"){
+                        if (value == "loop_range") {
                             newcondtions[conditionid][`${label}`]['uniqueID'] = 'loop_range'
                             newcondtions[conditionid][`${label}`][`${event.target.name}`] = 'loop';
                         }
-                        else{
+                        else {
                             newcondtions[conditionid][`${label}`]['uniqueID'] = ''
                             newcondtions[conditionid][`${label}`][`${event.target.name}`] = value;
                         }
                     }
                 }
-                
+
                 if (event.target.value === "hide_multiple" || event.target.value === "show_multiple" || event.target.value === "loop" || event.target.value === "loop_range"
                     || event.target.value === "loop_set" || event.target.value === "hide_range") {
                     delete newcondtions[conditionid].target["handler"];
@@ -755,7 +819,7 @@ class Settings extends React.Component {
      * @param label
      */
 
-    addNewCondtionsMulti(event, drop, property, label, param , loop_range) {
+    addNewCondtionsMulti(event, drop, property, label, param, loop_range) {
         let conditionid = drop.condtion_id;
         let newcondtions = this.state.conditions
         let match = true;
@@ -773,7 +837,7 @@ class Settings extends React.Component {
                 })
             }
             else {
-                let multipleDrops = this.multiList(drop , loop_range);
+                let multipleDrops = this.multiList(drop, loop_range);
                 if (multipleDrops.length > 0) {
                     var startIndex = multipleDrops.findIndex(p => p.value == (this.state.rangeStartElement.length > 0 && this.state.rangeStartElement[0].value));
                     var endIndex = multipleDrops.findIndex(p => p.value == event.value);
@@ -897,9 +961,10 @@ class Settings extends React.Component {
             </div>)
     };
 
-    /* If user selects valuemultipleany or valuemultipleall in target,returns the choice list to the matched value dropdown. */
-    choiceList_release = (conditions, source) => {
+    /* If user selects value multiple any or value multiple all in target,returns the choice list to the matched value dropdown. */
+    choiceList_release = (conditions, source, index) => {
         let handler = source.handler;
+        const selectedOptionsofQue = this.selectedOptionsOfCurrentQue(source, index, conditions.target);
         let selectedChoice = this.props.drops.filter(drop => {
             return handler === drop.handler;
         });
@@ -907,7 +972,34 @@ class Settings extends React.Component {
             return
         } else if (selectedChoice[0].properties.multilevel === 1 && selectedChoice[0].properties.options) {
             let options = [];
-            selectedChoice[0].properties.options.forEach((option, index) => {
+            const matchValues = new Set();
+            selectedOptionsofQue.forEach(item => {
+                if (Array.isArray(item.match_value)) {
+                    item.match_value.forEach(val => {
+                        if (val.label) matchValues.add(val.label);
+                        if (val.value) matchValues.add(val.value);
+                    });
+                } else if (typeof item.match_value === "string") {
+                    matchValues.add(item.match_value);
+                }
+            });
+
+            /** Filter out the option that are already used */
+            const filteredOptions = selectedChoice[0].properties.options
+                .map(parent => {
+                    const filteredSublabels = parent.sublabel.filter(
+                        sub => !matchValues.has(sub.sublabel)
+                    );
+                    if (filteredSublabels.length > 0) {
+                        return {
+                            ...parent,
+                            sublabel: filteredSublabels
+                        };
+                    }
+                    return null;
+                })
+                .filter(Boolean);
+            filteredOptions.forEach((option, index) => {
                 let header = {
                     label: option.label,
                     options: []
@@ -918,17 +1010,31 @@ class Settings extends React.Component {
                     })
                 }
                 options.push(header)
-
             });
             return options
         } else if (selectedChoice[0].properties.options) {
-            let options = [];
-            selectedChoice[0].properties.options.forEach((option, index) => {
-                options.push({ value: option.label, label: option.label, id: option.id });
+            const matchValues = new Set();
+            /** MATCH VALUES of options that are already used in conditions & filtered out from opitions array */
+            selectedOptionsofQue.forEach(item => {
+                if (Array.isArray(item.match_value)) {
+                    item.match_value.forEach(val => {
+                        if (val.label) {
+                            matchValues.add(val.label);
+                        }
+                    });
+                } else {
+                    matchValues.add(item.match_value);
+                }
             });
+            const options = selectedChoice[0].properties.options
+                .filter(item => !matchValues.has(item.label))
+                .map(item => ({
+                    value: item.label,
+                    label: item.label,
+                    id: item.id
+                }));
             return options
         }
-
     };
 
     /* If user selects valuemultipleany or valuemultipleall in target,returns the scale list to the matched value dropdown. */
@@ -963,21 +1069,51 @@ class Settings extends React.Component {
     };
 
     /* If user selects except valuemultipleany or valuemultipleall in target,returns the choice list to the matched value dropdown. */
-    choiceList = (conditions, source) => {
-        let matchVal = source.match_value;
+    choiceList = (conditions, source, index, returnArray, isMount, newcondtions) => {
         let handler = source.handler;
-        let pid = source.p_id
+        const selectedOptionsofQue = this.selectedOptionsOfCurrentQue(source, index, conditions.target, isMount, newcondtions);
         let selectedChoice = this.props.drops.filter(drop => {
             return handler === drop.handler;
         });
         if (selectedChoice === undefined || selectedChoice[0] === undefined) {
             return
         } else if (selectedChoice[0].properties.multilevel === 1 && selectedChoice[0].properties.options) {
-            return selectedChoice[0].properties.options.map((option, index) => (
+            const matchValues = new Set();
+            /** MATCH VALUES of options that are already used in conditions & filtered out from opitions array */
+            selectedOptionsofQue.forEach(item => {
+                if (Array.isArray(item.match_value)) {
+                    item.match_value.forEach(val => {
+                        if (val.label) matchValues.add(val.label);
+                        if (val.value) matchValues.add(val.value);
+                    });
+                } else if (typeof item.match_value === "string") {
+                    matchValues.add(item.match_value);
+                }
+            });
+
+            /** Filter out the option that are already used */
+            const filteredOptions = selectedChoice[0].properties.options
+                .map(parent => {
+                    const filteredSublabels = parent.sublabel.filter(
+                        sub => !matchValues.has(sub.sublabel)
+                    );
+                    if (filteredSublabels.length > 0) {
+                        return {
+                            ...parent,
+                            sublabel: filteredSublabels
+                        };
+                    }
+                    return null;
+                })
+                .filter(Boolean);
+            return returnArray ? filteredOptions : filteredOptions.map((option, index) => (
                 <optgroup key={index} label={option.label}>
                     {option.sublabel
                         ? option.sublabel.map((suboption, subindex) => (
-                            <option key={subindex} selected={((pid !== null && pid === option.id && matchVal === suboption.sublabel) || (pid === null && matchVal === suboption.sublabel)) ? "selected" : ""} value={option.id + "###id##" + suboption.sublabel}>
+                            <option key={subindex}
+                                // selected={((pid !== null && pid === option.id && matchVal === suboption.sublabel) || (!pid && matchVal === suboption.sublabel)) ? "selected" : ""} 
+                                value={option.id + "###id##" + suboption.sublabel}
+                            >
                                 {suboption.sublabel}
                             </option>
                         ))
@@ -985,11 +1121,125 @@ class Settings extends React.Component {
                 </optgroup>
             ));
         } else if (selectedChoice[0].properties.options) {
-            return selectedChoice[0].properties.options.map((option, index) => (
-                <option key={index} selected={matchVal === option.label ? "selected" : ""} value={option.label}>
+            const matchValues = new Set();
+
+            /** MATCH VALUES of options that are already used in conditions & filtered out from opitions array */
+            selectedOptionsofQue.forEach(item => {
+                if (Array.isArray(item.match_value)) {
+                    item.match_value.forEach(val => {
+                        if (val.label) {
+                            matchValues.add(val.label);
+                        }
+                    });
+                } else {
+                    matchValues.add(item.match_value);
+                }
+            });
+            const options = selectedChoice[0].properties.options.filter(item => !matchValues.has(item.label));
+            return returnArray ? options : options.map((option, index) => (
+                <option key={index}
+                    // selected={matchVal === option.label ? "selected" : false} //commented to solve while changing state option remaining selected
+                    value={option.label}
+                >
                     {option.label}
                 </option>
             ));
+        }
+    };
+
+    /** Check if any other condition has same source handler with "source.handler" and returns boolean (Only for is empty / is filled) */
+    optionValidation = (option, source, target, index) => {
+        let _return = true;
+        let filtered_target = [];
+        const filtered_source = this.state.conditions.filter((item, id) => id !== index).map((m_item) => {
+            filtered_target.push(m_item)
+            return m_item.source[0]
+        })
+        for (let i = 0; i < filtered_source.length; i++) {
+            if (filtered_source[i] && filtered_source[i].handler == source.handler && filtered_source[i].state == option) {
+                _return = false
+            }
+        }
+        // const filter_unmatch = filtered_target.filter((item)=>item.target.handler !== target.handler);
+        const filter_match = filtered_target.filter((item) => item.target.handler == target.handler);
+        const find_ = filter_match.find((item) => item.target.handler == target.handler)
+        if (find_ && find_.source[0].state == option) {
+            _return = false;
+        } else _return = true
+        return _return;
+    };
+
+    /** return selected option value of choice question */
+    checkMultiLevel = (source, drop, index) => {
+        let matchVal = source.match_value;
+        let pid = source.p_id;
+        let return_val = "";
+        let selectedChoice = this.props.drops.filter(drop => {
+            return source.handler === drop.handler;
+        });
+        const _options = this.choiceList(drop, source, index, true);
+        if (selectedChoice.length > 0 && selectedChoice[0].properties.multilevel === 1 && selectedChoice[0].properties.options) {
+            for (let s = 0; s < selectedChoice[0].properties.options.length; s++) {
+                const option = selectedChoice[0].properties.options[s];
+                const _id = s;
+                if (option.sublabel) {
+                    option.sublabel.map((suboption, subindex) => {
+                        const checkSame = _options && _options[_id].sublabel && _options[_id].sublabel.find((_sub) => _sub.sublabel == source.match_value);
+                        const condition = (pid !== null && pid === option.id && matchVal === suboption.sublabel) || (!pid && matchVal === suboption.sublabel);
+                        if (condition) {
+                            return_val = checkSame ? option.id + "###id##" + suboption.sublabel : "";
+                        }
+                    })
+                }
+            }
+        }
+        else {
+            const find_ = _options && _options.find((item) => item.label == source.match_value);
+            return_val = find_ ? source.match_value : ""
+        }
+        return return_val;
+    };
+
+    /** Selected options but with conditions of state (equal , not equal etc.) and target.do (hide , show etc.) */
+    selectedOptionsOfCurrentQue = (source, index, currentTarget, isMount, newcondtions) => {
+        let conditions = this.state.conditions;
+        if (isMount) {
+            conditions = newcondtions
+        }
+        /** Check if param current target has targeted multifield or not */
+        const isTargetMultifield = currentTarget.hasOwnProperty("multifield") && currentTarget.multifield.length > 0 ? true : false;
+        if (isTargetMultifield) {
+            return conditions
+                .filter((item, id) => {
+                    /** Check if item has targeted multifield or not */
+                    const isItemMultifield = item.target.hasOwnProperty("multifield") && item.target.multifield.length > 0 ? true : false;
+                    const firstValues = new Set(currentTarget.multifield.map(item => item.value));
+                    let secondValues = [];
+                    if (isItemMultifield) {
+                        secondValues = item.target.multifield.map(item => item.value);
+                    } else {
+                        secondValues = [item.target.handler];
+                    }
+                    const commonValues = secondValues.filter(value => id !== index && firstValues.has(value));
+                    return id !== index
+                        && item.source.length > 0 && item.source[0].handler == source.handler
+                        && source.state == item.source[0].state
+                        && commonValues && commonValues.length > 0
+                }).map((m_item) => { return m_item.source[0] })
+        }
+        else {
+            return conditions
+                .filter((item, id) => {
+
+                    /** Check if item has targeted multifield or not */
+                    const isItemMultifield = item.target.hasOwnProperty("multifield") && item.target.multifield.length > 0 ? true : false;
+                    return id !== index
+                        && item.source.length > 0 && item.source[0].handler == source.handler
+                        && source.state == item.source[0].state
+                        && (isItemMultifield
+                            ? item.target.multifield.find((t_item) => t_item.value == currentTarget.handler)
+                            : item.target.handler == currentTarget.handler)
+                }).map((m_item) => { return m_item.source[0] })
         }
     };
 
@@ -1108,7 +1358,7 @@ class Settings extends React.Component {
     }
 
     /* If user selects hidemultiple/showmultiple in the do list, user can able to select multiple question in the field list. */
-    multiList = (conditions , loop_range) => {
+    multiList = (conditions, loop_range, from) => {
         let fields = []
         if (conditions.source && conditions.source.length > 0) {
             this.props.drops.forEach(drop => {
@@ -1127,6 +1377,9 @@ class Settings extends React.Component {
             this.props.drops.forEach(drop => {
                 fields.push({ label: drop.label, value: drop.handler });
             });
+        }
+        if (from !== "show_multiple" || loop_range) {
+            fields.pop();
         }
         return fields
     }
@@ -1180,6 +1433,7 @@ class Settings extends React.Component {
                 }
             });
         }
+        multifields.pop();
         return multifields
     }
     onDragEnd(result) {
@@ -1305,7 +1559,7 @@ class Settings extends React.Component {
                                                                                 {this.state.conditions[index].target.do === "loop_set" ?
                                                                                     <div className="label-part">No.of Loops</div> :
                                                                                     this.state.conditions[index].target.uniqueID === "hide_range" ||
-                                                                                    this.state.conditions[index].target.uniqueID === "loop_range" ?
+                                                                                        this.state.conditions[index].target.uniqueID === "loop_range" ?
                                                                                         <div className="label-part">From Field</div> :
                                                                                         this.state.conditions[index].target.do === "release" ?
                                                                                             <div className="label-part">Project</div> :
@@ -1331,7 +1585,7 @@ class Settings extends React.Component {
                                                                                                 <Select
                                                                                                     isMulti
                                                                                                     name="multifield"
-                                                                                                    options={this.multiList(drop)}
+                                                                                                    options={this.multiList(drop, false, this.state.conditions[index].target.do)}
                                                                                                     closeMenuOnSelect={false}
                                                                                                     value={drop.target.multifield}
                                                                                                     className="basic-multi-select"
@@ -1348,7 +1602,7 @@ class Settings extends React.Component {
                                                                                                         }}
                                                                                                         isMulti={false}
                                                                                                         name="FromField"
-                                                                                                        options={this.multiList(drop)}
+                                                                                                        options={this.multiList(drop, false, this.state.conditions[index].target.do)}
                                                                                                         value={drop.target.multifield && drop.target.multifield[0]}
                                                                                                         className="basic-single"
                                                                                                         classNamePrefix="select"
@@ -1367,7 +1621,7 @@ class Settings extends React.Component {
                                                                                                         />
                                                                                                         :
                                                                                                         this.state.conditions[index].target.do && this.state.conditions[index].target.do === "loop" && this.state.conditions[index].target.uniqueID !== "loop_range"
-                                                                                                        ? <Select
+                                                                                                            ? <Select
                                                                                                                 isMulti
                                                                                                                 name="multifield"
                                                                                                                 options={this.loopset(index, 'loop')}
@@ -1378,54 +1632,54 @@ class Settings extends React.Component {
                                                                                                                 onBlur={e => this.change_field_order(e, drop, index, "multifield", "target")}
                                                                                                                 onChange={e => this.addNewCondtionsMulti(e, drop, "multifield", "target")}
                                                                                                             />
-                                                                                                        :
-                                                                                                        this.state.conditions[index].target.do && this.state.conditions[index].target.do === "loop" && this.state.conditions[index].target.uniqueID === "loop_range"
-                                                                                                            ? <Select
-                                                                                                                styles={{
-                                                                                                                    control: (baseStyles, state) => ({
-                                                                                                                        ...baseStyles,
-                                                                                                                        fontSize: 14,
-                                                                                                                    }),
-                                                                                                                }}
-                                                                                                                isMulti={false}
-                                                                                                                name="FromField"
-                                                                                                                options={this.loopset(index, 'loop')}
-                                                                                                                // options={this.multiList(drop)}
-                                                                                                                value={drop.target.multifield && drop.target.multifield[0]}
-                                                                                                                className="basic-single"
-                                                                                                                classNamePrefix="select"
-                                                                                                                onChange={e => this.addNewCondtionsMulti(e, drop, "multifield", "target", "FromField" , "loop_range")}
-                                                                                                            />
-                                                                                                            : this.state.conditions[index].target.do === "loop_input"
-                                                                                                                ?
-                                                                                                                <Select
-                                                                                                                    isMulti
-                                                                                                                    name="multifield"
-                                                                                                                    options={this.loopset(index, 'loop_input')}
-                                                                                                                    closeMenuOnSelect={false}
-                                                                                                                    value={drop.target.multifield}
-                                                                                                                    className="basic-multi-select"
+                                                                                                            :
+                                                                                                            this.state.conditions[index].target.do && this.state.conditions[index].target.do === "loop" && this.state.conditions[index].target.uniqueID === "loop_range"
+                                                                                                                ? <Select
+                                                                                                                    styles={{
+                                                                                                                        control: (baseStyles, state) => ({
+                                                                                                                            ...baseStyles,
+                                                                                                                            fontSize: 14,
+                                                                                                                        }),
+                                                                                                                    }}
+                                                                                                                    isMulti={false}
+                                                                                                                    name="FromField"
+                                                                                                                    options={this.loopset(index, 'loop')}
+                                                                                                                    // options={this.multiList(drop)}
+                                                                                                                    value={drop.target.multifield && drop.target.multifield[0]}
+                                                                                                                    className="basic-single"
                                                                                                                     classNamePrefix="select"
-                                                                                                                    onBlur={e => this.change_field_order(e, drop, index, "multifield", "target")}
-                                                                                                                    onChange={e => this.addNewCondtionsMulti(e, drop, "multifield", "target")}
+                                                                                                                    onChange={e => this.addNewCondtionsMulti(e, drop, "multifield", "target", "FromField", "loop_range")}
                                                                                                                 />
-                                                                                                                :
-                                                                                                                this.state.conditions[index].target.do === "release"
+                                                                                                                : this.state.conditions[index].target.do === "loop_input"
                                                                                                                     ?
-                                                                                                                    <select
-                                                                                                                        className="form-control"
-                                                                                                                        name="project"
-                                                                                                                        onChange={e => this.addNewCondtions(e, drop, "project")}>
-                                                                                                                        <option value="" disabled selected>
-                                                                                                                            Select your option</option>
-                                                                                                                        {this.state.projects.map((subdrop, index) => (
-                                                                                                                            <option key={index} selected={drop.target.project === subdrop.value ? "selected" : ""} value={subdrop.value}>
-                                                                                                                                {subdrop.label}
-                                                                                                                            </option>
-                                                                                                                        ))}
-                                                                                                                    </select>
+                                                                                                                    <Select
+                                                                                                                        isMulti
+                                                                                                                        name="multifield"
+                                                                                                                        options={this.loopset(index, 'loop_input')}
+                                                                                                                        closeMenuOnSelect={false}
+                                                                                                                        value={drop.target.multifield}
+                                                                                                                        className="basic-multi-select"
+                                                                                                                        classNamePrefix="select"
+                                                                                                                        onBlur={e => this.change_field_order(e, drop, index, "multifield", "target")}
+                                                                                                                        onChange={e => this.addNewCondtionsMulti(e, drop, "multifield", "target")}
+                                                                                                                    />
                                                                                                                     :
-                                                                                                                    null
+                                                                                                                    this.state.conditions[index].target.do === "release"
+                                                                                                                        ?
+                                                                                                                        <select
+                                                                                                                            className="form-control"
+                                                                                                                            name="project"
+                                                                                                                            onChange={e => this.addNewCondtions(e, drop, "project")}>
+                                                                                                                            <option value="" disabled selected>
+                                                                                                                                Select your option</option>
+                                                                                                                            {this.state.projects.map((subdrop, index) => (
+                                                                                                                                <option key={index} selected={drop.target.project === subdrop.value ? "selected" : ""} value={subdrop.value}>
+                                                                                                                                    {subdrop.label}
+                                                                                                                                </option>
+                                                                                                                            ))}
+                                                                                                                        </select>
+                                                                                                                        :
+                                                                                                                        null
                                                                                     }
                                                                                 </div>
                                                                             </div>
@@ -1519,7 +1773,7 @@ class Settings extends React.Component {
                                                                                             }),
                                                                                         }}
                                                                                         name="ToField"
-                                                                                        options={this.multiList(drop)}
+                                                                                        options={this.multiList(drop, false, this.state.conditions[index].target.do)}
                                                                                         value={drop.target.multifield && drop.target.multifield[drop.target.multifield.length - 1] || ""}
                                                                                         className="basic-single"
                                                                                         classNamePrefix="select"
@@ -1549,7 +1803,7 @@ class Settings extends React.Component {
                                                                                         value={drop.target.multifield && drop.target.multifield[drop.target.multifield.length - 1] || ""}
                                                                                         className="basic-single"
                                                                                         classNamePrefix="select"
-                                                                                        onChange={e => this.addNewCondtionsMulti(e, drop, "multifield", "target", "ToField" , "loop_range")}
+                                                                                        onChange={e => this.addNewCondtionsMulti(e, drop, "multifield", "target", "ToField", "loop_range")}
                                                                                     />
                                                                                 </div>
                                                                             </div>
@@ -1695,12 +1949,16 @@ class Settings extends React.Component {
                                                                                             <option selected={source.state === "notequal" ? "selected" : ""} value="notequal">
                                                                                                 Is Not Equal to
                                                                                             </option>
-                                                                                            <option selected={source.state === "empty" ? "selected" : ""} value="empty">
-                                                                                                Is Empty
-                                                                                            </option>
-                                                                                            <option selected={source.state === "filled" ? "selected" : ""} value="filled">
-                                                                                                Is Filled
-                                                                                            </option>
+                                                                                            {this.optionValidation("empty", drop.source[0], drop.target, index) &&
+                                                                                                <option selected={source.state === "empty" ? "selected" : ""} value="empty">
+                                                                                                    Is Empty
+                                                                                                </option>
+                                                                                            }
+                                                                                            {this.optionValidation("filled", drop.source[0], drop.target, index) &&
+                                                                                                <option selected={source.state === "filled" ? "selected" : ""} value="filled">
+                                                                                                    Is Filled
+                                                                                                </option>
+                                                                                            }
                                                                                         </select>
                                                                                     </div>
                                                                                 </div>
@@ -2070,11 +2328,16 @@ class Settings extends React.Component {
                                                                                                             <div className="form-group clear clearfix">
                                                                                                                 <div className="label-part">Value</div>
                                                                                                                 <div className="ans-part">
-                                                                                                                    <select className="form-control" name="match_value" onChange={e => this.addNewCondtions(e, drop, "source", idx)}>
+                                                                                                                    <select
+                                                                                                                        value={this.checkMultiLevel(source, drop, index) || ""}
+                                                                                                                        className="form-control"
+                                                                                                                        name="match_value"
+                                                                                                                        onChange={e => this.addNewCondtions(e, drop, "source", idx)}
+                                                                                                                    >
                                                                                                                         <option value="" disabled selected>
                                                                                                                             Select your option
                                                                                                                         </option>
-                                                                                                                        {this.choiceList(drop, source)}
+                                                                                                                        {this.choiceList(drop, source, index)}
                                                                                                                     </select>
                                                                                                                 </div>
                                                                                                             </div>
@@ -2118,7 +2381,7 @@ class Settings extends React.Component {
                                                                                                                             <div className="ans-part">
                                                                                                                                 <Select
                                                                                                                                     name="match_value"
-                                                                                                                                    options={this.choiceList_release(drop, source)}
+                                                                                                                                    options={this.choiceList_release(drop, source, index)}
                                                                                                                                     isMulti
                                                                                                                                     isClearable
                                                                                                                                     formatGroupLabel={this.formatGroupLabel}
