@@ -1697,6 +1697,14 @@ class CreateSurvey extends React.Component {
                             if (lastcondition.source[j].target === "field" && (lastcondition.source[j].matchid === "" || (!lastcondition.source[j].matchid))) {
                                 validatecheck.push(validatecheck.length)
                             }
+                            if(lastcondition.source[j].source_type == "choice" || lastcondition.source[j].source_type == "scale"){
+                                if (lastcondition.source[j].target === "Value_Multiple_Any" && ((!lastcondition.source[j].match_value) || lastcondition.source[j].match_value && lastcondition.source[j].match_value.length == 0)) {
+                                    validatecheck.push(validatecheck.length)
+                                }
+                                if (lastcondition.source[j].target === "Value_Multiple_All" && ((!lastcondition.source[j].match_value) || lastcondition.source[j].match_value && lastcondition.source[j].match_value.length == 0)) {
+                                    validatecheck.push(validatecheck.length)
+                                }
+                            }
                         }
                     }
 
