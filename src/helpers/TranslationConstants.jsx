@@ -11,6 +11,7 @@ export const Language_support = [
     { label: "Bosnian", value: "bs" },
     { label: "Bulgarian", value: "bg" },
     { label: "Catalan", value: "ca" },
+    { label: "Cantonese", value: "yue" },
     { label: "Cebuano", value: "ceb" },
     { label: "Chinese", value: "zh" },
     { label: "Corsican", value: "co" },
